@@ -1,14 +1,14 @@
-# TT-BUDA Installation
+# TT-Buda Installation
 
 ## Overview
 
-The TT-BUDA software stack can compile models from several different frameworks and execute them in many different ways on Tenstorrent hardware.
+The TT-Buda software stack can compile models from several different frameworks and execute them in many different ways on Tenstorrent hardware.
 
 This user guide is intended to help you setup your system with the appropriate device drivers, firmware, system dependencies, and compiler / runtime software.
 
 **Note on terminology:**
 
-While TT-BUDA is the official Tenstorrent AI/ML compiler stack, PyBUDA is the Python interface for TT-BUDA. TT-BUDA is the core technology; however, PyBUDA allows users to access and utilize TT-BUDA's features directly from Python. This includes directly importing model architectures and weights from PyTorch, TensorFlow, ONNX, and TFLite.
+While TT-Buda is the official Tenstorrent AI/ML compiler stack, PyBuda is the Python interface for TT-Buda. TT-Buda is the core technology; however, PyBuda allows users to access and utilize TT-Buda's features directly from Python. This includes directly importing model architectures and weights from PyTorch, TensorFlow, ONNX, and TFLite.
 
 ### OS Compatibility
 
@@ -16,7 +16,7 @@ Presently, Tenstorrent software is only supported on the **Ubuntu 20.04 LTS (Foc
 
 ## Release Versions
 
-To access the PyBUDA software and associated files, please navigate to the [Releases](https://github.com/tenstorrent/tt-buda/releases) section of this repository.
+To access the PyBuda software and associated files, please navigate to the [Releases](https://github.com/tenstorrent/tt-Buda/releases) section of this repository.
 
 Once you have identified the release version you would like to install, you can download the individual files by clicking on their name.
 
@@ -35,11 +35,11 @@ Once you have identified the release version you would like to install, you can 
 
 ## Installation Instructions
 
-PyBUDA can be installed using two methods: Docker or Python virtualenv.
+PyBuda can be installed using two methods: Docker or Python virtualenv.
 
-If you would like to run PyBUDA in a Docker container, then follow the instructions for [PCI Driver Installation](#pci-driver-installation) and [Device Firmware Update](#device-firmware-update) and followed by [Docker Container Installation](#docker-container-installation).
+If you would like to run PyBuda in a Docker container, then follow the instructions for [PCI Driver Installation](#pci-driver-installation) and [Device Firmware Update](#device-firmware-update) and followed by [Docker Container Installation](#docker-container-installation).
 
-If you would like to run PyBUDA in a Python virtualenv, then follow the instructions for the [Setup HugePages](#setup-hugepages), [PCI Driver Installation](#pci-driver-installation), [Device Firmware Update](#device-firmware-update), and [Backend Compiler Dependencies](#backend-compiler-dependencies), followed by the [Tenstorrent Software Package](#tenstorrent-software-package).
+If you would like to run PyBuda in a Python virtualenv, then follow the instructions for the [Setup HugePages](#setup-hugepages), [PCI Driver Installation](#pci-driver-installation), [Device Firmware Update](#device-firmware-update), and [Backend Compiler Dependencies](#backend-compiler-dependencies), followed by the [Tenstorrent Software Package](#tenstorrent-software-package).
 
 ### Setup HugePages
 
@@ -78,17 +78,17 @@ Please navigate to [tt-smi](https://github.com/tenstorrent/tt-smi).
 
 ### Tenstorrent Software Package
 
-The directory contains instructions to install the PyBUDA and TVM software stack. This package consists of the following files:
+The directory contains instructions to install the PyBuda and TVM software stack. This package consists of the following files:
 
 ```bash
-pybuda-<version>.whl   <- Latest PyBUDA Release
+pyBuda-<version>.whl   <- Latest PyBuda Release
 tvm-<version>.whl      <- Latest TVM Release
 ```
 
 ### Python Environment Installation
 
-It is strongly recommended to use virtual environments for each project utilizing PyBUDA and
-Python dependencies. Creating a new virtual environment with PyBUDA and libraries is very easy.
+It is strongly recommended to use virtual environments for each project utilizing PyBuda and
+Python dependencies. Creating a new virtual environment with PyBuda and libraries is very easy.
 
 #### Step 1. Navigate to [Releases](https://github.com/tenstorrent/tt-buda/releases)
 
@@ -114,7 +114,7 @@ pip install pybuda-<version>.whl tvm-<version>.whl
 
 ### Docker Container Installation
 
-Alternatively, PyBUDA and its dependencies are provided as Docker images which can run in separate containers.
+Alternatively, PyBuda and its dependencies are provided as Docker images which can run in separate containers.
 
 #### Step 1. Setup a personal access token (classic)
 
@@ -148,7 +148,7 @@ cd home/
 
 ### Smoke Test
 
-With your Python environment with PyBUDA install activated, run the following Python script:
+With your Python environment with PyBuda install activated, run the following Python script:
 
 ```python
 import pybuda
@@ -170,7 +170,7 @@ class PyTorchTestModule(torch.nn.Module):
 def test_module_direct_pytorch():
     input1 = torch.rand(4, 32, 32)
     input2 = torch.rand(4, 32, 32)
-    # Run single inference pass on a PyTorch module, using a wrapper to convert to PyBUDA first
+    # Run single inference pass on a PyTorch module, using a wrapper to convert to PyBuda first
     output = pybuda.PyTorchModule("direct_pt", PyTorchTestModule()).run(input1, input2)
     print(output)
     print("PyBuda installation was a success!")
