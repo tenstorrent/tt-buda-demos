@@ -43,6 +43,6 @@ We keep a running FAQ & troubleshoot guide to help you quickly resolve some of t
 
 ## Communication
 
-If you would like to formally propose a new feature, report a bug, or have issues with permissions, please file through [GitHub issues](https://github.com/tenstorrent/tt-buda-demos/issues).
+If you would like to formally propose a new feature, report a bug, or have issues with permissions, please file through [GitHub issues](../../issues).
 
 Please access the [Discord community](https://discord.gg/xUHw4tMcRV) forum for updates, tips, live troubleshooting support, and more!
