@@ -25,7 +25,7 @@ def run_resnet_timm():
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
 
     # Load data sample
-    url = "https://datasets-server.huggingface.co/assets/imagenet-1k/--/default/train/18/image/image.jpg"
+    url = "https://images.rawpixel.com/image_1300/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA1L3BkMTA2LTA0Ny1jaGltXzEuanBn.jpg"
     image = Image.open(requests.get(url, stream=True).raw).convert("RGB")
     label = "tiger"
 
