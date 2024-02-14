@@ -35,7 +35,6 @@ def run_xception_timm(variant="xception"):
             compiler_cfg.balancer_policy = "Ribbon"
     os.environ["PYBUDA_RIBBON2"] = "1"
     os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
-    compiler_cfg.default_dram_parameters = False
 
     model_name = variant
     model = timm.create_model(model_name, pretrained=True)

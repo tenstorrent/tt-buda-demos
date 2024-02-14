@@ -7,6 +7,7 @@ import pybuda
 import requests
 import timm
 import torch
+import os
 from PIL import Image
 from pybuda._C.backend_api import BackendDevice
 from timm.data import resolve_data_config
