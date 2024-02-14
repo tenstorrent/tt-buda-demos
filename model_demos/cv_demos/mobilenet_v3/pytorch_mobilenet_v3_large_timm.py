@@ -6,6 +6,7 @@ import pybuda
 import requests
 import timm
 import torch
+import os
 from PIL import Image
 from timm.data import resolve_data_config
 from timm.data.transforms_factory import create_transform
@@ -16,8 +17,8 @@ def run_mobilenetv3_large_timm():
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "Ribbon"
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
+    os.environ["PYBUDA_LEGACY_KERNEL_BROADCAST"] = "1"
 
     # Create PyBuda module from PyTorch model
     # model = timm.create_model('mobilenetv3_large_100', pretrained=True)

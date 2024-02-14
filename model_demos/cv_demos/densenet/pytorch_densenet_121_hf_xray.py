@@ -43,7 +43,6 @@ def run_densenet_121_hf_xray_pytorch():
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
-    compiler_cfg.enable_t_streaming = True
     # Fallbacks to CPU output normalization of the model. Contains problematic indexing which cause dynamic shapes in model, thus, doing this on host.
     compiler_cfg.enable_tm_cpu_fallback = True
     # Does constant prop on TVM side

@@ -15,7 +15,6 @@ def run_beit_classify_224_hf_pytorch(variant="microsoft/beit-base-patch16-224"):
     compiler_cfg = pybuda.config._get_global_compiler_config()
     available_devices = pybuda.detect_available_devices()
 
-    compiler_cfg.enable_t_streaming = True
     if variant == "microsoft/beit-base-patch16-224":
         compiler_cfg.retain_tvm_python_files = True
         compiler_cfg.enable_tvm_constant_prop = True

@@ -18,7 +18,6 @@ def run_vit_classify_224_hf_pytorch_1x1(variant="google/vit-base-patch16-224"):
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.default_df_override = pybuda._C.DataFormat.Float16_b
     compiler_cfg.balancer_policy = "Ribbon"
 

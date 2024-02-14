@@ -13,7 +13,6 @@ def run_whisper_generation(variant="openai/whisper-small"):
 
     # PyBuda configurations
     compiler_cfg = pybuda.config._get_global_compiler_config()
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.enable_auto_fusing = False
     compiler_cfg.amp_level = 2
     compiler_cfg.enable_enumerate_u_kt = False
