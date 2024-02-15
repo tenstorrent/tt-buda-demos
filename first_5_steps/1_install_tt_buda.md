@@ -137,7 +137,7 @@ sudo docker pull ghcr.io/tenstorrent/tt-buda/<TAG>
 #### Step 4. Run the container
 
 ```bash
-sudo docker run --rm -ti --shm-size=4g --device /dev/tenstorrent -v /dev/hugepages-1G:/dev/hugepages-1G -v `pwd`/:/home/ ghcr.io/tenstorrent/tt-buda/<TAG> bash
+sudo docker run --rm -ti --cap-add=sys_nice --shm-size=4g --device /dev/tenstorrent -v /dev/hugepages-1G:/dev/hugepages-1G -v `pwd`/:/home/ ghcr.io/tenstorrent/tt-buda/<TAG> bash
 ```
 
 #### Step 5. Change root directory
