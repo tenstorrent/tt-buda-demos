@@ -15,7 +15,6 @@ from cv_demos.yolo_v5.utils.processing import data_postprocessing, data_preproce
 def run_pytorch_yolov5_320(variant="yolov5s"):
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "Ribbon"
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.enable_tm_cpu_fallback = False
     compiler_cfg.enable_conv_prestride = True
     compiler_cfg.enable_tvm_constant_prop = True

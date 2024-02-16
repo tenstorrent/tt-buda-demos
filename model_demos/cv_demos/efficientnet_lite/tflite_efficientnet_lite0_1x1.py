@@ -22,7 +22,6 @@ def run_efficientnet_lite0_1x1():
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "Ribbon"
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.enable_tvm_constant_prop = True
     compiler_cfg.graph_solver_self_cut_type = "FastCut"
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16

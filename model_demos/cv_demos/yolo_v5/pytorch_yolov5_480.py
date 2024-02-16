@@ -17,7 +17,6 @@ def run_pytorch_yolov5_480(variant="yolov5s"):
     # Set PyBUDA configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "Ribbon"
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.enable_tm_cpu_fallback = True
     os.environ["PYBUDA_DECOMPOSE_SIGMOID"] = "1"
     os.environ["PYBUDA_LEGACY_UBLOCK_SHAPE"] = "1"

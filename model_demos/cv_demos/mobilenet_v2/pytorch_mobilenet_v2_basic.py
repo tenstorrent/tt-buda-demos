@@ -20,7 +20,6 @@ def run_mobilenetv2_basic():
             compiler_cfg.default_df_override = pybuda._C.DataFormat.Float16_b
         elif available_devices[0] == BackendDevice.Grayskull:
             compiler_cfg.balancer_policy = "CNN"
-    compiler_cfg.enable_t_streaming = True
 
     # STEP 2: Create PyBuda module from PyTorch model
     model = torch.hub.load("pytorch/vision:v0.10.0", "mobilenet_v2", pretrained=True)

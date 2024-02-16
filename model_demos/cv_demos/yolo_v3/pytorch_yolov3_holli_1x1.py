@@ -20,7 +20,6 @@ def run_yolov3_holli_pytorch_1x1():
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "Ribbon"
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.default_df_override = pybuda._C.Float16_b
 
     # Device specific configurations

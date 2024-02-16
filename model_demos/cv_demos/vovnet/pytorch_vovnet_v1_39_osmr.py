@@ -34,13 +34,7 @@ def run_vovnet_v1_39_osmr_pytorch():
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "CNN"
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
-
-    available_devices = pybuda.detect_available_devices()
-    if available_devices:
-        if available_devices[0] == BackendDevice.Grayskull:
-            os.environ["PYBUDA_FORCE_EMULATE_HARVESTED"] = "1"
 
     # Create PyBuda module from PyTorch model
     model = ptcv_get_model("vovnet39", pretrained=True)

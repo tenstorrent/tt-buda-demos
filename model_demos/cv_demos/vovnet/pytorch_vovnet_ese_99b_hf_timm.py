@@ -6,9 +6,11 @@ import pybuda
 import requests
 import timm
 import torch
+import os
 from PIL import Image
 from timm.data import resolve_data_config
 from timm.data.transforms_factory import create_transform
+from pybuda._C.backend_api import BackendDevice
 
 # Source
 # https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/vovnet.py
@@ -37,9 +39,12 @@ def run_vovnet_ese_99b_timm_pytorch():
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "CNN"
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.enable_auto_fusing = False
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
+
+    available_devices = pybuda.detect_available_devices()
+    if available_devices and available_devices[0] == BackendDevice.Grayskull:
+        os.environ["PYBUDA_LEGACY_KERNEL_BROADCAST"] = "1"
 
     # Create PyBuda module from PyTorch model
     tt_model = pybuda.PyTorchModule(model_name + "_pt", model)
