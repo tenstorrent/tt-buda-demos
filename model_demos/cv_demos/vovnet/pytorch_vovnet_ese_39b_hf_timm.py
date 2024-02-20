@@ -40,7 +40,6 @@ def run_vovnet_ese_39b_timm_pytorch():
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "CNN"
-    compiler_cfg.enable_auto_fusing = False
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
     compiler_cfg.default_dram_parameters = False
     os.environ["PYBUDA_RIBBON2"] = "1"
