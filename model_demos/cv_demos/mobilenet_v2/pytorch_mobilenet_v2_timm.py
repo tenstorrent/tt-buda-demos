@@ -12,6 +12,7 @@ from PIL import Image
 from pybuda._C.backend_api import BackendDevice
 from timm.data import resolve_data_config
 from timm.data.transforms_factory import create_transform
+from pybuda._C.backend_api import BackendDevice
 
 
 def run_mobilenetv2_timm():
