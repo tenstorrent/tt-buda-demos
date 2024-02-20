@@ -18,11 +18,9 @@ def run_opt_question_answering(variant="facebook/opt-350m"):
     # on a downstream task. Code is for demonstration purposes only.
     model_ckpt = variant
 
-    if model_ckpt == "facebook/opt-1.3b" or model_ckpt == "facebook/opt-350m":
-        compiler_cfg.enable_auto_fusing = False
-        if model_ckpt == "facebook/opt-1.3b":
-            compiler_cfg.default_df_override = pybuda.DataFormat.Float16
-            os.environ["PYBUDA_FORCE_SEQUENTIAL"] = "1"
+    if model_ckpt == "facebook/opt-1.3b":
+        compiler_cfg.default_df_override = pybuda.DataFormat.Float16
+        os.environ["PYBUDA_FORCE_SEQUENTIAL"] = "1"
 
     tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
     model = OPTForQuestionAnswering.from_pretrained(model_ckpt, torchscript=True)
