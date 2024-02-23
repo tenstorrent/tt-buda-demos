@@ -81,7 +81,7 @@ Please navigate to [tt-smi](https://github.com/tenstorrent/tt-smi).
 The directory contains instructions to install the PyBuda and TVM software stack. This package consists of the following files:
 
 ```bash
-pyBuda-<version>.whl   <- Latest PyBuda Release
+pybuda-<version>.whl   <- Latest PyBuda Release
 tvm-<version>.whl      <- Latest TVM Release
 ```
 
