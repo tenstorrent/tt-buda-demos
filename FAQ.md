@@ -4,7 +4,6 @@
 
 If you encounter a situation where a Tenstorrent chip appears to be unresponsive or is exhibiting unusual behavior, a software reset of the board might be a viable solution.
 
-For Grayskull: `tt-smi -tr all`
 
 For a software reset on a single chip use : `tt-smi -lr 0` .
 
