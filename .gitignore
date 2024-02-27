@@ -6,8 +6,16 @@
 __pycache__
 *egg-info
 
+
 # Virtual Environment
-env
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
 
 # Output Files
 *netlist.yaml
@@ -20,3 +28,9 @@ generated_modules/
 *.json
 *.pt
 archive/
+
+
+#  Ignore installable whl files and folders
+{pybuda-,tvm-}*.whl
+
+
