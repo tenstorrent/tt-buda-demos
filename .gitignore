@@ -31,6 +31,6 @@ archive/
 
 
 #  Ignore installable whl files and folders
-{pybuda-,tvm-}*.whl
+*.whl
 
 
