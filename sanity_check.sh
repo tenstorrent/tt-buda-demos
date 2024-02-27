@@ -60,6 +60,7 @@ if [ $? -eq 0 ]; then
     echo -e "${GREEN}1. Setup HugePages: OK${NC}"
 else
     echo -e "${RED}1. Setup HugePages: Not properly configured${NC}"
+    FAILED_CHECKS+=("1. Setup HugePages")
 fi
 CURRENT_STEP=$((CURRENT_STEP + 1))
 print_progress
@@ -69,6 +70,7 @@ if command_exists lsmod && lsmod | grep "$LSMOD_GREP" >/dev/null 2>&1; then
     echo -e "${GREEN}2. PCI Driver Installation: OK${NC}"
 else
     echo -e "${RED}2. PCI Driver Installation: Not installed${NC}"
+    FAILED_CHECKS+=("2. PCI Driver Installation")
 fi
 CURRENT_STEP=$((CURRENT_STEP + 1))
 print_progress
@@ -79,6 +81,7 @@ if command_exists "$RUSTUP_COMMAND" && \
     echo -e "${GREEN}3. Device Firmware Update: OK${NC}"
 else
     echo -e "${RED}3. Device Firmware Update: Not installed${NC}"
+    FAILED_CHECKS+=("3. Device Firmware Update")
 fi
 CURRENT_STEP=$((CURRENT_STEP + 1))
 print_progress
@@ -97,6 +100,7 @@ if [ ${#missing_packages[@]} -eq 0 ]; then
 else
     echo -e "${RED}4. Packages are not installed correctly${NC}"
     echo -e "${RED}Missing packages: ${missing_packages[@]}${NC}"
+    FAILED_CHECKS+=("4. Packages Installation")
 fi
 CURRENT_STEP=$((CURRENT_STEP + 1))
 print_progress
@@ -106,6 +110,7 @@ if command_exists "$TT_SMI_COMMAND" && "$TT_SMI_COMMAND" "$TT_SMI_HELP_ARG" >/de
     echo -e "${GREEN}5. TT-SMI Installation: OK${NC}"
 else
     echo -e "${RED}5. TT-SMI Installation: Not installed${NC}"
+    FAILED_CHECKS+=("5. TT-SMI Installation")
 fi
 CURRENT_STEP=$((CURRENT_STEP + 1))
 print_progress
@@ -115,6 +120,7 @@ if command_exists "$TT_FLASH_COMMAND" && "$TT_FLASH_COMMAND" "$TT_FLASH_HELP_ARG
     echo -e "${GREEN}6. TT-Flash Installation: OK${NC}"
 else
     echo -e "${RED}6. TT-Flash Installation: Not installed${NC}"
+    FAILED_CHECKS+=("6. TT-Flash Installation")
 fi
 CURRENT_STEP=$((CURRENT_STEP + 1))
 print_progress
@@ -124,13 +130,20 @@ if command_exists "$PYTHON_COMMAND" && "$PYTHON_COMMAND" -c "$PYBUDA_IMPORT_CHEC
     echo -e "${GREEN}7. PyBuda installation : OK${NC}"
 else
     echo -e "${RED}7. PyBuda Installation: Not installed or import failed${NC}"
+    FAILED_CHECKS+=("7. PyBuda Installation")
 fi
 CURRENT_STEP=$((CURRENT_STEP + 1))
 print_progress
 
-# print out results 
-if [ $CURRENT_STEP -eq $TOTAL_STEPS ]; then
-    echo -e "${GREEN}All Installs Good :)${NC}"
+# Print final message
+echo
+if [ ${#FAILED_CHECKS[@]} -eq 0 ]; then
+    echo -e "${GREEN}All Install(s) OK :)${NC}"
 else
-    echo -e "${RED}2 Check Installs Step(s) in Red :(${NC}"
+    echo -e "${RED}Failed Checks:${NC}"
+    for check in "${FAILED_CHECKS[@]}"; do
+        echo -e "${RED}${check}${NC}"
+    done
 fi
+
+# end 
