@@ -41,17 +41,19 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
             if model_ckpt in ["yolov5l", "yolov5x"]:
                 os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{80*1024}"
                 os.environ["PYBUDA_GRAPHSOLVER_SELF_CUT_TYPE"] = "FastCut"
+                compiler_cfg.enable_enumerate_u_kt = True
                 os.environ["PYBUDA_INSERT_SLICE_FOR_CONCAT"] = "1"
                 os.environ["PYBUDA_CONCAT_SLICE_Y"] = "10"
                 os.environ["PYBUDA_RIBBON2"] = "1"
                 if model_ckpt == "yolov5x":
-                    compiler_cfg.enable_enumerate_u_kt = True
                     compiler_cfg.place_on_new_epoch("conv2d_210.dc.matmul.11")
                     os.environ["PYBUDA_TEMP_BALANCER_DISABLE_TARGET_PROXIMITY"] = "1"
             if model_ckpt in ["yolov5m"]:
                 os.environ["PYBUDA_RIBBON2"] = "1"
                 os.environ["PYBUDA_INSERT_SLICE_FOR_CONCAT"] = "1"
                 os.environ["PYBUDA_CONCAT_SLICE_Y"] = "10"
+                os.environ["PYBUDA_TEMP_BALANCER_DISABLE_TARGET_PROXIMITY"] = "1"
+
         elif available_devices[0] == BackendDevice.Wormhole_B0:
             os.environ["PYBUDA_PAD_SPARSE_MM"] = "{13:16, 3:4}"
             os.environ["PYBUDA_MAX_GRAPH_CUT_RETRY"] = "100"
