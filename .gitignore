@@ -34,3 +34,5 @@ archive/
 *.whl
 
 
+# System files / macOS
+.DS_Store
