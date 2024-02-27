@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # * all inputs *
@@ -37,6 +36,9 @@ TT_FLASH_HELP_ARG='--help'
 PYTHON_COMMAND='python3'
 PYBUDA_IMPORT_CHECK='import pybuda'
 
+# Progress bar
+TOTAL_STEPS=7
+CURRENT_STEP=0
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -45,6 +47,10 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
+print_progress() {
+    PERCENT=$((100 * CURRENT_STEP / TOTAL_STEPS))
+    printf "Progress: %s%% [%s%s]\n" "$PERCENT" "$(seq -s "#" $((PERCENT / 2)) | tr -d '[:digit:]')" "$(seq -s " " $(((100 - PERCENT) / 2)) | tr -d '[:digit:]')"
+}
 
 # 1. hugepages
 grep -q "$HUGEPAGES_CHECK_GREP" /etc/default/grub && \
@@ -55,6 +61,8 @@ if [ $? -eq 0 ]; then
 else
     echo -e "${RED}1. Setup HugePages: Not properly configured${NC}"
 fi
+CURRENT_STEP=$((CURRENT_STEP + 1))
+print_progress
 
 # 2. pci driver
 if command_exists lsmod && lsmod | grep "$LSMOD_GREP" >/dev/null 2>&1; then
@@ -62,6 +70,8 @@ if command_exists lsmod && lsmod | grep "$LSMOD_GREP" >/dev/null 2>&1; then
 else
     echo -e "${RED}2. PCI Driver Installation: Not installed${NC}"
 fi
+CURRENT_STEP=$((CURRENT_STEP + 1))
+print_progress
 
 # 3. tt-flash check
 if command_exists "$RUSTUP_COMMAND" && \
@@ -70,6 +80,8 @@ if command_exists "$RUSTUP_COMMAND" && \
 else
     echo -e "${RED}3. Device Firmware Update: Not installed${NC}"
 fi
+CURRENT_STEP=$((CURRENT_STEP + 1))
+print_progress
 
 # 4. pcks dep
 missing_packages=()
@@ -86,6 +98,8 @@ else
     echo -e "${RED}4. Packages are not installed correctly${NC}"
     echo -e "${RED}Missing packages: ${missing_packages[@]}${NC}"
 fi
+CURRENT_STEP=$((CURRENT_STEP + 1))
+print_progress
 
 # 5. TT-SMI check
 if command_exists "$TT_SMI_COMMAND" && "$TT_SMI_COMMAND" "$TT_SMI_HELP_ARG" >/dev/null 2>&1; then
@@ -93,6 +107,8 @@ if command_exists "$TT_SMI_COMMAND" && "$TT_SMI_COMMAND" "$TT_SMI_HELP_ARG" >/de
 else
     echo -e "${RED}5. TT-SMI Installation: Not installed${NC}"
 fi
+CURRENT_STEP=$((CURRENT_STEP + 1))
+print_progress
 
 # 6. TT-Flash check
 if command_exists "$TT_FLASH_COMMAND" && "$TT_FLASH_COMMAND" "$TT_FLASH_HELP_ARG" >/dev/null 2>&1; then
@@ -100,6 +116,8 @@ if command_exists "$TT_FLASH_COMMAND" && "$TT_FLASH_COMMAND" "$TT_FLASH_HELP_ARG
 else
     echo -e "${RED}6. TT-Flash Installation: Not installed${NC}"
 fi
+CURRENT_STEP=$((CURRENT_STEP + 1))
+print_progress
 
 # 7. pybuda check 
 if command_exists "$PYTHON_COMMAND" && "$PYTHON_COMMAND" -c "$PYBUDA_IMPORT_CHECK" >/dev/null 2>&1; then
@@ -107,5 +125,12 @@ if command_exists "$PYTHON_COMMAND" && "$PYTHON_COMMAND" -c "$PYBUDA_IMPORT_CHEC
 else
     echo -e "${RED}7. PyBuda Installation: Not installed or import failed${NC}"
 fi
+CURRENT_STEP=$((CURRENT_STEP + 1))
+print_progress
 
-# end 
+# last check
+if [ $CURRENT_STEP -eq $TOTAL_STEPS ]; then
+    echo -e "${GREEN}All Good :)${NC}"
+else
+    echo -e "${RED}2 Check Installs :(${NC}"
+fi
