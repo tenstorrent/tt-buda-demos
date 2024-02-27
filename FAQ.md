@@ -11,7 +11,7 @@ For more information on performing reset on multiple chips or other specifics vi
 
 If you need additional assistance, you can access a detailed explanation of all available command options by appending the help flag to the command like so: `tt-smi --help` or `tt-smi -h`.
 
-For comprehensive insights and detailed instructions on utilizing the command line GUI, we invite you to explore the Tenstorrent System Management Interface (TT-SMI) repository on GitHub at [tt-smi-repo](https://github.com/tenstorrent/tt-smi). TT-SMI serves as a versatile command-line utility tailored to streamline interaction with all Tenstorrent devices on host.
+For comprehensive insights and detailed instructions on utilizing the command line GUI, we invite you to explore the Tenstorrent System Management Interface (TT-SMI) repository on GitHub at [TT-SMI homepage](https://github.com/tenstorrent/tt-smi). TT-SMI serves as a versatile command-line utility tailored to streamline interaction with all Tenstorrent devices on host.
 
 If the software reset fails to resolve the issue, the next step would be to power cycle the board. This typically involves rebooting the host machine that the Tenstorrent board is connected to. 
 *Please note that any unsaved work may be lost during this process, so ensure all important data is saved before proceeding*
