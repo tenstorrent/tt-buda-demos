@@ -7,7 +7,7 @@ If you encounter a situation where a Tenstorrent chip appears to be unresponsive
 
 For a software reset on a single chip use : `tt-smi -lr 0` .
 
-For more information on performing reset on multiple chips or other specifics visit [TT-SMI homepage](https://github.com/tenstorrent/tt-smi?tab=readme-ov-file#resets:~:text=on%20the%20footer.-,Resets,-Another%20feature%20of)
+For more information on performing reset on multiple chips or other specifics visit [TT-SMI Resets](https://github.com/tenstorrent/tt-smi?tab=readme-ov-file#resets:~:text=on%20the%20footer.-,Resets,-Another%20feature%20of)
 
 If you need additional assistance, you can access a detailed explanation of all available command options by appending the help flag to the command like so: `tt-smi --help` or `tt-smi -h`.
 
