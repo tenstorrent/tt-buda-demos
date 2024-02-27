@@ -1,7 +1,7 @@
 # Falcon-7B Demo Script
 
 import pybuda
-from pybuda._C.backend_api import BackendDevice
+from pybuda._C.backend_api import BackendDevice, BackendType
 
 from nlp_demos.falcon.utils.model import Falcon
 
@@ -11,6 +11,8 @@ def run_falcon_pytorch():
     if available_devices:
         if available_devices[0] == BackendDevice.Grayskull:
             raise NotImplementedError("Model not supported on Grayskull")
+        if available_devices[0] == BackendType.Golden:
+            raise NotImplementedError("Model not supported on Golden")
 
     # Load model from HuggingFace
     model = Falcon(
