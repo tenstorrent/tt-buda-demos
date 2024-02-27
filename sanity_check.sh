@@ -128,9 +128,9 @@ fi
 CURRENT_STEP=$((CURRENT_STEP + 1))
 print_progress
 
-# last check
+# print out results 
 if [ $CURRENT_STEP -eq $TOTAL_STEPS ]; then
-    echo -e "${GREEN}All Good :)${NC}"
+    echo -e "${GREEN}All Installs Good :)${NC}"
 else
-    echo -e "${RED}2 Check Installs :(${NC}"
+    echo -e "${RED}2 Check Installs Step(s) in Red :(${NC}"
 fi
