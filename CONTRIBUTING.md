@@ -1,10 +1,10 @@
-# Contributing to model_demos
+# Contributing to TT-BUDA-DEMOS
 
 Thank you for your interest in this project.
 We want to make contributing to this project as easy and transparent as possible.
 
 If you are interested in making a contribution, then please familiarize
-yourself with our technical contribution standards as set forth in this guide.
+yourself with our technical [contribution standards](#contribution-standards) as set forth in this guide.
 
 Next, please request appropriate write permissions by [opening an
 issue](https://github.com/tenstorrent/tt-buda/issues/new/choose) for
