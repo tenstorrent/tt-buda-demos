@@ -16,8 +16,7 @@ All contributions require:
     feature support request or bug report under Issues to get help with finding
     an appropriate project to get a maintainer's attention.
 - a pull request (PR).
-  - Your PR must be approved by appropriate reviewers. We do not accept PRs
-    from forked repositories.
+- Your PR must be approved by appropriate reviewers.
 
 ## Setting up environment
 
