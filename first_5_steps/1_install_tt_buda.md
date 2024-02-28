@@ -31,8 +31,9 @@ Once you have identified the release version you would like to install, you can 
    6. [Tenstorrent Software Package](#tenstorrent-software-package)
    7. [Python Environment Installation](#python-environment-installation)
    8. [Docker Container Installation](#docker-container-installation)
-   9. [Optional Sanity Check Script](#optional-sanity-check-script)
-   10. [Smoke Test](#smoke-test)
+2. [Verifications](#verifications)
+   1. [Optional Sanity Check Script](#optional-sanity-check-script)
+   2. [Smoke Test](#smoke-test)
 
 ## Installation Instructions
 
@@ -41,6 +42,7 @@ PyBuda can be installed using two methods: Docker or Python virtualenv.
 If you would like to run PyBuda in a Docker container, then follow the instructions for [PCI Driver Installation](#pci-driver-installation) and [Device Firmware Update](#device-firmware-update) and followed by [Docker Container Installation](#docker-container-installation).
 
 If you would like to run PyBuda in a Python virtualenv, then follow the instructions for the [Setup HugePages](#setup-hugepages), [PCI Driver Installation](#pci-driver-installation), [Device Firmware Update](#device-firmware-update), and [Backend Compiler Dependencies](#backend-compiler-dependencies), followed by the [Tenstorrent Software Package](#tenstorrent-software-package).
+
 
 ### Setup HugePages
 
@@ -57,9 +59,11 @@ sudo reboot
 Please navigate to [tt-kmd](https://github.com/tenstorrent/tt-kmd) homepage and follow instructions within the README. 
 *Pro-Tip: ensure that you are within the home directory of the local clone version of [tt-kmd](https://github.com/tenstorrent/tt-kmd) when performing the installation steps*
 
+
 ### Device Firmware Update
 
 The [tt-firmware-gs](https://github.com/tenstorrent/tt-firmware-gs) firmware file needs to be installed using the [tt-flash](https://github.com/tenstorrent/tt-flash) utility, for more details visit [TT-Flash homepage.](https://github.com/tenstorrent/tt-flash?tab=readme-ov-file#firmware-files:~:text=Firmware%20files,of%20the%20images.) and follow instructions within the README.
+
 
 ### Backend Compiler Dependencies
 
@@ -152,8 +156,8 @@ sudo docker run --rm -ti --cap-add=sys_nice --shm-size=4g --device /dev/tenstorr
 ```bash
 cd home/
 ```
----
 
+## Verifications: 
 ### Optional Sanity Check Script
 
 #### Step 1. Change root directory to first_5_steps
