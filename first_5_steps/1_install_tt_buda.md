@@ -62,7 +62,7 @@ Please navigate to [tt-kmd](https://github.com/tenstorrent/tt-kmd) homepage and 
 
 ### Device Firmware Update
 
-The [tt-firmware-gs](https://github.com/tenstorrent/tt-firmware-gs) firmware file needs to be installed using the [tt-flash](https://github.com/tenstorrent/tt-flash) utility, for more details visit [TT-Flash homepage.](https://github.com/tenstorrent/tt-flash?tab=readme-ov-file#firmware-files:~:text=Firmware%20files,of%20the%20images.) and follow instructions within the README.
+The [tt-firmware-gs](https://github.com/tenstorrent/tt-firmware-gs) firmware file needs to be installed using the [tt-flash](https://github.com/tenstorrent/tt-flash) utility, for more details visit [TT-Flash homepage](https://github.com/tenstorrent/tt-flash?tab=readme-ov-file#firmware-files:~:text=Firmware%20files,of%20the%20images.) and follow instructions within the README.
 
 
 ### Backend Compiler Dependencies
