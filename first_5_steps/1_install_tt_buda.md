@@ -31,7 +31,8 @@ Once you have identified the release version you would like to install, you can 
    6. [Tenstorrent Software Package](#tenstorrent-software-package)
    7. [Python Environment Installation](#python-environment-installation)
    8. [Docker Container Installation](#docker-container-installation)
-   9. [Smoke Test](#smoke-test)
+   9. [Optional Sanity Check Script](#optional-sanity-check-script)
+   10. [Smoke Test](#smoke-test)
 
 ## Installation Instructions
 
