@@ -29,10 +29,8 @@ generated_modules/
 *.pt
 archive/
 
-
 #  Ignore installable whl files and folders
 *.whl
-
 
 # System files / macOS
 .DS_Store
