@@ -149,8 +149,11 @@ cd home/
 
 ### Optional Sanity Check Script
 
-With your current terminal, run the following command:
-
+#### Step 1. Change root directory to first_5_steps
+```bash
+cd first_5_steps
+```
+#### Step 2. Run Script 
 ```bash
 ./sanity_check.sh
 ```
