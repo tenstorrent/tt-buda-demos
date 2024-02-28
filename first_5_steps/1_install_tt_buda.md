@@ -146,6 +146,17 @@ sudo docker run --rm -ti --cap-add=sys_nice --shm-size=4g --device /dev/tenstorr
 cd home/
 ```
 
+### Optional Sanity Check Script
+
+With your current terminal, run the following command:
+
+```bash
+./sanity_check.sh
+```
+After hitting enter, the script will execute through completion. This script acts as a verifier, performing checks on recently installed dependencies like PyBuda, tt-smi, etc., ensuring error-free operation of your environment. 
+It enables you to confirm the correct setup and functionality of all configurations and dependencies.
+Once done, the script will generate a report within the command line interface, pinpointing any issues or errors that might need addressing.
+
 ### Smoke Test
 
 With your Python environment with PyBuda install activated, run the following Python script:
