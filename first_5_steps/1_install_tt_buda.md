@@ -54,11 +54,12 @@ sudo reboot
 
 ### PCI Driver Installation
 
-Please navigate to [tt-kmd](https://github.com/tenstorrent/tt-kmd).
+Please navigate to [tt-kmd](https://github.com/tenstorrent/tt-kmd) homepage and follow instructions within the README. 
+*Pro-Tip: ensure that you are within the home directory of the local clone version of [tt-kmd](https://github.com/tenstorrent/tt-kmd) when performing the installation steps*
 
 ### Device Firmware Update
 
-The [tt-firmware-gs](https://github.com/tenstorrent/tt-firmware-gs) firmware file needs to be installed using the [tt-flash](https://github.com/tenstorrent/tt-flash) utility, for more details visit [TT-Flash homepage](https://github.com/tenstorrent/tt-flash?tab=readme-ov-file#firmware-files:~:text=Firmware%20files,of%20the%20images.)
+The [tt-firmware-gs](https://github.com/tenstorrent/tt-firmware-gs) firmware file needs to be installed using the [tt-flash](https://github.com/tenstorrent/tt-flash) utility, for more details visit [TT-Flash homepage.](https://github.com/tenstorrent/tt-flash?tab=readme-ov-file#firmware-files:~:text=Firmware%20files,of%20the%20images.) and follow instructions within the README.
 
 ### Backend Compiler Dependencies
 
@@ -75,7 +76,7 @@ apt-get install -y build-essential clang-6.0 libhdf5-serial-dev libzmq3-dev
 
 ### TT-SMI
 
-Please navigate to [tt-smi](https://github.com/tenstorrent/tt-smi).
+Please navigate to [tt-smi](https://github.com/tenstorrent/tt-smi) homepage and follow instructions within the README.
 
 ### Tenstorrent Software Package
 
