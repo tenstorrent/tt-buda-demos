@@ -1,9 +1,10 @@
-# Contributing to model_demos
+# Contributing to TT-BUDA-DEMOS
 
 Thank you for your interest in this project.
+We want to make contributing to this project as easy and transparent as possible.
 
 If you are interested in making a contribution, then please familiarize
-yourself with our technical contribution standards as set forth in this guide.
+yourself with our technical [contribution standards](#contribution-standards) as set forth in this guide.
 
 Next, please request appropriate write permissions by [opening an
 issue](https://github.com/tenstorrent/tt-buda/issues/new/choose) for
@@ -16,8 +17,7 @@ All contributions require:
     feature support request or bug report under Issues to get help with finding
     an appropriate project to get a maintainer's attention.
 - a pull request (PR).
-  - Your PR must be approved by appropriate reviewers. We do not accept PRs
-    from forked repositories.
+- Your PR must be approved by appropriate reviewers.
 
 ## Setting up environment
 
@@ -80,10 +80,16 @@ def test_bert_masked_lm_pytorch(clear_pybuda):
 
 For new model demos, please include an entry in the [Models Table](README.md/#models-table) along with the supported hardware.
 
+
+### Model Weights:
+
+In general, we avoid including files that contain data, weights, etc within the files. Instead, these should be incorporated into the model script at runtime. For a practical illustration of this approach, please refer to this [example](https://github.com/tenstorrent/tt-buda-demos/blob/main/model_demos/cv_demos/resnet/onnx_resnet.py#L68).
+
 ## Contribution standards
 
 ### Code reviews
 
+We actively welcome your pull requests.
 - A PR must be opened for any code change with the following criteria:
   - Be approved, by a maintaining team member and any codeowners whose modules
     are relevant for the PR.
