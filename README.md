@@ -8,6 +8,7 @@
 - [Documentation](#documentation)
 - [FAQ & Troubleshooting](#faq--troubleshooting)
 - [Communication](#communication)
+- [Contributing](#contributing)
 
 ## Introduction
 
