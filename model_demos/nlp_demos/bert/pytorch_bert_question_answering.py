@@ -2,6 +2,7 @@
 
 import pybuda
 from transformers import BertForQuestionAnswering, BertTokenizer
+import os
 
 
 def run_bert_question_answering_pytorch():
@@ -10,6 +11,8 @@ def run_bert_question_answering_pytorch():
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.default_df_override = pybuda._C.DataFormat.Float16_b
     compiler_cfg.default_dram_parameters = False
+    compiler_cfg.balancer_policy = "Ribbon"
+    os.environ["PYBUDA_RIBBON2"] = "1"
 
     # Load Bert tokenizer and model from HuggingFace
     model_ckpt = "bert-large-cased-whole-word-masking-finetuned-squad"
