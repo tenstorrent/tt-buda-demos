@@ -54,6 +54,9 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
                 os.environ["PYBUDA_INSERT_SLICE_FOR_CONCAT"] = "1"
                 os.environ["PYBUDA_CONCAT_SLICE_Y"] = "10"
                 os.environ["PYBUDA_TEMP_BALANCER_DISABLE_TARGET_PROXIMITY"] = "1"
+                compiler_cfg.place_on_new_epoch("conv2d_27.dc.matmul.8")
+            if model_ckpt in ["yolov5l"]:
+                compiler_cfg.place_on_new_epoch("conv2d_313.dc.matmul.8")
 
         elif available_devices[0] == BackendDevice.Wormhole_B0:
             os.environ["PYBUDA_PAD_SPARSE_MM"] = "{13:16, 3:4}"

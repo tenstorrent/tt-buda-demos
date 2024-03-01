@@ -4,6 +4,7 @@ import os
 
 import pybuda
 from transformers import BertForQuestionAnswering, BertTokenizer
+import os
 
 
 def run_bert_question_answering_pytorch():
@@ -14,7 +15,6 @@ def run_bert_question_answering_pytorch():
     compiler_cfg.default_dram_parameters = False
     compiler_cfg.balancer_policy = "Ribbon"
     os.environ["PYBUDA_RIBBON2"] = "1"
-    os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{81*1024}"
 
     # Load Bert tokenizer and model from HuggingFace
     model_ckpt = "bert-large-cased-whole-word-masking-finetuned-squad"
