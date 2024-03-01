@@ -43,10 +43,6 @@ def run_vovnet_ese_99b_timm_pytorch():
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
     compiler_cfg.default_dram_parameters = False
 
-    available_devices = pybuda.detect_available_devices()
-    if available_devices and available_devices[0] == BackendDevice.Grayskull:
-        os.environ["PYBUDA_LEGACY_KERNEL_BROADCAST"] = "1"
-
     # Create PyBuda module from PyTorch model
     tt_model = pybuda.PyTorchModule(model_name + "_pt", model)
 
