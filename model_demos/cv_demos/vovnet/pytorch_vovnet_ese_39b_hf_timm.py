@@ -38,12 +38,10 @@ def run_vovnet_ese_39b_timm_pytorch():
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
-    compiler_cfg.balancer_policy = "CNN"
+    compiler_cfg.balancer_policy = "Ribbon"
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
-
-    available_devices = pybuda.detect_available_devices()
-    if available_devices and available_devices[0] == BackendDevice.Grayskull:
-        os.environ["PYBUDA_LEGACY_KERNEL_BROADCAST"] = "1"
+    compiler_cfg.default_dram_parameters = False
+    os.environ["PYBUDA_RIBBON2"] = "1"
 
     # Create PyBuda module from PyTorch model
     tt_model = pybuda.PyTorchModule(model_name + "_pt", model)
