@@ -150,7 +150,7 @@ cd home/
 
 ## Tests
 
-Use the smoke test to check for correct installation of PyBuda library and environment.
+Verify the correct installation of the PyBuda library and environment by conducting a smoke test.
 
 ### Smoke Test
 
