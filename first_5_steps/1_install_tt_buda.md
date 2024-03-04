@@ -28,10 +28,11 @@ Once you have identified the release version you would like to install, you can 
    3. [Device Firmware Update](#device-firmware-update)
    4. [Backend Compiler Dependencies](#backend-compiler-dependencies)
    5. [TT-SMI](#tt-smi)
-   6. [Tenstorrent Software Package](#tenstorrent-software-package)
-   7. [Python Environment Installation](#python-environment-installation)
-   8. [Docker Container Installation](#docker-container-installation)
-   9. [Smoke Test](#smoke-test)
+2. [PyBuda Installation](#pybuda-installation)
+    1. [Python Environment Installation](#python-environment-installation)
+    2. [Docker Container Installation](#docker-container-installation)
+3. [Tests](#tests)
+   1. [Smoke Test](#smoke-test)
 
 ## Installation Instructions
 
@@ -76,14 +77,11 @@ apt-get install -y build-essential clang-6.0 libhdf5-serial-dev libzmq3-dev
 
 Please navigate to [tt-smi](https://github.com/tenstorrent/tt-smi).
 
-### Tenstorrent Software Package
 
-The directory contains instructions to install the PyBuda and TVM software stack. This package consists of the following files:
+## PyBuda Installation
 
-```bash
-pybuda-<version>.whl   <- Latest PyBuda Release
-tvm-<version>.whl      <- Latest TVM Release
-```
+There are two ways to install PyBuda within the host environment: using Python virtual environment or Docker container.
+
 
 ### Python Environment Installation
 
@@ -145,6 +143,10 @@ sudo docker run --rm -ti --cap-add=sys_nice --shm-size=4g --device /dev/tenstorr
 ```bash
 cd home/
 ```
+
+## Tests
+
+Use the smoke test to check for correct installation of PyBuda library and environment.
 
 ### Smoke Test
 
