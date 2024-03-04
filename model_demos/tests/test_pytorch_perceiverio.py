@@ -1,6 +1,10 @@
 import pytest
 
-from cv_demos.perceiverio.pytorch_perceiverio import run_perceiverio_pytorch
+from cv_demos.perceiverio.pytorch_perceiverio_for_image_classification import (
+    run_perceiverio_for_image_classification_pytorch,
+)
+
+variants = ["deepmind/vision-perceiver-conv"]
 
 variants = ["deepmind/vision-perceiver-conv"]
 
