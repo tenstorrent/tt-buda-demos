@@ -54,20 +54,22 @@ sudo reboot
 
 ### PCI Driver Installation
 
-Please navigate to [tt-kmd](https://github.com/tenstorrent/tt-kmd).
+Please navigate to [tt-kmd](https://github.com/tenstorrent/tt-kmd) homepage and follow instructions within the README. 
+*Pro-Tip: ensure that you are within the home directory of the local clone version of [tt-kmd](https://github.com/tenstorrent/tt-kmd) when performing the installation steps*
 
 ### Device Firmware Update
 
-The [tt-firmware-gs](https://github.com/tenstorrent/tt-firmware-gs) firmware file needs to be installed using the [tt-flash](https://github.com/tenstorrent/tt-flash) utility, for more details visit [TT-Flash homepage](https://github.com/tenstorrent/tt-flash?tab=readme-ov-file#firmware-files:~:text=Firmware%20files,of%20the%20images.)
+The [tt-firmware-gs](https://github.com/tenstorrent/tt-firmware-gs) firmware file needs to be installed using the [tt-flash](https://github.com/tenstorrent/tt-flash) utility, for more details visit [TT-Flash homepage](https://github.com/tenstorrent/tt-flash?tab=readme-ov-file#firmware-files:~:text=Firmware%20files,of%20the%20images.) and follow instructions within the README.
 
 ### Backend Compiler Dependencies
 
 Instructions to install the Tenstorrent backend compiler dependencies on a fresh install of Ubuntu Server 20.04.
 
-You may need to append each `apt-get` command with `sudo` if you do not have root permissions.
+*You may need to **append** each `apt-get` command with `sudo` if you do not have root permissions.*
 
 ```bash
-apt-get update -y && apt-get upgrade -y --no-install-recommends
+apt-get update -y
+apt-get upgrade -y --no-install-recommends
 apt-get install -y software-properties-common
 apt-get install -y python3.8-venv libboost-all-dev libgoogle-glog-dev libgl1-mesa-glx libyaml-cpp-dev ruby
 apt-get install -y build-essential clang-6.0 libhdf5-serial-dev libzmq3-dev
@@ -75,8 +77,7 @@ apt-get install -y build-essential clang-6.0 libhdf5-serial-dev libzmq3-dev
 
 ### TT-SMI
 
-Please navigate to [tt-smi](https://github.com/tenstorrent/tt-smi).
-
+Please navigate to [tt-smi](https://github.com/tenstorrent/tt-smi) homepage and follow instructions within the README.
 
 ## PyBuda Installation
 
@@ -109,6 +110,9 @@ source env/bin/activate
 ```bash
 pip install pybuda-<version>.whl tvm-<version>.whl
 ```
+The `pybuda-<version>.whl` file contains the PyBuda and `tvm-<version>.whl` file contains the latest TVM downloaded release(s).
+
+---
 
 ### Docker Container Installation
 
