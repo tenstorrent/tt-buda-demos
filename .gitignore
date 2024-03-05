@@ -32,5 +32,10 @@ archive/
 
 #  Ignore installable whl files and folders
 {pybuda-,tvm-}*.whl
+*.whl
+
+
+# System files / macOS
+.DS_Store
 
 
