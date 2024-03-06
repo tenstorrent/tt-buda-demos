@@ -106,10 +106,16 @@ python3 -m venv env
 source env/bin/activate
 ```
 
-#### Step 5. Pip install PyBuda and TVM
+#### Step 5. Upgade the pip installer 
 
 ```bash
-pip install pybuda-<version>.whl tvm-<version>.whl
+pip install --upgrade pip==24.0
+```
+
+#### Step 6. Pip install PyBuda, TVM and Torchvision whl files    
+
+```bash
+pip install pybuda-<version>.whl tvm-<version>.whl torchvision-<version>.whl
 ```
 
 ### Docker Container Installation
