@@ -66,6 +66,12 @@ def run_pytorch_yolov5_480(variant="yolov5s"):
                 os.environ["PYBUDA_INSERT_SLICE_FOR_CONCAT"] = "1"
                 os.environ["PYBUDA_CONCAT_SLICE_Y"] = "10"
                 os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
+                os.environ["PYBUDA_MAX_FORK_JOIN_BUF"] = "1"
+                os.environ["PYBUDA_FORK_JOIN_SKIP_EXPANDING_BUFFERS"] = "1"
+                compiler_cfg.balancer_op_override(
+                    "concatenate_40.dc.concatenate.30.dc.concatenate.0.dc.concatenate.12", "t_stream_shape", (3, 1)
+                )
+
         else:
             print("not a supported device!")
             sys.exit()
