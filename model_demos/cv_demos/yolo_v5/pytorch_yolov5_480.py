@@ -28,6 +28,7 @@ def run_pytorch_yolov5_480(variant="yolov5s"):
             # Set PyBUDA environment variables
             os.environ["PYBUDA_PAD_SPARSE_MM"] = "{113:128}"
             os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{16*1024}"
+            os.environ["PYBUDA_FORK_JOIN_SKIP_EXPANDING_BUFFERS"] = "1"
             if variant == "yolov5m":
                 os.environ["PYBUDA_INSERT_SLICE_FOR_CONCAT"] = "1"
                 os.environ["PYBUDA_CONCAT_SLICE_Y"] = "10"
@@ -35,8 +36,6 @@ def run_pytorch_yolov5_480(variant="yolov5s"):
                     "concatenate_26.dc.concatenate.30.dc.concatenate.1.dc.buffer.0", "t_stream_shape", (6, 1)
                 )
                 os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{32*1024}"
-            if variant == "yolov5l":
-                os.environ["PYBUDA_FORK_JOIN_SKIP_EXPANDING_BUFFERS"] = "1"
             if variant == "yolov5x":
                 os.environ["PYBUDA_TEMP_ELT_UNARY_ESTIMATES_LEGACY"] = "1"
                 os.environ["PYBUDA_INSERT_SLICE_FOR_CONCAT"] = "1"
