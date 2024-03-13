@@ -2,13 +2,19 @@
 
 ## Resetting an accelerator board
 
-If a Tenstorrent chip seems to hang and/or is producing unexpected behaviour,
-you may try a software reset of the board.
+If you encounter a situation where a Tenstorrent chip appears to be unresponsive or is exhibiting unusual behavior, a software reset of the board might be a viable solution.
 
-For Grayskull: `tt-smi -tr all`
 
-If the software reset does not work, unfortunately you will have to power cycle
-the board. This usually means rebooting the host of a board.
+For a software reset on a single chip use : `tt-smi -lr 0` .
+
+For more information on performing reset on multiple chips or other specifics visit [TT-SMI Resets](https://github.com/tenstorrent/tt-smi?tab=readme-ov-file#resets:~:text=on%20the%20footer.-,Resets,-Another%20feature%20of)
+
+If you need additional assistance, you can access a detailed explanation of all available command options by appending the help flag to the command like so: `tt-smi --help` or `tt-smi -h`.
+
+For comprehensive insights and detailed instructions on utilizing the command line GUI, we invite you to explore the Tenstorrent System Management Interface (TT-SMI) repository on GitHub at [TT-SMI homepage](https://github.com/tenstorrent/tt-smi). TT-SMI serves as a versatile command-line utility tailored to streamline interaction with all Tenstorrent devices on host.
+
+If the software reset fails to resolve the issue, the next step would be to power cycle the board. This typically involves rebooting the host machine that the Tenstorrent board is connected to. 
+*Please note that any unsaved work may be lost during this process, so ensure all important data is saved before proceeding*
 
 ## `PermissionError` on `/tmp/*.lock` files
 
