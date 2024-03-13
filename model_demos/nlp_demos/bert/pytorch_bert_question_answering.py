@@ -1,8 +1,9 @@
 # BERT Demo Script - SQuADv1.1 QA
 
+import os
+
 import pybuda
 from transformers import BertForQuestionAnswering, BertTokenizer
-import os
 
 
 def run_bert_question_answering_pytorch():

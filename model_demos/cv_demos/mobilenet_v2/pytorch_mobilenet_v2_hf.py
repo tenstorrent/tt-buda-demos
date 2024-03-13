@@ -1,9 +1,10 @@
 # MobileNetV2 Demo Script - 96x96
 
+import os
+
 import pybuda
 import requests
 from PIL import Image
-import os
 from transformers import AutoImageProcessor, AutoModelForImageClassification
 
 

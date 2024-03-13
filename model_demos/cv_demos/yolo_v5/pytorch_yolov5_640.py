@@ -73,7 +73,7 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
                 compiler_cfg.enable_tm_cpu_fallback = False
             if model_ckpt in ["yolov5s", "yolov5n", "yolov5l"]:
                 os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{64*1024}"
-                compiler_cfg.balancer_op_override("concatenate_259.dc.concatenate.7", "grid_shape", (1,1))
+                compiler_cfg.balancer_op_override("concatenate_259.dc.concatenate.7", "grid_shape", (1, 1))
             if model_ckpt == "yolov5n":
                 compiler_cfg.balancer_op_override(
                     "concatenate_19.dc.concatenate.30.dc.concatenate.1.dc.buffer.0", "t_stream_shape", (3, 1)

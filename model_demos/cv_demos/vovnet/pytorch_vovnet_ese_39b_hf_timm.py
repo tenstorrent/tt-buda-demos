@@ -1,16 +1,16 @@
 # VoVNet Model V2
 
+import os
 import urllib
 
 import pybuda
 import requests
 import timm
 import torch
-import os
 from PIL import Image
+from pybuda._C.backend_api import BackendDevice
 from timm.data import resolve_data_config
 from timm.data.transforms_factory import create_transform
-from pybuda._C.backend_api import BackendDevice
 
 # Source
 # https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/vovnet.py

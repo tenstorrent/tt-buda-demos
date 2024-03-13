@@ -1,12 +1,12 @@
 # MobileNetV3 Demo Script - TIMM (large)
 
+import os
 import urllib
 
 import pybuda
 import requests
 import timm
 import torch
-import os
 from PIL import Image
 from timm.data import resolve_data_config
 from timm.data.transforms_factory import create_transform
