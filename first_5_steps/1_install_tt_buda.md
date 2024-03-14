@@ -105,21 +105,13 @@ python3 -m venv env
 source env/bin/activate
 ```
 
-#### Step 5. Upgade the pip installer 
+#### Step 5. Pip install PyBuda, TVM and Torchvision whl files    
 
 ```bash
 pip install --upgrade pip==24.0
-```
-The `pybuda-<version>.whl` file contains the PyBuda and `tvm-<version>.whl` file contains the latest TVM downloaded release(s).
-
----
-
-#### Step 6. Pip install PyBuda, TVM and Torchvision whl files    
-
-```bash
 pip install pybuda-<version>.whl tvm-<version>.whl torchvision-<version>.whl
 ```
-The `pybuda-<version>.whl` file contains the PyBuda and `tvm-<version>.whl` file contains the latest TVM downloaded release(s).
+The `pybuda-<version>.whl` file contains the PyBuda library, the `tvm-<version>.whl` file contains the latest TVM downloaded release, and the `torchvision-<version>.whl` file bundles the torchvision library.
 
 ---
 
