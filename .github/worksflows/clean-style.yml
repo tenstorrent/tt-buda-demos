@@ -15,11 +15,11 @@ jobs:
         - uses: actions/setup-node@v4
           with:
             node-version: '20'
-        - name: Setup Python and install dependencies
+        - name: Setup Python
           uses: actions/setup-python@v4
           with:
             python-version: '3.8'
-        - name: Run Clean and Lint
+        - name: Install dependencies and run clean and lint
           working-directory: model_demos
           run: |
             python -m venv venv
