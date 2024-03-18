@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code and setup Node.js
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v3
         with:
           python-version: '3.8'
       - name: Install dependencies and run clean and lint
@@ -23,10 +23,8 @@ jobs:
           source venv/bin/activate && \
           pip install --upgrade pip==24.0 && \
           pip install -r requirements-dev.txt && \
-          pip install black flake8 isort && \
-          pip list && \
           make clean &&\
-          make clean_tt
+          # make clean_tt
       - name: Remove files specified in .gitignore
         run: |
           while IFS= read -r -d '' file; do
