@@ -23,8 +23,6 @@ jobs:
           source venv/bin/activate && \
           pip install --upgrade pip==24.0 && \
           pip install -r requirements-dev.txt && \
-          pip install black flake8 isort && \
-          pip list && \
           make clean
       - name: Remove files specified in .gitignore
         run: |
