@@ -38,5 +38,6 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Commit changes made by make clean and make style
+          commit_user_name: CleanBot
           branch: ${{ github.head_ref }}
 
