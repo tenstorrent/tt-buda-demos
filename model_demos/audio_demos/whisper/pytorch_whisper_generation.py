@@ -1,6 +1,5 @@
 # Whisper Demo - Conditional Generation
 
-import os
 
 import pybuda
 from datasets import load_dataset
@@ -8,6 +7,7 @@ from pybuda._C.backend_api import BackendDevice
 from pybuda.transformers.pipeline import pipeline as pybuda_pipeline
 from transformers import WhisperForConditionalGeneration, WhisperProcessor
 
+import os
 
 def run_whisper_generation(variant="openai/whisper-small"):
 
