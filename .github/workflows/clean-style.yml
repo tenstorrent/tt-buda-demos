@@ -24,7 +24,6 @@ jobs:
           pip install --upgrade pip==24.0 && \
           pip install -r requirements-dev.txt && \
           make clean &&\
-          # make clean_tt
       - name: Remove files specified in .gitignore
         run: |
           while IFS= read -r -d '' file; do
