@@ -1,6 +1,6 @@
 on:
     push:
-      branches: [main]
+      branches: [github-clean-actions]
     pull_request:
       branches: [main]
       paths:
@@ -38,7 +38,7 @@ jobs:
         - name: Reset changes
           run: git reset HEAD
         - name: Commit changes
-          uses: stefanzweifel/git-auto-commit-action@v4
+          uses: stefanzweifel/git-auto-commit-action@v5
           with:
             commit_message: Commit changes made by make clean and make style
             branch: ${{ github.head_ref }}
