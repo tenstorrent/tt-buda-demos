@@ -1,45 +1,42 @@
 on:
-    push:
-      branches: [github-clean-actions]
-    pull_request:
-      branches: [main]
-      paths:
-        - 'model_demos/**'
+  push:
+    branches: [github-clean-actions]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'model_demos/**'
       
 jobs:
-    clean-and-lint:
-      runs-on: ubuntu-20.04
-      steps:
-        - name: Checkout code and setup Node.js
-          uses: actions/checkout@v4
-        - uses: actions/setup-node@v4
-          with:
-            node-version: '20'
-        - name: Setup Python
-          uses: actions/setup-python@v4
-          with:
-            python-version: '3.8'
-        - name: Install dependencies and run clean and lint
-          working-directory: model_demos
-          run: |
-            python -m venv venv
-            source venv/bin/activate && \
-            pip install --upgrade pip==24.0 && \
-            pip install -r requirements-dev.txt && \
-            pip install black flake8 isort && \
-            pip list && \
-            make clean
-            make clean_tt
-        - name: Remove files specified in .gitignore
-          run: |
-            while IFS= read -r -d '' file; do
-              git rm --cached "$file"
-            done < <(git ls-files --ignored --exclude-standard -z model_demos/)
-        - name: Reset changes
-          run: git reset HEAD
-        - name: Commit changes
-          uses: stefanzweifel/git-auto-commit-action@v5
-          with:
-            commit_message: Commit changes made by make clean and make style
-            branch: ${{ github.head_ref }}
-  
+  clean-and-lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code and setup Node.js
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+      - name: Install dependencies and run clean and lint
+        working-directory: model_demos
+        run: |
+          python -m venv venv
+          source venv/bin/activate && \
+          pip install --upgrade pip==24.0 && \
+          pip install -r requirements-dev.txt && \
+          pip install black flake8 isort && \
+          pip list && \
+          make clean
+          make clean_tt
+      - name: Remove files specified in .gitignore
+        run: |
+          while IFS= read -r -d '' file; do
+            git rm --cached "$file"
+          done < <(git ls-files --ignored --exclude-standard -z model_demos/)
+      - name: Reset changes
+        run: git reset HEAD
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Commit changes made by make clean and make style
+          branch: ${{ github.head_ref }}
+
