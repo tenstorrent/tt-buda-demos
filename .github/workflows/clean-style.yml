@@ -36,4 +36,5 @@ jobs:
         with:
           commit_message: Commit changes made by make clean and make style
           commit_user_name: CleanBot
+          commit_user_email: aramchandran@tenstorrent.com
           branch: ${{ github.head_ref }}
