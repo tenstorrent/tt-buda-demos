@@ -51,7 +51,6 @@ def run_linear_ae_pytorch():
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.balancer_policy = "Ribbon"
     compiler_cfg.default_df_override = pybuda._C.DataFormat.Float16_b
 

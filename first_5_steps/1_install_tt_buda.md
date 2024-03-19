@@ -91,7 +91,7 @@ Python dependencies. Creating a new virtual environment with PyBuda and librarie
 
 #### Step 1. Navigate to [Releases](https://github.com/tenstorrent/tt-buda/releases)
 
-#### Step 2. Under the latest release, download the `pybuda` and `tvm` wheel files
+#### Step 2. Under the latest release, download the `pybuda` and `tvm` and `torchvison` wheel files
 
 #### Step 3. Create your Python environment in desired directory
 
@@ -105,12 +105,13 @@ python3 -m venv env
 source env/bin/activate
 ```
 
-#### Step 5. Pip install PyBuda and TVM
+#### Step 5. Pip install PyBuda, TVM and Torchvision whl files    
 
 ```bash
-pip install pybuda-<version>.whl tvm-<version>.whl
+pip install --upgrade pip==24.0
+pip install pybuda-<version>.whl tvm-<version>.whl torchvision-<version>.whl
 ```
-The `pybuda-<version>.whl` file contains the PyBuda and `tvm-<version>.whl` file contains the latest TVM downloaded release(s).
+The `pybuda-<version>.whl` file contains the PyBuda library, the `tvm-<version>.whl` file contains the latest TVM downloaded release, and the `torchvision-<version>.whl` file bundles the torchvision library.
 
 ---
 

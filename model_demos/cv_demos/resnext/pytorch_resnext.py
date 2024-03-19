@@ -35,83 +35,45 @@ def run_resnext_pytorch(variant=("resnext14_32x4d", "osmr")):
     compiler_cfg = pybuda.config._get_global_compiler_config()
 
     # Device specific configurations
-    compiler_cfg.enable_t_streaming = True
     available_devices = pybuda.detect_available_devices()
+    if not available_devices:
+        raise NotImplementedError("No device detected")
+
+    compiler_cfg.balancer_policy = "Ribbon"
+    compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
+    os.environ["PYBUDA_RIBBON2"] = "1"
+    if available_devices[0] == BackendDevice.Grayskull:
+        compiler_cfg.enable_auto_fusing = False
+        os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
 
     model_ckpt = variant[0]
     impl = variant[1]
     model_name = f"pt_{model_ckpt.replace('/', '_')}"
     if model_ckpt == "resnext14_32x4d":
-        if available_devices:
-            if available_devices[0] == BackendDevice.Wormhole_B0:
-                compiler_cfg.balancer_policy = "Ribbon"
-                os.environ["PYBUDA_RIBBON2"] = "1"
-                compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
-            elif available_devices[0] == BackendDevice.Grayskull:
-                compiler_cfg.balancer_policy = "CNN"
-                compiler_cfg.enable_auto_fusing = False
-                os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
-                os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{24*1024}"
+        if available_devices[0] == BackendDevice.Grayskull:
+            os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{24*1024}"
     elif model_ckpt == "resnext26_32x4d":
-        if available_devices:
-            if available_devices[0] == BackendDevice.Wormhole_B0:
-                compiler_cfg.balancer_policy = "Ribbon"
-                compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
-                os.environ["PYBUDA_RIBBON2"] = "1"
-                os.environ["PYBUDA_BALANCER_PREPASS_DISABLED"] = "1"
-            elif available_devices[0] == BackendDevice.Grayskull:
-                compiler_cfg.balancer_policy = "CNN"
-                compiler_cfg.enable_auto_fusing = False
-                os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
-                os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{72*1024}"
+        if available_devices[0] == BackendDevice.Grayskull:
+            os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{72*1024}"
     elif model_ckpt == "resnext50_32x4d":
-        if available_devices:
-            if available_devices[0] == BackendDevice.Wormhole_B0:
-                compiler_cfg.default_dram_parameters = False
-                compiler_cfg.balancer_policy = "Ribbon"
-                os.environ["PYBUDA_RIBBON2"] = "1"
-                compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
-            elif available_devices[0] == BackendDevice.Grayskull:
-                compiler_cfg.balancer_policy = "CNN"
-                compiler_cfg.enable_auto_fusing = False
-                os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
-                os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{72*1024}"
+        if available_devices[0] == BackendDevice.Wormhole_B0:
+            compiler_cfg.default_dram_parameters = False
+        elif available_devices[0] == BackendDevice.Grayskull:
+            os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{72*1024}"
     elif model_ckpt == "resnext101_32x8d_wsl":
-        if available_devices:
-            if available_devices[0] == BackendDevice.Wormhole_B0:
-                compiler_cfg.balancer_policy = "Ribbon"
-                compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
-            elif available_devices[0] == BackendDevice.Grayskull:
-                compiler_cfg.balancer_policy = "CNN"
-                compiler_cfg.enable_auto_transposing_placement = True
-                compiler_cfg.enable_auto_fusing = False
-                os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
-                os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{80*1024}"
+        if available_devices[0] == BackendDevice.Grayskull:
+            compiler_cfg.enable_auto_transposing_placement = True
+            os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{80*1024}"
     elif model_ckpt == "resnext101_32x8d":
-        if available_devices:
-            if available_devices[0] == BackendDevice.Wormhole_B0:
-                compiler_cfg.balancer_policy = "Ribbon"
-                compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
-            elif available_devices[0] == BackendDevice.Grayskull:
-                compiler_cfg.balancer_policy = "CNN"
-                compiler_cfg.enable_auto_transposing_placement = True
-                compiler_cfg.enable_auto_fusing = False
-                os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
-                os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{80*1024}"
+        if available_devices[0] == BackendDevice.Grayskull:
+            os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{80*1024}"
     elif model_ckpt == "resnext101_64x4d":
-        if available_devices:
-            if available_devices[0] == BackendDevice.Wormhole_B0:
-                compiler_cfg.default_dram_parameters = False
-                compiler_cfg.balancer_policy = "Ribbon"
-                os.environ["PYBUDA_RIBBON2"] = "1"
-                os.environ["PYBUDA_BALANCER_PREPASS_DISABLED"] = "1"
-                compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
-            elif available_devices[0] == BackendDevice.Grayskull:
-                compiler_cfg.balancer_policy = "CNN"
-                compiler_cfg.enable_auto_transposing_placement = True
-                compiler_cfg.enable_auto_fusing = False
-                os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
-                os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{80*1024}"
+        if available_devices[0] == BackendDevice.Wormhole_B0:
+            compiler_cfg.default_dram_parameters = False
+            os.environ["PYBUDA_BALANCER_PREPASS_DISABLED"] = "1"
+        elif available_devices[0] == BackendDevice.Grayskull:
+            compiler_cfg.enable_auto_transposing_placement = True
+            os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{80*1024}"
 
     # Create PyBuda module from PyTorch model
     if impl == "osmr":

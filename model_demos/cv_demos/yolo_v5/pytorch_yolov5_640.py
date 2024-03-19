@@ -21,7 +21,6 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
     # Set PyBUDA configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "Ribbon"
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.enable_auto_fusing = False
     os.environ["PYBUDA_DECOMPOSE_SIGMOID"] = "1"
     os.environ["PYBUDA_DISABLE_CAP_SPARSE_MM_FIDELITY"] = "1"
@@ -37,26 +36,27 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
             compiler_cfg.enable_tm_cpu_fallback = True
             compiler_cfg.enable_conv_prestride = True
             os.environ["PYBUDA_PAD_SPARSE_MM"] = "{13:16, 3:4}"
-            if model_ckpt in ["yolov5s", "yolov5m", "yolov5l", "yolov5x"]:
+            if model_ckpt in ["yolov5s", "yolov5m", "yolov5l", "yolov5x", "yolov5n"]:
                 os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{65*1024}"
-                os.environ["PYBUDA_FORCE_EMULATE_HARVESTED"] = "1"
             if model_ckpt in ["yolov5l", "yolov5x"]:
-                os.environ["PYBUDA_GRAPHSOLVER_SELF_CUT_TYPE"] = "ConsumerOperandDataEdgesFirst"
-                os.environ["PYBUDA_TEMP_ELT_UNARY_ESTIMATES_LEGACY"] = "1"
+                os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{80*1024}"
+                os.environ["PYBUDA_GRAPHSOLVER_SELF_CUT_TYPE"] = "FastCut"
+                compiler_cfg.enable_enumerate_u_kt = True
                 os.environ["PYBUDA_INSERT_SLICE_FOR_CONCAT"] = "1"
                 os.environ["PYBUDA_CONCAT_SLICE_Y"] = "10"
                 os.environ["PYBUDA_RIBBON2"] = "1"
-                compiler_cfg.balancer_op_override("conv2d_41.dc.matmul.8", "grid_shape", (5, 5))
                 if model_ckpt == "yolov5x":
-                    compiler_cfg.enable_enumerate_u_kt = True
-                    compiler_cfg.place_on_new_epoch("concatenate_40.dc.select.28")
                     compiler_cfg.place_on_new_epoch("conv2d_210.dc.matmul.11")
+                    os.environ["PYBUDA_TEMP_BALANCER_DISABLE_TARGET_PROXIMITY"] = "1"
             if model_ckpt in ["yolov5m"]:
                 os.environ["PYBUDA_RIBBON2"] = "1"
                 os.environ["PYBUDA_INSERT_SLICE_FOR_CONCAT"] = "1"
                 os.environ["PYBUDA_CONCAT_SLICE_Y"] = "10"
-            if variant == "yolov5n":
-                os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "65536"
+                os.environ["PYBUDA_TEMP_BALANCER_DISABLE_TARGET_PROXIMITY"] = "1"
+                compiler_cfg.place_on_new_epoch("conv2d_27.dc.matmul.8")
+            if model_ckpt in ["yolov5l"]:
+                compiler_cfg.place_on_new_epoch("conv2d_313.dc.matmul.8")
+
         elif available_devices[0] == BackendDevice.Wormhole_B0:
             os.environ["PYBUDA_PAD_SPARSE_MM"] = "{13:16, 3:4}"
             os.environ["PYBUDA_MAX_GRAPH_CUT_RETRY"] = "100"
@@ -73,12 +73,12 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
                 compiler_cfg.enable_tm_cpu_fallback = False
             if model_ckpt in ["yolov5s", "yolov5n", "yolov5l"]:
                 os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{64*1024}"
+                compiler_cfg.balancer_op_override("concatenate_259.dc.concatenate.7", "grid_shape", (1, 1))
             if model_ckpt == "yolov5n":
                 compiler_cfg.balancer_op_override(
                     "concatenate_19.dc.concatenate.30.dc.concatenate.1.dc.buffer.0", "t_stream_shape", (3, 1)
                 )
             if model_ckpt == "yolov5m":
-                compiler_cfg.balancer_op_override("concatenate_260.dc.concatenate.0", "grid_shape", (1, 1))
                 os.environ["PYBUDA_RIBBON2"] = "1"
                 os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{112*1024}"
             if model_ckpt == "yolov5l":
@@ -92,6 +92,7 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
                 os.environ["PYBUDA_RIBBON2"] = "1"
                 compiler_cfg.enable_tm_cpu_fallback = True
                 os.environ["PYBUDA_DISABLE_CAP_SPARSE_MM_FIDELITY"] = "0"
+                os.environ["PYBUDA_TEMP_BALANCER_DISABLE_TARGET_PROXIMITY"] = "1"
         else:
             print("not a supported device!")
             sys.exit()

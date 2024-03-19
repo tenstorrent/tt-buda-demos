@@ -29,7 +29,6 @@ def run_lwopenpose_3d_osmr_pytorch():
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "CNN"
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.enable_auto_fusing = False
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16
 

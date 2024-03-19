@@ -1,5 +1,6 @@
 # MobileNetV3 Demo Script - TIMM (small)
 
+import os
 import urllib
 
 import pybuda
@@ -16,9 +17,9 @@ def run_mobilenetv3_small_timm():
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "Ribbon"
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.default_dram_parameters = False
     compiler_cfg.default_df_override = pybuda._C.DataFormat.Float16_b
+    os.environ["PYBUDA_LEGACY_KERNEL_BROADCAST"] = "1"
 
     # Create PyBuda module from PyTorch model
     # Both options are good

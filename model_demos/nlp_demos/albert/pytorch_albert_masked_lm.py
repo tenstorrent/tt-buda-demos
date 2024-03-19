@@ -23,7 +23,6 @@ def run_albert_masked_lm_pytorch(size="base", variant="v2"):
         if available_devices:
             if available_devices[0] == BackendDevice.Grayskull:
                 compiler_cfg = pybuda.config._get_global_compiler_config()
-                compiler_cfg.enable_t_streaming = True
                 compiler_cfg.enable_auto_fusing = False
                 compiler_cfg.amp_level = 2
                 os.environ["PYBUDA_NLP_MANUAL_TARGET"] = "2000000"
@@ -45,7 +44,6 @@ def run_albert_masked_lm_pytorch(size="base", variant="v2"):
         if available_devices:
             if available_devices[0] == BackendDevice.Grayskull:
                 compiler_cfg = pybuda.config._get_global_compiler_config()
-                compiler_cfg.enable_t_streaming = True
                 os.environ["PYBUDA_NLP_MANUAL_TARGET"] = "2000000"
 
     elif "large" in model_ckpt:
@@ -53,7 +51,6 @@ def run_albert_masked_lm_pytorch(size="base", variant="v2"):
             if available_devices[0] == BackendDevice.Grayskull:
                 os.environ["PYBUDA_FORCE_EMULATE_HARVESTED"] = "1"
                 compiler_cfg = pybuda.config._get_global_compiler_config()
-                compiler_cfg.enable_t_streaming = True
                 compiler_cfg.enable_auto_fusing = False
                 os.environ["PYBUDA_TEMP_ELT_UNARY_ESTIMATES_LEGACY"] = "1"
 

@@ -20,7 +20,6 @@ def run_t5_pybuda_pipeline(variant="t5-small"):
     os.environ["PYBUDA_NLP_MANUAL_TARGET"] = "30000"
     os.environ["TT_BACKEND_DRAM_POLLING_FREQUENCY"] = "64"
     compiler_cfg = pybuda.config._get_global_compiler_config()
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.enable_tvm_cpu_fallback = False
     compiler_cfg.default_df_override = pybuda._C.Float16_b
     compiler_cfg.default_dram_parameters = False

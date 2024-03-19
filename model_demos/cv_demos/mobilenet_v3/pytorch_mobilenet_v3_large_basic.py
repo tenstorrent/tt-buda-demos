@@ -15,7 +15,6 @@ def run_mobilenetv3_large_basic():
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()  # load global compiler config object
     compiler_cfg.balancer_policy = "Ribbon"
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.default_df_override = pybuda._C.DataFormat.Float16_b
     available_devices = pybuda.detect_available_devices()
     if available_devices:

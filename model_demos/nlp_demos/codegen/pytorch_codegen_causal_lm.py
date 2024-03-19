@@ -13,7 +13,6 @@ def run_codegen_causal_lm(variant="Salesforce/codegen-350M-mono"):
 
     # Configurations
     compiler_cfg = pybuda.config._get_global_compiler_config()
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.enable_tvm_cpu_fallback = False
     compiler_cfg.default_dram_parameters = False
     compiler_cfg.enable_enumerate_u_kt = False
