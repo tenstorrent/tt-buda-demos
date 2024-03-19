@@ -1,13 +1,14 @@
 # BeiT Model Demo
 
-import os
 
-import pybuda
-import requests
+
 from PIL import Image
 from pybuda._C.backend_api import BackendDevice
 from transformers import BeitForImageClassification, BeitImageProcessor
+import pybuda
+import requests
 
+import os
 
 def run_beit_classify_224_hf_pytorch(variant="microsoft/beit-base-patch16-224"):
 
