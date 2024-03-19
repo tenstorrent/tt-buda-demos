@@ -91,7 +91,7 @@ Python dependencies. Creating a new virtual environment with PyBuda and librarie
 
 #### Step 1. Navigate to [Releases](https://github.com/tenstorrent/tt-buda/releases)
 
-#### Step 2. Under the latest release, download the `pybuda` and `tvm` wheel files
+#### Step 2. Under the latest release, download the `pybuda` and `tvm` and `torchvison` wheel files
 
 #### Step 3. Create your Python environment in desired directory
 
