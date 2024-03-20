@@ -1,12 +1,19 @@
 # Convolutional Autoencoder Demo Script
 
 
-import pybuda
-import torch
 import torchvision.transforms as transforms
 from datasets import load_dataset
 
+import torch
 
+
+
+
+
+
+
+
+import pybuda
 class ConvAE(torch.nn.Module):
     def __init__(self):
         super().__init__()
