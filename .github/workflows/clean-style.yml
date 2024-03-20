@@ -36,6 +36,7 @@ jobs:
         with:
           commit_user_name: CleanBot
           commit_message: Commit changes made by make clean and make style
+          commit_options: '--signoff' # Add this line
           branch: ${{ github.head_ref }}
         env:
           GPG_KEY_ID: 8ABB51ADB4DFDBE8
