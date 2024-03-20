@@ -33,10 +33,10 @@ jobs:
         run: git reset HEAD
       - name: Import GPG key
         id: import-gpg
-        uses: crazy-max/ghaction-import-gpg@v4
+        uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }} # If your key is protected by a passphrase
+          passphrase: ${{ secrets.PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
       - name: Commit changes
@@ -45,5 +45,5 @@ jobs:
           commit_user_name: CleanBot
           commit_user_email: aramchandran@tenstorrent.com
           commit_message: Commit changes made by make clean and make style
-          commit_options: '--signoff' 
+          commit_options: '-S'
           branch: ${{ github.head_ref }}
