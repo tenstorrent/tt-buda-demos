@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2   #TODO verify this 
+        uses: actions/checkout@v4   #TODO verify this 
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
@@ -23,7 +23,9 @@ jobs:
           source venv/bin/activate && \
           pip install --upgrade pip==24.0 && \
           pip install -r requirements-dev.txt && \
+          make style
           make clean
+          make clean_tt
       - name: Remove files specified in .gitignore
         run: |
           while IFS= read -r -d '' file; do
