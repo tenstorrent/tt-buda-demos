@@ -3,11 +3,11 @@ import os
 import pybuda
 import requests
 from PIL import Image
-
+from pybuda._C.backend_api import BackendDevice
 
 from cv_demos.yolo_v3.holli_src import utils
 from cv_demos.yolo_v3.holli_src.yolov3 import *
-from pybuda._C.backend_api import BackendDevice
+
 
 def run_yolov3_holli_pytorch_1x1():
 

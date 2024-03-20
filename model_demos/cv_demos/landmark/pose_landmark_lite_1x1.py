@@ -2,12 +2,12 @@
 
 import os
 
-
-from pybuda import TFLiteModule
-from pybuda._C.backend_api import BackendDevice
 import pybuda
 import requests
 import torch
+from pybuda import TFLiteModule
+from pybuda._C.backend_api import BackendDevice
+
 
 def run_pose_landmark_lite_1x1():
 
