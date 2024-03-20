@@ -1,6 +1,4 @@
 on:
-  push:
-    branches: [github-clean-actions]
   pull_request:
     branches: [main]
     paths:
