@@ -45,6 +45,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_user_name: CleanBot
-          commit_message: Auto Commit  | changes made by make clean and make style
+          commit_message: Auto Commit | changes made by make clean and make style
+          commit_user_email: aramchandran@tenstorrent.com
           commit_options: '-S'
           branch: ${{ github.head_ref }}
