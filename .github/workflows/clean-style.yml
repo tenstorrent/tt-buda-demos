@@ -24,8 +24,8 @@ jobs:
           make style
           make clean
           make clean_tt
-      - name: Reset changes
-        run: git reset HEAD
+      # - name: Reset changes
+      #   run: git reset HEAD
       - name: Import GPG key
         id: import-gpg
         uses: crazy-max/ghaction-import-gpg@v6
