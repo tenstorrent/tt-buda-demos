@@ -3,7 +3,7 @@
 
 def add_numbers(a, b):
     # Missing whitespace after comma
-    return a+b  # Missing whitespace around operator
+    return a + b  # Missing whitespace around operator
 
 
 def main():

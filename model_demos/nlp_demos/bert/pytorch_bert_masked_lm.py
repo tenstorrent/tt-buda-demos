@@ -1,8 +1,9 @@
 # BERT Demo Script - Masked LM
 
 
-from transformers import BertForMaskedLM, BertTokenizer
 import pybuda
+from transformers import BertForMaskedLM, BertTokenizer
+
 
 def run_bert_masked_lm_pytorch():
 
