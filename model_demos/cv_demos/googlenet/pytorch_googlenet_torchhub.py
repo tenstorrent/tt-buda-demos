@@ -4,17 +4,17 @@
 import urllib
 
 import pybuda
-import requests
-import torch
+
 from PIL import Image
 from pybuda._C.backend_api import BackendDevice
 from torchvision import models, transforms
-
+import requests
+import torch
 
 def run_googlenet_pytorch():
 
     # Set PyBuda configuration parameters
-    compiler_cfg = pybuda.config._get_global_compiler_config()  # load global compiler config object
+     compiler_cfg = pybuda.config._get_global_compiler_config()  # load global compiler config object
     compiler_cfg.enable_t_streaming = True
     compiler_cfg.balancer_policy = "Ribbon"
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
