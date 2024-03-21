@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4   #TODO verify this 
+        uses: actions/checkout@v4 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -24,14 +24,6 @@ jobs:
           make style
           make clean
           make clean_tt
-      # - name: Remove ignored files specified in .gitignore
-      #   run: |
-      #       git ls-files --ignored --exclude-standard -z | xargs -0 git rm --cached
-      # - name: Remove files specified in .gitignore
-      #   run: |
-      #     while IFS= read -r -d '' file; do
-      #       git rm --cached "$file"
-      #     done < <(git ls-files --ignored --exclude-standard -z model_demos/)
       - name: Reset changes
         run: git reset HEAD
       - name: Import GPG key
