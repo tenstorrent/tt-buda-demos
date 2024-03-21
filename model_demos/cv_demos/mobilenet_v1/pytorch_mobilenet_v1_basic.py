@@ -1,8 +1,9 @@
 # MobileNetV1 Demo Script - Basic
 
-import pybuda
 import torch
 import torch.nn as nn
+import pybuda
+
 
 
 class Conv(nn.Module):

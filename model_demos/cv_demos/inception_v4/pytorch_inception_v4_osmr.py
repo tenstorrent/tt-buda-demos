@@ -4,13 +4,16 @@ import os
 import sys
 import urllib
 
-import pybuda
-import requests
+
 import torch
 from PIL import Image
 from pybuda._C.backend_api import BackendDevice
 from pytorchcv.model_provider import get_model as ptcv_get_model
 from torchvision import transforms
+
+
+import pybuda
+import requests
 
 torch.multiprocessing.set_sharing_strategy("file_system")
 
