@@ -36,7 +36,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_user_name: CleanBot
-          commit_message: '*** AUTOMATED COMMIT | Applied Code Formatting and Cleanup ***'
+          commit_message: '*** AUTOMATED COMMIT | Applied Code Formatting and Cleanup ✨ 🍰 ✨***'
           commit_user_email: aramchandran@tenstorrent.com
           commit_options: '-S'
           branch: ${{ github.head_ref }}
