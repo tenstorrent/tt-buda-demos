@@ -52,4 +52,4 @@ jobs:
           commit_message: '*** AUTOMATED COMMIT | Applied Code Formatting and Cleanup ***'
           commit_user_email: aramchandran@tenstorrent.com
           commit_options: '-S'
-          # branch: ${{ github.head_ref }}
+          branch: ${{ github.head_ref }}
