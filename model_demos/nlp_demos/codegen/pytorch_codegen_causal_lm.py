@@ -8,8 +8,10 @@ from pybuda.transformers.pipeline import pipeline as pybuda_pipeline
 from transformers import AutoTokenizer, CodeGenForCausalLM
 
 
-import pybuda
 import os
+
+
+import pybuda
 def run_codegen_causal_lm(variant="Salesforce/codegen-350M-mono"):
 
     # Configurations
