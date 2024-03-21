@@ -24,11 +24,14 @@ jobs:
           make style
           make clean
           make clean_tt
-      - name: Remove files specified in .gitignore
+      - name: Remove ignored files specified in .gitignore
         run: |
-          while IFS= read -r -d '' file; do
-            git rm --cached "$file"
-          done < <(git ls-files --ignored --exclude-standard -z model_demos/)
+            git ls-files --ignored --exclude-standard -z | xargs -0 git rm --cached
+      # - name: Remove files specified in .gitignore
+      #   run: |
+      #     while IFS= read -r -d '' file; do
+      #       git rm --cached "$file"
+      #     done < <(git ls-files --ignored --exclude-standard -z model_demos/)
       - name: Reset changes
         run: git reset HEAD
       - name: Import GPG key
