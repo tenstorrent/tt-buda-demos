@@ -1,14 +1,15 @@
 # CodeGen Demo - CasualLM
 # Support for Wormhole only
 
-import os
 
-import pybuda
+
 from pybuda._C.backend_api import BackendDevice
 from pybuda.transformers.pipeline import pipeline as pybuda_pipeline
 from transformers import AutoTokenizer, CodeGenForCausalLM
 
 
+import pybuda
+import os
 def run_codegen_causal_lm(variant="Salesforce/codegen-350M-mono"):
 
     # Configurations

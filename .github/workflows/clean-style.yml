@@ -42,6 +42,9 @@ jobs:
           passphrase: ${{ secrets.GPG_PASSPHRASE}}
           git_user_signingkey: true
           git_commit_gpgsign: true
+      - uses: actions/checkout@v4
+        with:
+            ref: ${{ github.head_ref }}
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
@@ -49,4 +52,4 @@ jobs:
           commit_message: '*** AUTOMATED COMMIT | Applied Code Formatting and Cleanup ***'
           commit_user_email: aramchandran@tenstorrent.com
           commit_options: '-S'
-          branch: ${{ github.head_ref }}
+          # branch: ${{ github.head_ref }}
