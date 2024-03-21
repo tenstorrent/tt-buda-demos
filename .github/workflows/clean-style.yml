@@ -24,15 +24,15 @@ jobs:
           make style
           make clean
           make clean_tt
-      # - name: Check for ignored files
-      #   run: |
-      #       ignored_files=$(git ls-files --exclude-standard --ignored)
-      #       if [[ -n "$ignored_files" ]]; then
-      #         echo "Ignored files found: $ignored_files"
-      #         exit 1
-      #       else
-      #         echo "No ignored files found."
-      #       fi
+      - name: Check for ignored files
+        run: |
+                ignored_files=$(git ls-files --exclude-standard --ignored -o)
+                if [[ -n "$ignored_files" ]]; then
+                    echo "Ignored files found: $ignored_files"
+                    exit 1
+                else
+                    echo "No ignored files found."
+                fi
       - name: Import GPG key
         id: import-gpg
         uses: crazy-max/ghaction-import-gpg@v6
