@@ -7,13 +7,16 @@ import urllib
 
 
 from PIL import Image
-from pybuda._C.backend_api import BackendDevice
+
 from torchvision import models, transforms
 
 import requests
 import torch
 
 import pybuda
+
+from pybuda._C.backend_api import BackendDevice
+
 def run_googlenet_pytorch():
 
     # Set PyBuda configuration parameters
