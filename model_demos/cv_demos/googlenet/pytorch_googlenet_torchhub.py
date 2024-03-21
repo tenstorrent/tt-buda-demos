@@ -4,12 +4,12 @@
 import urllib
 
 import pybuda
-import requests
-import torch
+
 from PIL import Image
 from pybuda._C.backend_api import BackendDevice
 from torchvision import models, transforms
-
+import requests
+import torch
 
 def run_googlenet_pytorch():
 
