@@ -1,0 +1,42 @@
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'model_demos/**'
+      
+jobs:
+  clean-and-lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+      - name: Install dependencies and run clean and lint
+        working-directory: model_demos
+        run: |
+          python -m venv venv
+          source venv/bin/activate && \
+          pip install --upgrade pip==24.0 && \
+          pip install -r requirements-dev.txt && \
+          make style
+          make clean
+          make clean_tt
+      - name: Import GPG key
+        id: import-gpg
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE}}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_user_name: CleanBot
+          commit_message: '*** AUTOMATED COMMIT | Applied Code Formatting and Cleanup ✨ 🍰 ✨***'
+          commit_user_email: aramchandran@tenstorrent.com
+          commit_options: '-S'
+          branch: ${{ github.head_ref }}

@@ -1,5 +1,6 @@
 # BERT Demo Script - Masked LM
 
+
 import pybuda
 from transformers import BertForMaskedLM, BertTokenizer
 
