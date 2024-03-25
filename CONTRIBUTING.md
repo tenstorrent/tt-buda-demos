@@ -20,16 +20,14 @@ All contributions require:
 - Your PR must be approved by appropriate reviewers.
 
 
-
-
-
 ## Setting up environment
 
-Install all dependencies from [requriements-dev.txt](requirements-dev.txt) and install pre-commit hooks in a Python environment with PyBuda installed.
+Install all dependencies listed in [requirements-dev.txt](requirements-dev.txt) and [requirements.txt](requirements.txt), and set up pre-commit hooks in a Python environment with PyBuda installed.
 
 ```bash
 cd model_demos
 pip install -r requirements-dev.txt
+pip install -r requirements.txt
 pre-commit install
 ```
 
