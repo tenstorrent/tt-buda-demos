@@ -22,7 +22,8 @@ All contributions require:
 
 ## Setting up environment
 
-Install all dependencies listed in [requirements-dev.txt](requirements-dev.txt) and [requirements.txt](requirements.txt), and set up pre-commit hooks in a Python environment with PyBuda installed.
+Install all dependencies listed in [requirements-dev.txt](model_demos/requirements-dev.txt) and [requirements.txt](model_demos/requirements.txt), and set up pre-commit hooks in a Python environment with PyBuda installed.
+
 
 ```bash
 cd model_demos
