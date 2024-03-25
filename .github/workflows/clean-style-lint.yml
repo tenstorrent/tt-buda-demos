@@ -21,9 +21,9 @@ jobs:
           source venv/bin/activate && \
           pip install --upgrade pip==24.0 && \
           pip install -r requirements-dev.txt && \
-          make style
           make clean
           make clean_tt
+          make style
       - name: Import GPG key
         id: import-gpg
         uses: crazy-max/ghaction-import-gpg@v6

@@ -1,6 +1,5 @@
 # Convolutional Autoencoder Demo Script
 
-
 import pybuda
 import torch
 import torchvision.transforms as transforms

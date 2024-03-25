@@ -1,6 +1,5 @@
 # GoogLeNet Demo Script
 
-
 import urllib
 
 import pybuda
