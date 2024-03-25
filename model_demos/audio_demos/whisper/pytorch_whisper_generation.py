@@ -14,11 +14,12 @@ def run_whisper_generation(variant="openai/whisper-small"):
 
     # PyBuda configurations
     compiler_cfg = pybuda.config._get_global_compiler_config()
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.enable_auto_fusing = False
     compiler_cfg.amp_level = 2
     compiler_cfg.enable_enumerate_u_kt = False
     compiler_cfg.default_df_override = pybuda._C.DataFormat.Float16_b
+    compiler_cfg.balancer_policy = "Ribbon"
+    os.environ["PYBUDA_RIBBON2"] = "1"
     os.environ["PYBUDA_LEGACY_UBLOCK_SHAPE"] = "1"
     if "small" in variant:
         os.environ["PYBUDA_NLP_MANUAL_TARGET"] = "35000"

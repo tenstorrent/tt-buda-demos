@@ -17,7 +17,6 @@ def run_pytorch_yolov5_480(variant="yolov5s"):
     # Set PyBUDA configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "Ribbon"
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.enable_tm_cpu_fallback = True
     os.environ["PYBUDA_DECOMPOSE_SIGMOID"] = "1"
     os.environ["PYBUDA_LEGACY_UBLOCK_SHAPE"] = "1"
@@ -29,6 +28,7 @@ def run_pytorch_yolov5_480(variant="yolov5s"):
             # Set PyBUDA environment variables
             os.environ["PYBUDA_PAD_SPARSE_MM"] = "{113:128}"
             os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{16*1024}"
+            os.environ["PYBUDA_FORK_JOIN_SKIP_EXPANDING_BUFFERS"] = "1"
             if variant == "yolov5m":
                 os.environ["PYBUDA_INSERT_SLICE_FOR_CONCAT"] = "1"
                 os.environ["PYBUDA_CONCAT_SLICE_Y"] = "10"
@@ -36,8 +36,6 @@ def run_pytorch_yolov5_480(variant="yolov5s"):
                     "concatenate_26.dc.concatenate.30.dc.concatenate.1.dc.buffer.0", "t_stream_shape", (6, 1)
                 )
                 os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{32*1024}"
-            if variant == "yolov5l":
-                os.environ["PYBUDA_FORK_JOIN_SKIP_EXPANDING_BUFFERS"] = "1"
             if variant == "yolov5x":
                 os.environ["PYBUDA_TEMP_ELT_UNARY_ESTIMATES_LEGACY"] = "1"
                 os.environ["PYBUDA_INSERT_SLICE_FOR_CONCAT"] = "1"
@@ -48,7 +46,6 @@ def run_pytorch_yolov5_480(variant="yolov5s"):
                 compiler_cfg.balancer_op_override("conv2d_41.dc.matmul.8", "grid_shape", (5, 5))
         elif available_devices[0] == BackendDevice.Wormhole_B0:
             # Set PyBUDA environment variables
-            compiler_cfg.enable_auto_fusing = False
             compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
             compiler_cfg.default_dram_parameters = True
             os.environ["PYBUDA_RIBBON2"] = "1"
@@ -61,11 +58,19 @@ def run_pytorch_yolov5_480(variant="yolov5s"):
                     "concatenate_26.dc.concatenate.30.dc.concatenate.1.dc.buffer.0", "t_stream_shape", (6, 1)
                 )
             elif variant == "yolov5l":
+                compiler_cfg.enable_auto_fusing = False
                 compiler_cfg.place_on_new_epoch("concatenate_208.dc.concatenate.0")
             elif variant == "yolov5x":
+                compiler_cfg.enable_auto_fusing = False
                 os.environ["PYBUDA_INSERT_SLICE_FOR_CONCAT"] = "1"
                 os.environ["PYBUDA_CONCAT_SLICE_Y"] = "10"
                 os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
+                os.environ["PYBUDA_MAX_FORK_JOIN_BUF"] = "1"
+                os.environ["PYBUDA_FORK_JOIN_SKIP_EXPANDING_BUFFERS"] = "1"
+                compiler_cfg.balancer_op_override(
+                    "concatenate_40.dc.concatenate.30.dc.concatenate.0.dc.concatenate.12", "t_stream_shape", (3, 1)
+                )
+
         else:
             print("not a supported device!")
             sys.exit()

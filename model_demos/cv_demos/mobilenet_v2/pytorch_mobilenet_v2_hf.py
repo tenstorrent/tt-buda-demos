@@ -1,5 +1,7 @@
 # MobileNetV2 Demo Script - 96x96
 
+import os
+
 import pybuda
 import requests
 from PIL import Image
@@ -12,10 +14,10 @@ def run_mobilenetv2_hf(variant="google/mobilenet_v2_0.35_96"):
     compiler_cfg = pybuda.config._get_global_compiler_config()
 
     # Device specific configurations
-    if variant == "google/mobilenet_v2_0.35_96" or "google/mobilenet_v2_0.75_160" or "google/mobilenet_v2_1.0_224":
-        compiler_cfg.balancer_policy = "Ribbon"
-        compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
-        compiler_cfg.enable_t_streaming = True
+    compiler_cfg.balancer_policy = "Ribbon"
+    compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
+    if variant == "google/mobilenet_v2_1.0_224":
+        os.environ["PYBUDA_RIBBON2"] = "1"
 
     # Create PyBuda module from PyTorch model
     model_ckpt = variant

@@ -57,7 +57,6 @@ def run_unet_qubvel_pytorch():
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "Ribbon"
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
     compiler_cfg.conv_multi_op_fracture_factor_override["conv2d_1488"] = 3
     compiler_cfg.default_dram_parameters = False

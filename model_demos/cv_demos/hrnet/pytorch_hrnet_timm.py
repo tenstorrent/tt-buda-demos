@@ -22,7 +22,6 @@ def run_hrnet_timm_pytorch(variant="hrnet_w18_small"):
 
     # Device specific configurations
     compiler_cfg.balancer_policy = "CNN"
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
     os.environ["PYBUDA_LEGACY_UBLOCK_SHAPE"] = "1"
 

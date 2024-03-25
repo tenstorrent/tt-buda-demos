@@ -19,7 +19,6 @@ def run_resnet_pytorch(variant="microsoft/resnet-50"):
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "Ribbon"
     compiler_cfg.default_df_override = pybuda._C.DataFormat.Float16_b
-    compiler_cfg.enable_t_streaming = True
     os.environ["PYBUDA_DISABLE_STREAM_OUTPUT"] = "1"
     os.environ["PYBUDA_PAD_OUTPUT_BUFFER"] = "1"
 

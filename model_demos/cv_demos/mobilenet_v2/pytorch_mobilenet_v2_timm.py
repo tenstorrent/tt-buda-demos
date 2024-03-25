@@ -1,5 +1,6 @@
 # MobileNetV2 Demo Script - TIMM
 
+import os
 import urllib
 
 import pybuda
@@ -7,6 +8,7 @@ import requests
 import timm
 import torch
 from PIL import Image
+from pybuda._C.backend_api import BackendDevice
 from timm.data import resolve_data_config
 from timm.data.transforms_factory import create_transform
 
@@ -17,7 +19,10 @@ def run_mobilenetv2_timm():
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "Ribbon"
     compiler_cfg.default_df_override = pybuda._C.DataFormat.Float16_b
-    compiler_cfg.enable_t_streaming = True
+    available_devices = pybuda.detect_available_devices()
+    if available_devices:
+        if available_devices[0] == BackendDevice.Grayskull:
+            os.environ["PYBUDA_RIBBON2"] = "1"
 
     # Create PyBuda module from PyTorch model
     model = timm.create_model("mobilenetv2_100", pretrained=True)

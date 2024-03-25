@@ -15,8 +15,10 @@ def run_beit_classify_224_hf_pytorch(variant="microsoft/beit-base-patch16-224"):
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
     available_devices = pybuda.detect_available_devices()
+    compiler_cfg.balancer_policy = "Ribbon"
+    os.environ["PYBUDA_RIBBON2"] = "1"
+    compiler_cfg.default_df_override = pybuda._C.DataFormat.Float16_b
 
-    compiler_cfg.enable_t_streaming = True
     if variant == "microsoft/beit-base-patch16-224":
         compiler_cfg.retain_tvm_python_files = True
         compiler_cfg.enable_tvm_constant_prop = True
@@ -27,8 +29,6 @@ def run_beit_classify_224_hf_pytorch(variant="microsoft/beit-base-patch16-224"):
             compiler_cfg.retain_tvm_python_files = True
             compiler_cfg.enable_tvm_constant_prop = True
             os.environ["PYBUDA_ENABLE_STABLE_SOFTMAX"] = "1"
-        else:
-            compiler_cfg.default_df_override = pybuda._C.DataFormat.Float16_b
 
     # Create PyBuda module from PyTorch model
     image_processor = BeitImageProcessor.from_pretrained(variant)

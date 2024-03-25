@@ -11,7 +11,6 @@ def run_mobilenetv1_hf(variant="google/mobilenet_v1_0.75_192"):
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "Ribbon"
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
 
     # Create PyBuda module from PyTorch model

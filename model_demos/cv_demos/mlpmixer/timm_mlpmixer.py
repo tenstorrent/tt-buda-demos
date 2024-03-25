@@ -25,7 +25,6 @@ def run_mlpmixer_timm():
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()  # load global compiler config object
     compiler_cfg.balancer_policy = "Ribbon"
-    compiler_cfg.enable_t_streaming = True
 
     # Load data sample
     url = "https://images.rawpixel.com/image_1300/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA1L3BkMTA2LTA0Ny1jaGltXzEuanBn.jpg"

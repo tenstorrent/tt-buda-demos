@@ -1,5 +1,6 @@
 # VoVNet Model V2
 
+import os
 import urllib
 
 import pybuda
@@ -37,9 +38,8 @@ def run_vovnet_ese_99b_timm_pytorch():
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "CNN"
-    compiler_cfg.enable_t_streaming = True
-    compiler_cfg.enable_auto_fusing = False
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
+    compiler_cfg.default_dram_parameters = False
 
     # Create PyBuda module from PyTorch model
     tt_model = pybuda.PyTorchModule(model_name + "_pt", model)

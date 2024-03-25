@@ -77,7 +77,6 @@ def run_resnet_onnx():
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()  # load global compiler config object
     compiler_cfg.balancer_policy = "CNN"
-    compiler_cfg.enable_t_streaming = True
     compiler_cfg.enable_auto_fusing = False
     os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
 
