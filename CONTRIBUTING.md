@@ -19,6 +19,10 @@ All contributions require:
 - a pull request (PR).
 - Your PR must be approved by appropriate reviewers.
 
+
+
+
+
 ## Setting up environment
 
 Install all dependencies from [requriements-dev.txt](requirements-dev.txt) and install pre-commit hooks in a Python environment with PyBuda installed.
@@ -95,5 +99,26 @@ We actively welcome your pull requests.
     are relevant for the PR.
   - Run pre-commit hooks.
   - Pass any acceptance criteria mandated in the original issue.
+  - Pass automated github actions worksflow test
   - Pass any testing criteria mandated by codeowners whose modules are relevant
     for the PR.
+
+For more information on the GitHub Actions and Pull Request Workflow, please see the [GitHub Actions and Pull Request Workflow section](#github-actions-and-pull-request-workflow) within the document.
+
+### GitHub Actions and Pull Request Workflow
+
+#### Automated Linting with GitHub Actions
+
+Linting, styling, and cleaning checks are automatically performed on pull requests using GitHub Actions. This ensures that contributed code meets standard Python coding standards before it's merged into the main branch.
+
+1. **Pull Request Process**: When you open a pull request, GitHub Actions will automatically trigger linting, styling, and cleaning checks on the changes made within the `model_demos` directory.
+
+2. **Approval Requirement**: In order to merge a pull request, it must pass the GitHub Actions workflow test. This ensures that all contributions adhere to our coding standards and maintain consistency throughout our `tt-buda-demos` repository.
+
+3. **Interpreting Results**: If linting fails on your pull request, review the output to identify and fix any issues. You'll need to address these issues before the pull request can be approved and merged. In case of repeated failures or failures within the GitHub Actions workflow files, please reach out to one of the repository maintainers from the [Maintainers.md](MAINTAINERS.md).
+
+#### Automated Commit by GitHub Actions
+
+The GitHub Actions workflow also automatically makes a commit with the message ```*** AUTOMATED COMMIT | Applied Code Formatting and Cleanup ✨ 🍰 ✨***``` authored by ```[anirudTT]``` when it performs code formatting and cleanup. If you open a pull request and subsequently push more changes, we suggest **rebasing or pulling again** from the pull request branch before pushing your changes again to avoid conflicts.
+
+
