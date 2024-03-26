@@ -30,8 +30,9 @@ python cv_demos/resnet/pytorch_resnet.py
 | **Model** | **Supported Hardware** <br /> GS - Grayskull <br /> WH - Wormhole |
 |-------------------------------------------|:--------:|
 |   [ALBERT](nlp_demos/albert/)            |     GS, WH   |
-|   [Autoencoder](cv_demos/autoencoder/)  |     GS, WH   |
-|   [BeiT](nlp_demos/beit/)                |     GS, WH   |
+|   [Autoencoder (convolutional)](cv_demos/conv_autoencoder/)  |     GS, WH   |
+|   [Autoencoder (linear)](cv_demos/linear_autoencoder/)  |     GS, WH   |
+|   [BeiT](cv_demos/beit/)                |     GS, WH   |
 |   [BERT](nlp_demos/bert/)                |     GS, WH   |
 |   [CLIP](cv_demos/clip/)                |     GS, WH   |
 |   [CodeGen](nlp_demos/codegen/)          |     GS, WH   |
@@ -47,7 +48,7 @@ python cv_demos/resnet/pytorch_resnet.py
 |   [GoogLeNet](cv_demos/googlenet/)      |     GS, WH   |
 |   [GPT-2](nlp_demos/gpt2/)               |     GS, WH   |
 |   [GPT Neo](nlp_demos/gptneo/)           |     GS, WH   |
-|   [Hand Landmark](nlp_demos/landmark/)  |    WH   |
+|   [Hand Landmark](cv_demos/landmark/)  |    WH   |
 |   [HRNet](cv_demos/hrnet/)              |     GS, WH   |
 |   [Inception-v4](cv_demos/inceptionv4/) |    GS, WH   |
 |   [MLP-Mixer](cv_demos/mlpmixer/)  |     GS, WH   |
@@ -76,4 +77,3 @@ python cv_demos/resnet/pytorch_resnet.py
 |   [XGLM](nlp_demos/xglm/)                |     GS, WH   |
 |   [YOLOv3](cv_demos/yolo_v3/)            |     GS, WH   |
 |   [YOLOv5](cv_demos/yolo_v5/)            |     GS, WH   |
-
