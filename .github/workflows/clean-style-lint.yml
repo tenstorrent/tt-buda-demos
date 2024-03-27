@@ -40,3 +40,4 @@ jobs:
           commit_user_email: aramchandran@tenstorrent.com
           commit_options: '-S'
           branch: ${{ github.head_ref }}
+          
