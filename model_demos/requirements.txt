@@ -11,5 +11,5 @@ numba==0.53.1  # For Whisper
 segmentation-models-pytorch==0.3.3  # For U-Net
 diffusers==0.14.0  # For Stable Diffusion
 transformers==4.37.0 # For Qwen2
-acceleration==0.28.0 # For Qwen2
+accelerate==0.28.0 # For Qwen2
 auto-gptq==0.7.1 # For Qwen2-GPTQ
