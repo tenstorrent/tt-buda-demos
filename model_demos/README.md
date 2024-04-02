@@ -59,6 +59,7 @@ python cv_demos/resnet/pytorch_resnet.py
 |   [OpenPose](cv_demos/openpose/)          |     GS, WH   |
 |   [OPT](nlp_demos/opt/)                  |     GS, WH   |
 |   [Pose Landmark](cv_demos/landmark/)  |    WH   |
+|   [Perceiver IO](cv_demos/perceiverio/) |     GS, WH   |
 |   [ResNet](cv_demos/resnet/)            |     GS, WH   |
 |   [ResNeXt](cv_demos/resnext/)          |     GS, WH   |
 |   [RetinaNet](cv_demos/retinanet/)      |     GS, WH   |
