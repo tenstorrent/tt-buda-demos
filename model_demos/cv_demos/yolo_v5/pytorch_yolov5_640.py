@@ -48,6 +48,7 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
                 if model_ckpt == "yolov5x":
                     compiler_cfg.place_on_new_epoch("conv2d_210.dc.matmul.11")
                     os.environ["PYBUDA_TEMP_BALANCER_DISABLE_TARGET_PROXIMITY"] = "1"
+                    os.environ["PYBUDA_TEMP_RIBBON2_LEGACY_UTIL_EVAL"] = "1"
             if model_ckpt in ["yolov5m"]:
                 os.environ["PYBUDA_RIBBON2"] = "1"
                 os.environ["PYBUDA_INSERT_SLICE_FOR_CONCAT"] = "1"
@@ -56,6 +57,7 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
                 compiler_cfg.place_on_new_epoch("conv2d_27.dc.matmul.8")
             if model_ckpt in ["yolov5l"]:
                 compiler_cfg.place_on_new_epoch("conv2d_313.dc.matmul.8")
+                os.environ["PYBUDA_TEMP_DISABLE_MODEL_KB_PROLOGUE_BW"] = "1"
 
         elif available_devices[0] == BackendDevice.Wormhole_B0:
             os.environ["PYBUDA_PAD_SPARSE_MM"] = "{13:16, 3:4}"
@@ -79,8 +81,10 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
                     "concatenate_19.dc.concatenate.30.dc.concatenate.1.dc.buffer.0", "t_stream_shape", (3, 1)
                 )
             if model_ckpt == "yolov5m":
+                compiler_cfg.balancer_op_override("concatenate_332.dc.concatenate.7", "grid_shape", (1,1))
                 os.environ["PYBUDA_RIBBON2"] = "1"
-                os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{112*1024}"
+                os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"]  = f"{112*1024}"
+                os.environ["PYBUDA_TEMP_RIBBON2_LEGACY_UTIL_EVAL"] = "1"
             if model_ckpt == "yolov5l":
                 compiler_cfg.enable_auto_transposing_placement = True
                 compiler_cfg.enable_tm_cpu_fallback = True
