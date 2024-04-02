@@ -57,6 +57,7 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
                 compiler_cfg.place_on_new_epoch("conv2d_27.dc.matmul.8")
             if model_ckpt in ["yolov5l"]:
                 compiler_cfg.place_on_new_epoch("conv2d_313.dc.matmul.8")
+                os.environ["PYBUDA_TEMP_DISABLE_MODEL_KB_PROLOGUE_BW"] = "1"
 
         elif available_devices[0] == BackendDevice.Wormhole_B0:
             os.environ["PYBUDA_PAD_SPARSE_MM"] = "{13:16, 3:4}"
