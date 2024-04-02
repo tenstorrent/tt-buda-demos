@@ -32,7 +32,10 @@ def run_xception_timm(variant="xception"):
         if available_devices[0] == BackendDevice.Wormhole_B0:
             compiler_cfg.balancer_policy = "CNN"
         elif available_devices[0] == BackendDevice.Grayskull:
-            compiler_cfg.balancer_policy = "Ribbon"
+            os.environ["PYBUDA_TEMP_DISABLE_MODEL_KB_PROLOGUE_BW"] = "1"
+    if available_devices[0] == BackendDevice.Grayskull:
+        compiler_cfg.balancer_policy = "Ribbon"
+
     os.environ["PYBUDA_RIBBON2"] = "1"
     os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
     compiler_cfg.default_dram_parameters = False
