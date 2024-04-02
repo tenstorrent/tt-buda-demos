@@ -32,7 +32,7 @@ def run_perceiverio_pytorch(variant="deepmind/vision-perceiver-conv"):
     pixel_values = inputs["pixel_values"]
 
     # Run inference on Tenstorrent device
-    output_q = pybuda.run_inference(pybuda.PyTorchModule("pt_resnet50", model), inputs=[(pixel_values,)])
+    output_q = pybuda.run_inference(pybuda.PyTorchModule("pt_perceiver_io", model), inputs=[(pixel_values,)])
     output = output_q.get()  # return last queue object
 
     # Data postprocessing
