@@ -12,7 +12,7 @@ While TT-Buda is the official Tenstorrent AI/ML compiler stack, PyBuda is the Py
 
 ### OS Compatibility
 
-Presently, Tenstorrent software is only supported on the **Ubuntu 20.04 LTS (Focal Fossa)** operating system.
+Currently our Tenstorrent software can be access on **Ubuntu 20.04 LTS (Focal Fossa)** and **Ubuntu 20.04 LTS (Jammy Jellyfish)** operating systems. 
 
 ## Release Versions
 
@@ -63,16 +63,38 @@ The [tt-firmware](https://github.com/tenstorrent/tt-firmware) file needs to be i
 
 ### Backend Compiler Dependencies
 
-Instructions to install the Tenstorrent backend compiler dependencies on a fresh install of Ubuntu Server 20.04.
+Instructions to install the Tenstorrent backend compiler dependencies on a fresh install of Ubuntu Server 20.04 or Ubuntu Server 22.04.
 
 *You may need to **append** each `apt-get` command with `sudo` if you do not have root permissions.*
+
+For both operating systems run the following commands:
 
 ```bash
 apt-get update -y
 apt-get upgrade -y --no-install-recommends
-apt-get install -y software-properties-common
-apt-get install -y python3.8-venv libboost-all-dev libgoogle-glog-dev libgl1-mesa-glx libyaml-cpp-dev ruby
-apt-get install -y build-essential clang-6.0 libhdf5-serial-dev libzmq3-dev
+apt install -y build-essential curl libboost-all-dev libgl1-mesa-glx libgoogle-glog-dev libhdf5-serial-dev ruby software-properties-common libzmq3-dev 
+
+```
+
+Then, for Ubuntu 20.04, you would add:
+```bash
+apt install -y clang-6.0 libyaml-cpp-dev libzmq3-dev python3.8-venv 
+pip3 install -U pip
+```
+
+For Ubuntu 22.04, you would add:
+```bash
+apt install -y python3-venv clang wget
+wget http://mirrors.kernel.org/ubuntu/pool/main/y/yaml-cpp/libyaml-cpp-dev_0.6.2-4ubuntu1_amd64.deb
+wget http://mirrors.kernel.org/ubuntu/pool/main/y/yaml-cpp/libyaml-cpp0.6_0.6.2-4ubuntu1_amd64.deb
+dpkg -i libyaml-cpp-dev_0.6.2-4ubuntu1_amd64.deb libyaml-cpp0.6_0.6.2-4ubuntu1_amd64.deb
+rm libyaml-cpp-dev_0.6.2-4ubuntu1_amd64.deb libyaml-cpp0.6_0.6.2-4ubuntu1_amd64.deb
+```
+
+Then in both operating system run the following command:
+
+```bash
+apt install -y python3-pip python-is-python3 && rm -rf /var/lib/apt/lists/*
 ```
 
 ### TT-SMI
