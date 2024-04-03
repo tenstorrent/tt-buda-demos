@@ -78,7 +78,7 @@ apt install -y build-essential curl libboost-all-dev libgl1-mesa-glx libgoogle-g
 
 For Ubuntu 20.04, add:
 ```bash
-apt install -y clang-6.0 libyaml-cpp-dev libzmq3-dev python3.8-venv 
+apt install -y clang-6.0 libyaml-cpp-dev python3.8-venv 
 ```
 
 For Ubuntu 22.04, add:
