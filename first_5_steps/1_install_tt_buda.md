@@ -82,7 +82,7 @@ apt install -y clang-6.0 libyaml-cpp-dev libzmq3-dev python3.8-venv
 pip3 install -U pip
 ```
 
-For Ubuntu 22.04, you would add:
+For Ubuntu 22.04, add:
 ```bash
 apt install -y python3-venv clang wget
 wget http://mirrors.kernel.org/ubuntu/pool/main/y/yaml-cpp/libyaml-cpp-dev_0.6.2-4ubuntu1_amd64.deb
