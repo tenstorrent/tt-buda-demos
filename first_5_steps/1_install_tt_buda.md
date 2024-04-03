@@ -65,7 +65,7 @@ The [tt-firmware](https://github.com/tenstorrent/tt-firmware) file needs to be i
 
 Instructions to install the Tenstorrent backend compiler dependencies on a fresh install of Ubuntu Server 20.04 or Ubuntu Server 22.04.
 
-*You may need to **append** each `apt-get` command with `sudo` if you do not have root permissions.*
+*You may need to **append** each `apt` command with `sudo` if you do not have root permissions.*
 
 For both operating systems run the following commands:
 
