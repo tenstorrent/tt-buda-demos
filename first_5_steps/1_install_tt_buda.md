@@ -76,7 +76,7 @@ apt install -y build-essential curl libboost-all-dev libgl1-mesa-glx libgoogle-g
 
 ```
 
-Then, for Ubuntu 20.04, you would add:
+For Ubuntu 20.04, add:
 ```bash
 apt install -y clang-6.0 libyaml-cpp-dev libzmq3-dev python3.8-venv 
 pip3 install -U pip
