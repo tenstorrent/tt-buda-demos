@@ -79,6 +79,7 @@ apt install -y build-essential curl libboost-all-dev libgl1-mesa-glx libgoogle-g
 For Ubuntu 20.04, add:
 ```bash
 apt install -y libyaml-cpp-dev
+```
 
 For Ubuntu 22.04, add:
 ```bash
