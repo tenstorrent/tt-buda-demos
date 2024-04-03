@@ -91,7 +91,7 @@ dpkg -i libyaml-cpp-dev_0.6.2-4ubuntu1_amd64.deb libyaml-cpp0.6_0.6.2-4ubuntu1_a
 rm libyaml-cpp-dev_0.6.2-4ubuntu1_amd64.deb libyaml-cpp0.6_0.6.2-4ubuntu1_amd64.deb
 ```
 
-Then in both operating system run the following command:
+Then, for both operating systems, run:
 
 ```bash
 apt install -y python3-pip python-is-python3 && rm -rf /var/lib/apt/lists/*
