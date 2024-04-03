@@ -71,7 +71,7 @@ For both operating systems run the following commands:
 
 ```bash
 apt update -y
-apt-get upgrade -y --no-install-recommends
+apt upgrade -y --no-install-recommends
 apt install -y build-essential curl libboost-all-dev libgl1-mesa-glx libgoogle-glog-dev libhdf5-serial-dev ruby software-properties-common libzmq3-dev 
 
 ```
