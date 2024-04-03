@@ -72,29 +72,22 @@ For both operating systems run the following commands:
 ```bash
 apt update -y
 apt upgrade -y --no-install-recommends
-apt install -y build-essential curl libboost-all-dev libgl1-mesa-glx libgoogle-glog-dev libhdf5-serial-dev ruby software-properties-common libzmq3-dev 
+apt install -y build-essential curl libboost-all-dev libgl1-mesa-glx libgoogle-glog-dev libhdf5-serial-dev ruby software-properties-common libzmq3-dev clang wget python3-pip python-is-python3 python3-venv
 
 ```
 
 For Ubuntu 20.04, add:
 ```bash
-apt install -y clang-6.0 libyaml-cpp-dev python3.8-venv 
-```
+apt install -y libyaml-cpp-dev
 
 For Ubuntu 22.04, add:
 ```bash
-apt install -y python3-venv clang wget
 wget http://mirrors.kernel.org/ubuntu/pool/main/y/yaml-cpp/libyaml-cpp-dev_0.6.2-4ubuntu1_amd64.deb
 wget http://mirrors.kernel.org/ubuntu/pool/main/y/yaml-cpp/libyaml-cpp0.6_0.6.2-4ubuntu1_amd64.deb
 dpkg -i libyaml-cpp-dev_0.6.2-4ubuntu1_amd64.deb libyaml-cpp0.6_0.6.2-4ubuntu1_amd64.deb
 rm libyaml-cpp-dev_0.6.2-4ubuntu1_amd64.deb libyaml-cpp0.6_0.6.2-4ubuntu1_amd64.deb
 ```
 
-Then, for both operating systems, run:
-
-```bash
-apt install -y python3-pip python-is-python3 && rm -rf /var/lib/apt/lists/*
-```
 
 ### TT-SMI
 
