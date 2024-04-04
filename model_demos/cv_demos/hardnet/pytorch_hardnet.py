@@ -1,11 +1,10 @@
-import os
-import urllib
-
 import pybuda
 import torch
+import os
+import urllib
 from PIL import Image
-from pybuda._C.backend_api import BackendDevice
 from torchvision import transforms
+from pybuda._C.backend_api import BackendDevice
 
 
 def run_hardnet_pytorch(variant):
@@ -62,7 +61,7 @@ def run_hardnet_pytorch(variant):
     )
     try:
         urllib.URLopener().retrieve(url, filename)
-    except Exception:
+    except:
         urllib.request.urlretrieve(url, filename)
 
     input_image = Image.open(filename)
@@ -98,7 +97,6 @@ def run_hardnet_pytorch(variant):
 
     # Remove the downloaded image
     os.remove(filename)
-
 
 if __name__ == "__main__":
     run_hardnet_pytorch()
