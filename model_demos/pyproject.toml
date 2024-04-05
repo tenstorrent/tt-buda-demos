@@ -81,4 +81,5 @@ markers = [
     "xception: tests that involve Xception",
     "ghostnet: tests that involve GhostNet",
     "perceiverio: tests that involve PerceiverIO",
+    "hardnet: tests that involve hardnet",
 ]
