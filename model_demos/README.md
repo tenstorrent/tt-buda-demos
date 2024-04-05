@@ -78,3 +78,8 @@ python cv_demos/resnet/pytorch_resnet.py
 |   [XGLM](nlp_demos/xglm/)                                    |     GS, WH   | v0.10.5 |
 |   [YOLOv3](cv_demos/yolo_v3/)                                |     GS, WH   | v0.10.5 |
 |   [YOLOv5](cv_demos/yolo_v5/)                                |     GS, WH   | v0.10.5 |
+
+
+## Note:
+
+Please note that alpha relases are not stable releases and may not support or have all functionality as the stable releaes. If full functionality is needed we suggest picking a stable relases.
