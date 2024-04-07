@@ -82,4 +82,5 @@ markers = [
     "ghostnet: tests that involve GhostNet",
     "perceiverio: tests that involve Perceiver IO",
     "hardnet: tests that involve hardnet",
+    "fpn: tests that involve FPN",
 ]
