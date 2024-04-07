@@ -42,12 +42,14 @@ python cv_demos/resnet/pytorch_resnet.py
 |   [EfficientNet-Lite](cv_demos/efficientnet_lite/) |     WH   |
 |   [Falcon-7B](nlp_demos/falcon/)               |    WH   |
 |   [FLAN-T5](nlp_demos/flant5/)           |     GS, WH   |
+|   [FPN](cv_demos/fpn/)           |     GS, WH   |
 |   [Fuyu-8B](nlp_demos/fuyu8b/)          |       |
 |   [GhostNet](cv_demos/ghostnet/)         |     GS, WH   |
 |   [GoogLeNet](cv_demos/googlenet/)      |     GS, WH   |
 |   [GPT-2](nlp_demos/gpt2/)               |     GS, WH   |
 |   [GPT Neo](nlp_demos/gptneo/)           |     GS, WH   |
 |   [Hand Landmark](nlp_demos/landmark/)  |    WH   |
+|   [HardNet](cv_demos/hardnet/)              |     GS, WH   |
 |   [HRNet](cv_demos/hrnet/)              |     GS, WH   |
 |   [Inception-v4](cv_demos/inceptionv4/) |    GS, WH   |
 |   [MLP-Mixer](cv_demos/mlpmixer/)  |     GS, WH   |
