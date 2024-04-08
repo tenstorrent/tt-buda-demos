@@ -22,20 +22,13 @@ jobs:
           make clean
           make clean_tt
           make style
-      - name: Import GPG key
-        id: import-gpg
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE}}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-      - name: Commit changes
+      - name: Check if GPG key exists
+        id: check-gpg-key
+        run: echo ::set-output name=key_exists::$(if [ -n "${{ secrets.GPG_PRIVATE_KEY }}" ]; then echo "true"; else echo "false"; fi)
+      - name: Commit changes with or without GPG signing
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_user_name: CleanBot
           commit_message: '*** AUTOMATED COMMIT | Applied Code Formatting and Cleanup ✨ 🍰 ✨***'
+          commit_user_name: CleanBot
           commit_user_email: aramchandran@tenstorrent.com
-          commit_options: '-S'
-          branch: ${{ github.head_ref }}
-          
+          commit_options: ${{ steps.check-gpg-key.outputs.key_exists == 'true' && '-S' || '' }}
