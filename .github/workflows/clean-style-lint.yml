@@ -27,12 +27,7 @@ jobs:
           make clean
           make clean_tt
           make style
-      
-      #!TODO: remove in future -- after a few runs 
-      # - name: Check if GPG key exists
-      #   id: check-gpg-key
-      #   run: echo ::set-output name=key_exists::$(if [ -n "${{ secrets.GPG_PRIVATE_KEY }}" ]; then echo "true"; else echo "false"; fi)
-      
+          
       - name: Check if GPG key exists
         id: check-gpg-key
         run: |
