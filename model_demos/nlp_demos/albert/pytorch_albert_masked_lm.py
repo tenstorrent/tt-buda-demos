@@ -2,11 +2,11 @@
 
 import os
 
-
+import pybuda
 from pybuda._C.backend_api import BackendDevice
 from transformers import AlbertForMaskedLM, AlbertTokenizer
 
-import pybuda
+
 def run_albert_masked_lm_pytorch(size="base", variant="v2"):
     available_devices = pybuda.detect_available_devices()
 
