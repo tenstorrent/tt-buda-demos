@@ -1,7 +1,7 @@
 on:
   pull_request:
     branches: [main]
-      
+    types: [opened, reopened, synchronize, closed, assigned, unassigned, labeled, unlabeled, review_requested, review_request_removed]
 jobs:
   clean-and-lint:
     runs-on: ubuntu-20.04
