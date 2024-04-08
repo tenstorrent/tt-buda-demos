@@ -1,8 +1,8 @@
 on:
   pull_request:
     branches: [main]
-    paths:
-      - 'model_demos/**'
+    # paths:
+    #   - 'model_demos/**'
       
 jobs:
   clean-and-lint:
