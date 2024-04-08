@@ -1,3 +1,5 @@
+name: Clean and Lint
+
 on:
   pull_request:
     branches: [main]
@@ -9,10 +11,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4 
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.8'
+      
       - name: Install dependencies and run clean and lint
         working-directory: model_demos
         run: |
@@ -23,9 +27,22 @@ jobs:
           make clean
           make clean_tt
           make style
+      
+      #!TODO: remove in future -- after a few runs 
+      # - name: Check if GPG key exists
+      #   id: check-gpg-key
+      #   run: echo ::set-output name=key_exists::$(if [ -n "${{ secrets.GPG_PRIVATE_KEY }}" ]; then echo "true"; else echo "false"; fi)
+      
       - name: Check if GPG key exists
         id: check-gpg-key
-        run: echo ::set-output name=key_exists::$(if [ -n "${{ secrets.GPG_PRIVATE_KEY }}" ]; then echo "true"; else echo "false"; fi)
+        run: |
+          if [ -n "${{ secrets.GPG_PRIVATE_KEY }}" ]; then
+            echo "::set-output name=key_exists::true"
+          else
+            echo "::set-output name=key_exists::false"
+          fi
+
+
       - name: Import GPG key if it exists
         if: steps.check-gpg-key.outputs.key_exists == 'true'
         id: import-gpg
@@ -35,6 +52,7 @@ jobs:
           passphrase: ${{ secrets.GPG_PASSPHRASE}}
           git_user_signingkey: true
           git_commit_gpgsign: true
+
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
