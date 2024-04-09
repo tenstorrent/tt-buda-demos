@@ -12,7 +12,7 @@ While TT-Buda is the official Tenstorrent AI/ML compiler stack, PyBuda is the Py
 
 ### OS Compatibility
 
-Currently, Tenstorrent software is supported on **Ubuntu 20.04 LTS (Focal Fossa)** and **Ubuntu 20.04 LTS (Jammy Jellyfish)** operating systems. 
+Currently, Tenstorrent software is supported on **Ubuntu 20.04 LTS (Focal Fossa)** and **Ubuntu 22.04 LTS (Jammy Jellyfish)** operating systems. 
 
 ## Release Versions
 
