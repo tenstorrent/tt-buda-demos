@@ -1,6 +1,7 @@
 import importlib
 from abc import ABCMeta, abstractmethod
-from collections import Iterable, OrderedDict, defaultdict
+from collections import OrderedDict, defaultdict
+from collections.abc import Iterable
 
 import torch
 import torch.nn as nn
