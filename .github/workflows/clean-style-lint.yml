@@ -3,7 +3,13 @@ name: Clean and Lint
 on:
   pull_request:
     branches: [main]
-    types: [opened, reopened, synchronize, assigned, review_requested]
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - assigned
+      - review_requested
+
 
 jobs:
   clean-and-lint:
@@ -21,9 +27,9 @@ jobs:
         working-directory: model_demos
         run: |
           python -m venv venv
-          source venv/bin/activate && \
-          pip install --upgrade pip==24.0 && \
-          pip install -r requirements-dev.txt && \
+          source venv/bin/activate
+          pip install --upgrade pip==24.0
+          pip install -r requirements-dev.txt
           make clean
           make clean_tt
           make style
