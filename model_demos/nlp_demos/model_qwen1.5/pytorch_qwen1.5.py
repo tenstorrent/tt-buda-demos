@@ -1,4 +1,5 @@
 import pybuda
+import os
 
 from transformers import Qwen2ForCausalLM, Qwen2Tokenizer, Qwen2Config
 from pybuda.transformers.pipeline import pipeline as pybuda_pipeline
@@ -16,9 +17,15 @@ model_name = "Qwen/Qwen1.5-0.5B"
 
 
 def run_qwen_causal_lm(max_length=1024, top_p=0.9, top_k=50, temperature=0.7):
+    # Set environment variables
+    os.environ['PYBUDA_DEVMODE'] = '0'
+    os.environ['TT_BACKEND_TIMEOUT'] = '0'
+    os.environ["PYBUDA_FORK_JOIN_EXPAND_FORK_OUTPUT_BUF"] = "0"
+    os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "65536"
+
     # Set PyBuda configurations
     compiler_cfg = pybuda.config._get_global_compiler_config()
-    compiler_cfg.default_df_override = pybuda._C.DataFormat.Float16_b
+    compiler_cfg.amp_level = 0
 
     # Config
     config = Qwen2Config.from_pretrained(model_name)
