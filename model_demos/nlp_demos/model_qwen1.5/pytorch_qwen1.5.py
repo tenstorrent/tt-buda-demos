@@ -36,9 +36,8 @@ def run_qwen_causal_lm(max_length=1024, top_p=0.9, top_k=50, temperature=0.7):
     config = Qwen2Config(**config_dict)
 
     # Load the model and tokenizer
-    model = Qwen2ForCausalLM.from_pretrained(
-        model_name, config=config, device_map=device)
-    tokenizer = Qwen2Tokenizer.from_pretrained(model_name, device_map=device)
+    model = Qwen2ForCausalLM.from_pretrained(model_name, config=config)
+    tokenizer = Qwen2Tokenizer.from_pretrained(model_name)
 
     # Set pad token
     tokenizer.pad_token = tokenizer.eos_token
