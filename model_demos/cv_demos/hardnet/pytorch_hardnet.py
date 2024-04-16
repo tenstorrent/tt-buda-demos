@@ -1,10 +1,11 @@
-import pybuda
-import torch
 import os
 import urllib
+
+import pybuda
+import torch
 from PIL import Image
-from torchvision import transforms
 from pybuda._C.backend_api import BackendDevice
+from torchvision import transforms
 
 
 def run_hardnet_pytorch(variant):
@@ -97,6 +98,7 @@ def run_hardnet_pytorch(variant):
 
     # Remove the downloaded image
     os.remove(filename)
+
 
 if __name__ == "__main__":
     run_hardnet_pytorch()
