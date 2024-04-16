@@ -50,7 +50,7 @@ python cv_demos/resnet/pytorch_resnet.py
 |   [GPT Neo](nlp_demos/gptneo/)                               |     GS, WH   | v0.10.5 |
 |   [Hand Landmark](cv_demos/landmark/)                        |         WH   | v0.10.5 |
 |   [HRNet](cv_demos/hrnet/)                                   |     GS, WH   | v0.10.5 |
-|   [Hardnet](cv_demos/hardnet/)                               |     GS, WH   | v0.11.0-alpha |
+|   [HarDNet](cv_demos/hardnet/)                               |     GS, WH   | v0.11.0-alpha |
 |   [Inception-v4](cv_demos/inceptionv4/)                      |     GS, WH   | v0.10.5 |
 |   [MLP-Mixer](cv_demos/mlpmixer/)                            |     GS, WH   | v0.10.5 |
 |   [MobileNetSSD](cv_demos/mobilenet_ssd/)                    |         WH   | v0.10.5 |
