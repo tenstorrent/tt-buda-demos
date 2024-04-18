@@ -3,22 +3,55 @@ import shutil
 import subprocess
 from datetime import datetime
 from pathlib import Path
-
-import pybuda
 import pytest
+import pybuda
+from pybuda._C.backend_api import BackendDevice, BackendType
 
+# Environment variable storage for cleanup
 environ_before_test = None
+
+# Detect available devices and determine the backend type
+detected_devices = pybuda.detect_available_devices()
+device_type = BackendType.Golden if len(detected_devices) == 0 else BackendType.Silicon
+
+# Define RESET_TIMEOUT for the reset_board function
+RESET_TIMEOUT = 600  # seconds
+
+def reset_board():
+    """Executes the reset command on the board."""
+    try:
+        print("Resetting board...")
+        subprocess.run(
+            args=["tt-smi", "-lr", "0"],
+            capture_output=True,
+            timeout=RESET_TIMEOUT,
+        )
+    except subprocess.TimeoutExpired:
+        print("Reset command timed out.")
+    except subprocess.CalledProcessError as e:
+        print(f"Reset command failed with a non-zero exit status: {e}")
+    except Exception as e:
+        print(f"An error occurred during board reset: {e}")
 
 @pytest.fixture(autouse=True)
 def clear_pybuda():
     """
-    Cleans up the pybuda environment after each test and archives test-related files.
+    Fixture to clean up and reset devices after each test.
+    Automatically used before each test due to 'autouse=True'.
     """
-    yield
+    yield  # Yield control back to pytest for test execution
+    
     pybuda.shutdown()
     pybuda.pybuda_reset()
+    
+
     archive_files()
     subprocess.run(["make", "clean_tt"])
+    
+    # Reset the board if it's a Silicon device and in a bad state
+    if device_type == BackendType.Silicon:
+        print('Silicon device detected. Resetting board...')
+        reset_board()
 
 def pytest_runtest_logreport(report):
     """
@@ -37,6 +70,9 @@ def archive_files(src_directory=Path("."), dest_directory=Path("./archive")):
     Archives files ending with '_netlist.yaml' from the source directory to the archive directory,
     appending a timestamp to the filename to avoid overwriting.
     """
+    src_directory = Path(src_directory).absolute()
+    dest_directory = Path(dest_directory).absolute()
+
     if not src_directory.exists():
         print(f"Source directory {src_directory} does not exist!")
         return
@@ -45,11 +81,15 @@ def archive_files(src_directory=Path("."), dest_directory=Path("./archive")):
         dest_directory.mkdir(parents=True)
 
     for file_path in src_directory.glob("*_netlist.yaml"):
+        if not file_path.exists():
+            print(f"File not found: {file_path}")
+            continue
+
         timestamp = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
         dest_path = dest_directory / f"{file_path.stem}_{timestamp}{file_path.suffix}"
+
         try:
             shutil.copy(file_path, dest_path)
             print(f"Copied {file_path} to {dest_path}")
         except Exception as e:
             print(f"Failed to copy {file_path} to {dest_path}. Reason: {e}")
-
