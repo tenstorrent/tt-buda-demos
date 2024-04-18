@@ -37,3 +37,5 @@ archive/
 
 # System files / macOS
 .DS_Store
+
+model_demos/OUTPUTS/

@@ -51,12 +51,5 @@ def archive_files(src_directory=Path("."), dest_directory=Path("./archive")):
             shutil.copy(file_path, dest_path)
             print(f"Copied {file_path} to {dest_path}")
         except Exception as e:
-            print(f"Failed to copy {file_path} to {dest_path}: {e}")
+            print(f"Failed to copy {file_path} to {dest_path}. Reason: {e}")
 
-def pytest_addoption(parser):
-    """
-    Adds custom command line options to control the scope of the tests.
-    """
-    parser.addoption("--silicon-only", action="store_true", default=False, help="Run silicon tests only, skip golden/model")
-    parser.addoption("--no-silicon", action="store_true", default=False, help="Skip silicon tests")
-    parser.addoption("--no-skips", action="store_true", default=False, help="Ignore pytest.skip() calls and continue with the test")
