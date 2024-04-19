@@ -10,12 +10,10 @@ from pybuda._C.backend_api import BackendDevice, BackendType
 # Environment variable storage for cleanup
 environ_before_test = None
 
-# Detect available devices and determine the backend type
 detected_devices = pybuda.detect_available_devices()
 device_type = BackendType.Golden if len(detected_devices) == 0 else BackendType.Silicon
 
-# Define RESET_TIMEOUT for the reset_board function
-RESET_TIMEOUT = 600  # seconds
+RESET_TIMEOUT = 60
 
 def reset_board():
     """Executes the reset command on the board."""
