@@ -1,11 +1,11 @@
 #!/bin/bash
 
-TIMEOUT_DURATION=1000
+TIMEOUT_DURATION=3600
 PYTHON_ENV_PATH="/home/anirudhsr/Releases/16_April_2024/python_env/bin/activate"
 OUTPUT_DIR="./OUTPUTS"
 RETRY_LIMIT=2
 MAX_TESTS=15 # Limit to run on a number
-ALL=false # Set to true to run all tests, otherwise limited to MAX_TESTS
+ALL=true # Set to true to run all tests, otherwise limited to number set above in MAX_TESTS 
 
 if [ ! -d "$OUTPUT_DIR" ]; then
     mkdir -p "$OUTPUT_DIR"
