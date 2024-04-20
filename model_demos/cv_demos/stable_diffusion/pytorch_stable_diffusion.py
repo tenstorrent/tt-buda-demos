@@ -255,7 +255,13 @@ def run_stable_diffusion_pytorch(variant="CompVis/stable-diffusion-v1-4"):
     print("Generating image for prompt: ", prompt)
 
     # Data preprocessing
-    (latents, timesteps, extra_step_kwargs, prompt_embeds, extra_step_kwargs,) = stable_diffusion_preprocessing(
+    (
+        latents,
+        timesteps,
+        extra_step_kwargs,
+        prompt_embeds,
+        extra_step_kwargs,
+    ) = stable_diffusion_preprocessing(
         pipe,
         prompt,
         num_inference_steps=num_inference_steps,

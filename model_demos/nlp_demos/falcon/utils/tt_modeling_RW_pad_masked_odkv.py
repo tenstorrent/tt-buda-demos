@@ -834,12 +834,12 @@ class DecoderLayer(nn.Module):
 
         # replace mlp with padded
         padded_mlp = PaddedMLP(self.config)
-        padded_mlp.dense_h_to_4h.weight.data[
-            : 4 * unpadded_hidden, :unpadded_hidden
-        ] = self.mlp.dense_h_to_4h.weight.data
-        padded_mlp.dense_4h_to_h.weight.data[
-            :unpadded_hidden, : 4 * unpadded_hidden
-        ] = self.mlp.dense_4h_to_h.weight.data
+        padded_mlp.dense_h_to_4h.weight.data[: 4 * unpadded_hidden, :unpadded_hidden] = (
+            self.mlp.dense_h_to_4h.weight.data
+        )
+        padded_mlp.dense_4h_to_h.weight.data[:unpadded_hidden, : 4 * unpadded_hidden] = (
+            self.mlp.dense_4h_to_h.weight.data
+        )
         padded_mlp.make_pad_weights()
         self.mlp = padded_mlp
 
@@ -1280,7 +1280,7 @@ class RWModel(RWPreTrainedModel):
 
         if past_key_values is not None and attention_mask is not None:
             flattened_kv = []
-            for (k, v) in past_key_values:
+            for k, v in past_key_values:
                 flattened_kv.extend([k, v])
             # outputs = self.blocks(hidden_states, cos, sin, attention_mask, *flattened_kv)
             # import pdb; pdb.set_trace()
