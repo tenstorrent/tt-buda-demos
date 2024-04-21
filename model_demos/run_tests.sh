@@ -4,59 +4,19 @@ TIMEOUT_DURATION=3600
 PYTHON_ENV_PATH="/home/anirudhsr/Releases/16_April_2024/python_env/bin/activate"
 OUTPUT_DIR="./OUTPUTS"
 RETRY_LIMIT=2
+TEST_FILES_PATH="test_files.txt"
+
 echo "Running script from directory: $(pwd)"
-# Explicitly define the list of test files
-declare -a TEST_FILES=(
-    "./tests/test_pytorch_albert.py"
-    "./tests/test_pytorch_autoencoder.py"
-    "./tests/test_pytorch_beit.py"
-    "./tests/test_pytorch_bert.py"
-    "./tests/test_pytorch_clip.py"
-    "./tests/test_pytorch_codegen.py"
-    "./tests/test_pytorch_deit.py"
-    "./tests/test_pytorch_densenet.py"
-    "./tests/test_pytorch_distilbert.py"
-    "./tests/test_pytorch_dpr.py"
-    "./tests/test_pytorch_falcon.py"
-    "./tests/test_pytorch_flant5.py"
-    "./tests/test_pytorch_fuyu8b.py"
-    "./tests/test_pytorch_ghostnet.py"
-    "./tests/test_pytorch_googlenet.py"
-    "./tests/test_pytorch_gpt2.py"
-    "./tests/test_pytorch_gptneo.py"
-    "./tests/test_pytorch_hardnet.py"
-    "./tests/test_pytorch_hrnet.py"
-    "./tests/test_pytorch_inceptionv4.py"
-    "./tests/test_pytorch_mlpmixer.py"
-    "./tests/test_pytorch_mobilenetv1.py"
-    "./tests/test_pytorch_mobilenetv2.py"
-    "./tests/test_pytorch_mobilenetv3.py"
-    "./tests/test_pytorch_openpose.py"
-    "./tests/test_pytorch_opt.py"
-    "./tests/test_pytorch_perceiverio.py"
-    "./tests/test_pytorch_resnet.py"
-    "./tests/test_pytorch_resnext.py"
-    "./tests/test_pytorch_roberta.py"
-    "./tests/test_pytorch_squeezebert.py"
-    "./tests/test_pytorch_stable_diffusion.py"
-    "./tests/test_pytorch_t5.py"
-    "./tests/test_pytorch_unet.py"
-    "./tests/test_pytorch_vgg.py"
-    "./tests/test_pytorch_vilt.py"
-    "./tests/test_pytorch_vit.py"
-    "./tests/test_pytorch_vovnet.py"
-    "./tests/test_pytorch_whisper.py"
-    "./tests/test_pytorch_wideresnet.py"
-    "./tests/test_pytorch_xception.py"
-    "./tests/test_pytorch_xglm.py"
-    "./tests/test_pytorch_yolov3.py"
-    "./tests/test_pytorch_yolov5.py"
-    "./tests/test_onnx_resnet.py"
-    "./tests/test_onnx_retinanet.py"
-    "./tests/test_tflite_efficientnet_lite.py"
-    "./tests/test_tflite_landmark.py"
-    "./tests/test_tflite_mobilenet_ssd.py"
-)
+
+# Check if test files list exists
+if [ ! -f "$TEST_FILES_PATH" ]; then
+    echo "Error: Test files list $TEST_FILES_PATH does not exist."
+    exit 1
+fi
+
+# Read test files into an array, removing quotes
+mapfile -t TEST_FILES < <(sed 's/"//g' $TEST_FILES_PATH)
+
 if [ ! -d "$OUTPUT_DIR" ]; then
     mkdir -p "$OUTPUT_DIR"
     echo "Created output directory at $OUTPUT_DIR"
