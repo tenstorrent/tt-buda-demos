@@ -116,7 +116,6 @@ def initialize_compiler_overrides():
 
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.enable_tvm_constant_prop = True
-    compiler_cfg.enable_enumerate_u_kt = False
     compiler_cfg.graph_solver_self_cut_type = "FastCut"
     compiler_cfg.retain_tvm_python_files = True
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
