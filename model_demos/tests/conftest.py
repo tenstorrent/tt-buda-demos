@@ -3,8 +3,9 @@ import shutil
 import subprocess
 from datetime import datetime
 from pathlib import Path
-import pytest
+
 import pybuda
+import pytest
 from pybuda._C.backend_api import BackendDevice, BackendType
 
 # Environment variable storage for cleanup
@@ -14,6 +15,7 @@ detected_devices = pybuda.detect_available_devices()
 device_type = BackendType.Golden if len(detected_devices) == 0 else BackendType.Silicon
 
 RESET_TIMEOUT = 60
+
 
 def reset_board():
     """Executes the reset command on the board."""
@@ -31,6 +33,7 @@ def reset_board():
     except Exception as e:
         print(f"An error occurred during board reset: {e}")
 
+
 @pytest.fixture(autouse=True)
 def clear_pybuda():
     """
@@ -38,18 +41,18 @@ def clear_pybuda():
     Automatically used before each test due to 'autouse=True'.
     """
     yield  # Yield control back to pytest for test execution
-    
+
     pybuda.shutdown()
     pybuda.pybuda_reset()
-    
 
     archive_files()
     subprocess.run(["make", "clean_tt"])
-    
+
     # Reset the board if it's a Silicon device and in a bad state
     if device_type == BackendType.Silicon:
-        print('Silicon device detected. Resetting board...')
+        print("Silicon device detected. Resetting board...")
         reset_board()
+
 
 def pytest_runtest_logreport(report):
     """
@@ -62,6 +65,7 @@ def pytest_runtest_logreport(report):
         new_env_keys = set(os.environ.keys()) - set(environ_before_test.keys())
         for key in new_env_keys:
             os.environ.pop(key, None)
+
 
 def archive_files(src_directory=Path("."), dest_directory=Path("./archive")):
     """
