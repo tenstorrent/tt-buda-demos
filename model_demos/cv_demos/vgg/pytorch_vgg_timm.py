@@ -29,7 +29,6 @@ def preprocess_timm_model(model_name):
 
 
 def run_vgg_bn19_timm_pytorch(variant="vgg19_bn"):
-
     """
     Variants = {
      'vgg11':
