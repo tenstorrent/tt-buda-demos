@@ -65,6 +65,7 @@ python cv_demos/resnet/pytorch_resnet.py
 |   [ResNet](cv_demos/resnet/)                                 |     GS, WH   | v0.10.5 |
 |   [ResNeXt](cv_demos/resnext/)                               |     GS, WH   | v0.10.5 |
 |   [RetinaNet](cv_demos/retinanet/)                           |     GS, WH   | v0.10.5 |
+|   [SSD300RESNET50](cv_demos/ssd300_resnet50/)                |     GS, WH   |   TBD   |
 |   [RoBERTa](nlp_demos/roberta/)                              |     GS, WH   | v0.10.5 |
 |   [SqueezeBERT](nlp_demos/squeezebert/)                      |     GS, WH   | v0.10.5 |
 |   [Stable Diffusion](cv_demos/stable_diffusion/)             |         WH   | v0.10.5 |
@@ -80,6 +81,7 @@ python cv_demos/resnet/pytorch_resnet.py
 |   [XGLM](nlp_demos/xglm/)                                    |     GS, WH   | v0.10.5 |
 |   [YOLOv3](cv_demos/yolo_v3/)                                |     GS, WH   | v0.10.5 |
 |   [YOLOv5](cv_demos/yolo_v5/)                                |     GS, WH   | v0.10.5 |
+|   [YOLOv6](cv_demos/yolo_v6/)                                |     GS, WH   |   TBD   |
 
 
 ## Note:
