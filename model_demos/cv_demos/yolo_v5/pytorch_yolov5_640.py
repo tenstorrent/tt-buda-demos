@@ -97,6 +97,7 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
                 compiler_cfg.enable_tm_cpu_fallback = True
                 os.environ["PYBUDA_DISABLE_CAP_SPARSE_MM_FIDELITY"] = "0"
                 os.environ["PYBUDA_TEMP_BALANCER_DISABLE_TARGET_PROXIMITY"] = "1"
+                os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{100*1024}"
         else:
             print("not a supported device!")
             sys.exit()
