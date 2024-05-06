@@ -67,6 +67,7 @@ python cv_demos/resnet/pytorch_resnet.py
 |   [RetinaNet](cv_demos/retinanet/)                           |     GS, WH   | v0.10.5 |
 |   [SSD300RESNET50](cv_demos/ssd300_resnet50/)                |     GS, WH   |   TBD   |
 |   [RoBERTa](nlp_demos/roberta/)                              |     GS, WH   | v0.10.5 |
+|   [SegFormer](cv_demos/segformer/)                           |     GS, WH   |   TBD   |
 |   [SqueezeBERT](nlp_demos/squeezebert/)                      |     GS, WH   | v0.10.5 |
 |   [Stable Diffusion](cv_demos/stable_diffusion/)             |         WH   | v0.10.5 |
 |   [T5](nlp_demos/t5/)                                        |     GS, WH   | v0.10.5 |
