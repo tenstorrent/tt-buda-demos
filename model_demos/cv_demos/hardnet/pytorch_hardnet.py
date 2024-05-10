@@ -62,7 +62,7 @@ def run_hardnet_pytorch(variant):
     )
     try:
         urllib.URLopener().retrieve(url, filename)
-    except:
+    except Exception:
         urllib.request.urlretrieve(url, filename)
 
     input_image = Image.open(filename)
