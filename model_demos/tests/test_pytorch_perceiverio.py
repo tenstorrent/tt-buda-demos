@@ -1,7 +1,9 @@
 import pytest
+
 from cv_demos.perceiverio.pytorch_perceiverio import run_perceiverio_pytorch
 
 variants = ["deepmind/vision-perceiver-conv"]
+
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.perceiverio

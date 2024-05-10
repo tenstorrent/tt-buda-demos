@@ -52,7 +52,7 @@ def run_densenet_pytorch(variant="densenet121"):
 
     elif variant == "densenet161":
         os.environ["PYBUDA_RIBBON2"] = "1"
-        compiler_cfg.balancer_policy = "Ribbon"  
+        compiler_cfg.balancer_policy = "Ribbon"
         compiler_cfg.default_df_override = pybuda._C.DataFormat.Float16_b
 
     elif variant == "densenet169":

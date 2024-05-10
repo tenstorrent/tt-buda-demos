@@ -1,9 +1,10 @@
-import pybuda
-import torch
 import os
+
+import pybuda
 import requests
-from PIL import Image
+import torch
 from loguru import logger
+from PIL import Image
 from transformers import AutoImageProcessor, PerceiverForImageClassificationConvProcessing
 
 

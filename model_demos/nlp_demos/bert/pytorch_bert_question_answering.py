@@ -4,7 +4,6 @@ import os
 
 import pybuda
 from transformers import BertForQuestionAnswering, BertTokenizer
-import os
 
 
 def run_bert_question_answering_pytorch():
