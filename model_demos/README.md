@@ -87,4 +87,4 @@ python cv_demos/resnet/pytorch_resnet.py
 
 ## Note:
 
-Please be note that releases identified as alpha (e.g., v0.10.9-alpha) are preliminary and not considered stable. They may not offer the full functionality found in stable versions. Furthermore, alpha releases are compatible only with models specifically released under the same version, as detailed in the above table. For ensured full functionality, we strongly advise opting for a stable release.
+Please note that releases identified as alpha (e.g., v0.10.9-alpha) are preliminary and not considered stable. They may not offer the full functionality found in stable versions. Furthermore, alpha releases are compatible only with models specifically released under the same version, as detailed in the above table. For ensured full functionality, we strongly advise opting for a stable release.
