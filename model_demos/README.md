@@ -27,60 +27,64 @@ python cv_demos/resnet/pytorch_resnet.py
 
 ## Models Support Table
 
-| **Model** | **Supported Hardware** <br> GS - Grayskull <br> WH - Wormhole | **Supported Release** |
-|--------------------------------------------------------------|:------------:|:-------:|
-|   [ALBERT](nlp_demos/albert/)                                |     GS, WH   | v0.10.5 |
-|   [Autoencoder (convolutional)](cv_demos/conv_autoencoder/)  |     GS, WH   | v0.10.5 |
-|   [Autoencoder (linear)](cv_demos/linear_autoencoder/)       |     GS, WH   | v0.10.5 |
-|   [BeiT](cv_demos/beit/)                                     |     GS, WH   | v0.10.5 |
-|   [BERT](nlp_demos/bert/)                                    |     GS, WH   | v0.10.5 |
-|   [CLIP](cv_demos/clip/)                                     |     GS, WH   | v0.10.5 |
-|   [CodeGen](nlp_demos/codegen/)                              |     GS, WH   | v0.10.5 |
-|   [DeiT](cv_demos/deit/)                                     |     GS, WH   | v0.10.5 |
-|   [DenseNet](cv_demos/densenet/)                             |     GS, WH   | v0.10.5 |
-|   [DistilBERT](nlp_demos/distilbert/)                        |     GS, WH   | v0.10.5 |
-|   [DPR](nlp_demos/dpr/)                                      |     GS, WH   | v0.10.5 |
-|   [EfficientNet-Lite](cv_demos/efficientnet_lite/)           |         WH   | v0.10.5 |
-|   [Falcon-7B](nlp_demos/falcon/)                             |         WH   | v0.10.5 |
-|   [FLAN-T5](nlp_demos/flant5/)                               |     GS, WH   | v0.10.5 |
-|   [Fuyu-8B](nlp_demos/fuyu8b/)                               |              |         |
-|   [GhostNet](cv_demos/ghostnet/)                             |     GS, WH   | v0.10.5 |
-|   [GoogLeNet](cv_demos/googlenet/)                           |     GS, WH   | v0.10.5 |
-|   [GPT-2](nlp_demos/gpt2/)                                   |     GS, WH   | v0.10.5 |
-|   [GPT Neo](nlp_demos/gptneo/)                               |     GS, WH   | v0.10.5 |
-|   [Hand Landmark](cv_demos/landmark/)                        |         WH   | v0.10.5 |
-|   [HarDNet](cv_demos/hardnet/)                               |     GS, WH   | v0.11.0-alpha |
-|   [HRNet](cv_demos/hrnet/)                                   |     GS, WH   | v0.10.5 |
-|   [Inception-v4](cv_demos/inceptionv4/)                      |     GS, WH   | v0.10.5 |
-|   [MLP-Mixer](cv_demos/mlpmixer/)                            |     GS, WH   | v0.10.5 |
-|   [MobileNetSSD](cv_demos/mobilenet_ssd/)                    |         WH   | v0.10.5 |
-|   [MobileNetV1](cv_demos/mobilenet_v1/)                      |     GS, WH   | v0.10.5 |
-|   [MobileNetV2](cv_demos/mobilenet_v2/)                      |     GS, WH   | v0.10.5 |
-|   [MobileNetV3](cv_demos/mobilenet_v3/)                      |     GS, WH   | v0.10.5 |
-|   [OpenPose](cv_demos/openpose/)                             |     GS, WH   | v0.10.5 |
-|   [OPT](nlp_demos/opt/)                                      |     GS, WH   | v0.10.5 |
-|   [Pose Landmark](cv_demos/landmark/)                        |         WH   | v0.10.5 |
-|   [Perceiver IO](cv_demos/perceiverio/)                      |     GS, WH   | v0.10.9-alpha |
-|   [ResNet](cv_demos/resnet/)                                 |     GS, WH   | v0.10.5 |
-|   [ResNeXt](cv_demos/resnext/)                               |     GS, WH   | v0.10.5 |
-|   [RetinaNet](cv_demos/retinanet/)                           |     GS, WH   | v0.10.5 |
-|   [RoBERTa](nlp_demos/roberta/)                              |     GS, WH   | v0.10.5 |
-|   [SqueezeBERT](nlp_demos/squeezebert/)                      |     GS, WH   | v0.10.5 |
-|   [Stable Diffusion](cv_demos/stable_diffusion/)             |         WH   | v0.10.5 |
-|   [T5](nlp_demos/t5/)                                        |     GS, WH   | v0.10.5 |
-|   [U-Net](cv_demos/unet/)                                    |     GS, WH   | v0.10.5 |
-|   [VGG](cv_demos/vgg/)                                       |     GS, WH   | v0.10.5 |
-|   [ViT](cv_demos/vit/)                                       |     GS, WH   | v0.10.5 |
-|   [ViLT](cv_demos/vilt/)                                     |     GS, WH   | v0.10.5 |
-|   [VoVNet](cv_demos/vovnet/)                                 |     GS, WH   | v0.10.5 |
-|   [WideResNet](cv_demos/wideresnet/)                         |     GS, WH   | v0.10.5 |
-|   [Whisper](audio_demos/whisper/)                            |     GS, WH   | v0.10.5 |
-|   [Xception](cv_demos/xception/)                             |     GS, WH   | v0.10.5 |
-|   [XGLM](nlp_demos/xglm/)                                    |     GS, WH   | v0.10.5 |
-|   [YOLOv3](cv_demos/yolo_v3/)                                |     GS, WH   | v0.10.5 |
-|   [YOLOv5](cv_demos/yolo_v5/)                                |     GS, WH   | v0.10.5 |
+| **Model**                                                 | **e75** | **e150** | **n150** | **Supported Release** |
+| --------------------------------------------------------- | :-----: | :------: | :------: | :-------------------: |
+| [ALBERT](nlp_demos/albert/)                               |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [Autoencoder (convolutional)](cv_demos/conv_autoencoder/) |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [Autoencoder (linear)](cv_demos/linear_autoencoder/)      |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [BeiT](cv_demos/beit/)                                    |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [BERT](nlp_demos/bert/)                                   |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [CLIP](cv_demos/clip/)                                    |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [CodeGen](nlp_demos/codegen/)                             |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [DeiT](cv_demos/deit/)                                    |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [DenseNet](cv_demos/densenet/)                            |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [DistilBERT](nlp_demos/distilbert/)                       |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [DPR](nlp_demos/dpr/)                                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [EfficientNet-Lite](cv_demos/efficientnet_lite/)          |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
+| [Falcon-7B](nlp_demos/falcon/)                            |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
+| [FLAN-T5](nlp_demos/flant5/)                              |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [Fuyu-8B](nlp_demos/fuyu8b/)                              |   ✘    |    ✘    |    ✘    |        v0.12.3        |
+| [GhostNet](cv_demos/ghostnet/)                            |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [GoogLeNet](cv_demos/googlenet/)                          |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [GPT-2](nlp_demos/gpt2/)                                  |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [GPT Neo](nlp_demos/gptneo/)                              |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [Hand Landmark](cv_demos/landmark/)                       |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
+| [HardNet](cv_demos/hardnet/)                              |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [HRNet](cv_demos/hrnet/)                                  |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [Inception-v4](cv_demos/inceptionv4/)                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [MLP-Mixer](cv_demos/mlpmixer/)                           |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [MobileNetSSD](cv_demos/mobilenet_ssd/)                   |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
+| [MobileNetV1](cv_demos/mobilenet_v1/)                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [MobileNetV2](cv_demos/mobilenet_v2/)                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [MobileNetV3](cv_demos/mobilenet_v3/)                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [OpenPose](cv_demos/openpose/)                            |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [OPT](nlp_demos/opt/)                                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [Pose Landmark](cv_demos/landmark/)                       |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
+| [Perceiver IO](cv_demos/perceiverio/)                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [ResNet](cv_demos/resnet/)                                |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [ResNeXt](cv_demos/resnext/)                              |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [RetinaNet](cv_demos/retinanet/)                          |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [RoBERTa](nlp_demos/roberta/)                             |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [SqueezeBERT](nlp_demos/squeezebert/)                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [Stable Diffusion](cv_demos/stable_diffusion/)            |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
+| [T5](nlp_demos/t5/)                                       |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [U-Net](cv_demos/unet/)                                   |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [VGG](cv_demos/vgg/)                                      |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [ViT](cv_demos/vit/)                                      |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [ViLT](cv_demos/vilt/)                                    |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [VoVNet](cv_demos/vovnet/)                                |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [WideResNet](cv_demos/wideresnet/)                        |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [Whisper](audio_demos/whisper/)                           |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [Xception](cv_demos/xception/)                            |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [XGLM](nlp_demos/xglm/)                                   |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [YOLOv3](cv_demos/yolo_v3/)                               |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [YOLOv5](cv_demos/yolo_v5/)                               |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 
+### Legend
+
+- ✔️: Supported on the device
+- ✘: Not supported on the device
 
 ## Note:
 
-Please note that alpha relases are not stable releases and may not support or have all functionality as the stable releaes. If full functionality is needed we suggest picking a stable relases.
+Please note that releases identified as alpha (e.g., v0.10.9-alpha) are preliminary and not considered stable. They may not offer the full functionality found in stable versions. Furthermore, alpha releases are compatible only with models specifically released under the same version, as detailed in the above table. For ensured full functionality, we strongly advise opting for a stable release.
