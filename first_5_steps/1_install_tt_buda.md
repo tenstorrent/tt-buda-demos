@@ -12,7 +12,7 @@ While TT-Buda is the official Tenstorrent AI/ML compiler stack, PyBuda is the Py
 
 ### OS Compatibility
 
-Currently, Tenstorrent software is supported on **Ubuntu 20.04 LTS (Focal Fossa)** and **Ubuntu 22.04 LTS (Jammy Jellyfish)** operating systems. 
+Currently, Tenstorrent software is supported on **Ubuntu 20.04 LTS (Focal Fossa)** and **Ubuntu 22.04 LTS (Jammy Jellyfish)** operating systems.
 
 ## Release Versions
 
@@ -29,8 +29,8 @@ Once you have identified the release version you would like to install, you can 
    4. [Backend Compiler Dependencies](#backend-compiler-dependencies)
    5. [TT-SMI](#tt-smi)
 2. [PyBuda Installation](#pybuda-installation)
-    1. [Python Environment Installation](#python-environment-installation)
-    2. [Docker Container Installation](#docker-container-installation)
+   1. [Python Environment Installation](#python-environment-installation)
+   2. [Docker Container Installation](#docker-container-installation)
 3. [Tests](#tests)
    1. [Smoke Test](#smoke-test)
 
@@ -54,8 +54,8 @@ sudo reboot
 
 ### PCI Driver Installation
 
-Please navigate to [tt-kmd](https://github.com/tenstorrent/tt-kmd) homepage and follow instructions within the README. 
-*Pro-Tip: ensure that you are within the home directory of the local clone version of [tt-kmd](https://github.com/tenstorrent/tt-kmd) when performing the installation steps*
+Please navigate to [tt-kmd](https://github.com/tenstorrent/tt-kmd) homepage and follow instructions within the README.
+_Pro-Tip: ensure that you are within the home directory of the local clone version of [tt-kmd](https://github.com/tenstorrent/tt-kmd) when performing the installation steps_
 
 ### Device Firmware Update
 
@@ -65,7 +65,7 @@ The [tt-firmware](https://github.com/tenstorrent/tt-firmware) file needs to be i
 
 Instructions to install the Tenstorrent backend compiler dependencies on a fresh install of Ubuntu Server 20.04 or Ubuntu Server 22.04.
 
-*You may need to **append** each `apt` command with `sudo` if you do not have root permissions.*
+_You may need to **append** each `apt` command with `sudo` if you do not have root permissions._
 
 For both operating systems run the following commands:
 
@@ -77,18 +77,19 @@ apt install -y build-essential curl libboost-all-dev libgl1-mesa-glx libgoogle-g
 ```
 
 For Ubuntu 20.04, add:
+
 ```bash
 apt install -y libyaml-cpp-dev
 ```
 
 For Ubuntu 22.04, add:
+
 ```bash
 wget http://mirrors.kernel.org/ubuntu/pool/main/y/yaml-cpp/libyaml-cpp-dev_0.6.2-4ubuntu1_amd64.deb
 wget http://mirrors.kernel.org/ubuntu/pool/main/y/yaml-cpp/libyaml-cpp0.6_0.6.2-4ubuntu1_amd64.deb
 dpkg -i libyaml-cpp-dev_0.6.2-4ubuntu1_amd64.deb libyaml-cpp0.6_0.6.2-4ubuntu1_amd64.deb
 rm libyaml-cpp-dev_0.6.2-4ubuntu1_amd64.deb libyaml-cpp0.6_0.6.2-4ubuntu1_amd64.deb
 ```
-
 
 ### TT-SMI
 
@@ -97,7 +98,6 @@ Please navigate to [tt-smi](https://github.com/tenstorrent/tt-smi) homepage and 
 ## PyBuda Installation
 
 There are two ways to install PyBuda within the host environment: using Python virtual environment or Docker container.
-
 
 ### Python Environment Installation
 
@@ -120,13 +120,24 @@ python3 -m venv env
 source env/bin/activate
 ```
 
-#### Step 5. Pip install PyBuda, TVM and Torchvision whl files    
+#### Step 5. Pip install PyBuda, TVM and Torchvision whl files
 
 ```bash
 pip install --upgrade pip==24.0
 pip install pybuda-<version>.whl tvm-<version>.whl torchvision-<version>.whl
 ```
+
 The `pybuda-<version>.whl` file contains the PyBuda library, the `tvm-<version>.whl` file contains the latest TVM downloaded release, and the `torchvision-<version>.whl` file bundles the torchvision library.
+
+#### Step 6. Pip install Debuda (Optional Step)
+
+For enhanced debugging capabilities, you may opt to install the Debuda library:
+
+```bash
+pip install debuda-<version>.whl
+```
+
+This wheel file installs the Debuda tool designed for debugging purposes.
 
 ---
 
