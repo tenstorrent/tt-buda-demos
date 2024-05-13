@@ -39,10 +39,12 @@ python cv_demos/resnet/pytorch_resnet.py
 | [DeiT](cv_demos/deit/)                                    |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [DenseNet](cv_demos/densenet/)                            |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [DistilBERT](nlp_demos/distilbert/)                       |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [DLA](cv_demos/dla/)                                      |   ✔️    |    ✔️    |    ✔️    |          TBD          |
 | [DPR](nlp_demos/dpr/)                                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [EfficientNet-Lite](cv_demos/efficientnet_lite/)          |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
 | [Falcon-7B](nlp_demos/falcon/)                            |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
 | [FLAN-T5](nlp_demos/flant5/)                              |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [FPN](cv_demos/fpn/)                                      |   ✔️    |    ✔️    |    ✔️    |          TBD          |
 | [Fuyu-8B](nlp_demos/fuyu8b/)                              |   ✘    |    ✘    |    ✘    |        v0.12.3        |
 | [GhostNet](cv_demos/ghostnet/)                            |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [GoogLeNet](cv_demos/googlenet/)                          |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
@@ -65,6 +67,8 @@ python cv_demos/resnet/pytorch_resnet.py
 | [ResNeXt](cv_demos/resnext/)                              |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [RetinaNet](cv_demos/retinanet/)                          |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [RoBERTa](nlp_demos/roberta/)                             |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [SSD300RESNET50](cv_demos/ssd300_resnet50/)               |   ✔️    |    ✔️    |    ✔️    |          TBD          |
+| [SegFormer](cv_demos/segformer/)                          |   ✔️    |    ✔️    |    ✔️    |          TBD          |
 | [SqueezeBERT](nlp_demos/squeezebert/)                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [Stable Diffusion](cv_demos/stable_diffusion/)            |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
 | [T5](nlp_demos/t5/)                                       |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
@@ -79,6 +83,7 @@ python cv_demos/resnet/pytorch_resnet.py
 | [XGLM](nlp_demos/xglm/)                                   |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [YOLOv3](cv_demos/yolo_v3/)                               |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [YOLOv5](cv_demos/yolo_v5/)                               |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [YOLOv6](cv_demos/yolo_v6/)                               |   ✔️    |    ✔️    |    ✔️    |          TBD          |
 
 ### Legend
 

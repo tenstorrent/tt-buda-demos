@@ -1,7 +1,8 @@
 import pytest
-from cv_demos.segformer.pytorch_segformer import run_segformer_pytorch
+from cv_demos.segformer.pytorch_segformer_semantic_segmentation import run_segformer_semantic_segmentation_pytorch
+from cv_demos.segformer.pytorch_segformer_image_classification import run_segformer_image_classification_pytorch
 
-variants = [
+variants_semseg = [
     "nvidia/segformer-b0-finetuned-ade-512-512",
     "nvidia/segformer-b1-finetuned-ade-512-512",
     "nvidia/segformer-b2-finetuned-ade-512-512",
@@ -10,7 +11,23 @@ variants = [
 ]
 
 
-@pytest.mark.parametrize("variant", variants, ids=variants)
+@pytest.mark.parametrize("variant", variants_semseg, ids=variants_semseg)
 @pytest.mark.segformer
-def test_segformer_pytorch(variant, clear_pybuda):
-    run_segformer_pytorch(variant)
+def test_segformer_semantic_segmentation_pytorch(variant, clear_pybuda):
+    run_segformer_semantic_segmentation_pytorch(variant)
+
+
+variants_img_classification = [
+    "nvidia/mit-b0",
+    "nvidia/mit-b1",
+    "nvidia/mit-b2",
+    "nvidia/mit-b3",
+    "nvidia/mit-b4",
+    "nvidia/mit-b5",
+]
+
+
+@pytest.mark.parametrize("variant", variants_img_classification, ids=variants_img_classification)
+@pytest.mark.segformer
+def test_segformer_image_classification_pytorch(variant, clear_pybuda):
+    run_segformer_image_classification_pytorch(variant)
