@@ -1,5 +1,5 @@
 import pytest
-from cv_demos.segformer.pytorch_segformer_semantic_segmentation import run_segformer_semantic_segmentation_pytorch
+from cv_demos.segformer.pytorch_segformer_semantic_segmentation import run_segformer_semseg_pytorch
 from cv_demos.segformer.pytorch_segformer_image_classification import run_segformer_image_classification_pytorch
 
 variants_semseg = [
@@ -13,8 +13,8 @@ variants_semseg = [
 
 @pytest.mark.parametrize("variant", variants_semseg, ids=variants_semseg)
 @pytest.mark.segformer
-def test_segformer_semantic_segmentation_pytorch(variant, clear_pybuda):
-    run_segformer_semantic_segmentation_pytorch(variant)
+def test_segformer_semseg_pytorch(variant, clear_pybuda):
+    run_segformer_semseg_pytorch(variant)
 
 
 variants_img_classification = [

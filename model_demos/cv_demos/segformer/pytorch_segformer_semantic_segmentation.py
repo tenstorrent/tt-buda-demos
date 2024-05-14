@@ -17,7 +17,7 @@ def get_sample_data(model_name):
     return pixel_values
 
 
-def run_segformer_semantic_segmentation_pytorch(variant="nvidia/segformer-b0-finetuned-ade-512-512"):
+def run_segformer_semseg_pytorch(variant="nvidia/segformer-b0-finetuned-ade-512-512"):
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -65,4 +65,4 @@ def run_segformer_semantic_segmentation_pytorch(variant="nvidia/segformer-b0-fin
 
 
 if __name__ == "__main__":
-    run_segformer_semantic_segmentation_pytorch()
+    run_segformer_semseg_pytorch()
