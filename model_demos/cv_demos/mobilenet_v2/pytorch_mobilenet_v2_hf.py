@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
+
 # MobileNetV2 Demo Script - 96x96
 
 import os
