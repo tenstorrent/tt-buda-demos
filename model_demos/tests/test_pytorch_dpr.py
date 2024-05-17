@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 
 from nlp_demos.dpr.pytorch_dpr_context_encoder import run_dpr_context_encoder_pytorch

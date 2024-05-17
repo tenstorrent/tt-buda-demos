@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 
 from nlp_demos.gpt_neo.pytorch_gptneo_causal_lm import run_gptneo_causal_lm
