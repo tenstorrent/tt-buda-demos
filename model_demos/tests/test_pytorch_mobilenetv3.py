@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 
 from cv_demos.mobilenet_v3.pytorch_mobilenet_v3_large_basic import run_mobilenetv3_large_basic
