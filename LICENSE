@@ -196,5 +196,7 @@ Third-Party Dependencies:
 The following dependencies are utilized by this project but are not explicitly
 distributed as part of the software:
 
+- 
+- Olli Huotari - [License available here](https://github.com/holli/yolov3_pytorch/blob/master/LICENSE)
 - Daniil-Osokin - [License available here](https://github.com/Daniil-Osokin/lightweight-human-pose-estimation.pytorch/blob/master/LICENSE)
 - transformers - [License available here](https://github.com/huggingface/transformers/blob/main/LICENSE)
