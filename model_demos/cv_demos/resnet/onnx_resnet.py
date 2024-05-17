@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # ResNet Demo Script - ONNX
 # Uses torch and torchvision for data pre- and post-processing;
 # can use other frameworks such as MXNet, TensorFlow or Numpy
