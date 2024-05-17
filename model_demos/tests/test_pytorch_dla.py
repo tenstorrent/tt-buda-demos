@@ -1,6 +1,6 @@
 import pytest
-from cv_demos.dla.pytorch_dla import run_dla_pytorch
 
+from cv_demos.dla.pytorch_dla import run_dla_pytorch
 
 variants = [
     "dla34",
