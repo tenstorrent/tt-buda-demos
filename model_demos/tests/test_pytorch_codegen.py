@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 
 from nlp_demos.codegen.pytorch_codegen_causal_lm import run_codegen_causal_lm
