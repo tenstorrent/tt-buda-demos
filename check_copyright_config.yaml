@@ -23,13 +23,4 @@ ignore:
   include:
     - .github/*
     - __pycache__
-    - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/holli_src/utils.py
-    - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/utils.py
-    - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolo_v3.py
-    - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/holli_src/utils.py
-    - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolov3_base.py
-    - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolov3_tiny.py
-    - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolov3.py
-    - /tt-buda-demos/model_demos/nlp_demos/falcon/utils/configuration_RW.py
-    - /CONTRIBUTING.md
-    - /MAINTAINERS.md
+    - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolo_layer.py
