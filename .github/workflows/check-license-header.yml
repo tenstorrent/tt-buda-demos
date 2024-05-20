@@ -19,6 +19,14 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: Read ignored paths from config
+        id: read-ignored-paths
+        run: |
+          ignored_paths=$(yq e '.include | join(" ")' check_copyright_config.yaml)
+          echo "ignored_paths=$ignored_paths" >> $GITHUB_ENV
+        env:
+          GITHUB_ENV: $GITHUB_ENV
+
       - name: Identify currently changed files and check licenses
         id: check-licenses
         run: |
@@ -26,9 +34,11 @@ jobs:
           echo "current_year=$current_year" >> $GITHUB_ENV  # Export current year to environment variables
           missing_license_files=""
           for file in $(git diff --name-only HEAD^ HEAD | grep '\.py$'); do
-            # Check if file contains the correct SPDX license identifier and the exact copyright statement with dynamic current year
-            if ! grep -q "SPDX-License-Identifier: Apache-2.0" "$file" || ! grep -q "SPDX-FileCopyrightText: © $current_year Tenstorrent AI ULC" "$file"; then
-              missing_license_files="$missing_license_files$file "
+            if [[ ! " $ignored_paths " =~ " $file " ]]; then
+              # Check if file contains the correct SPDX license identifier and the exact copyright statement with dynamic current year
+              if ! grep -q "SPDX-License-Identifier: Apache-2.0" "$file" || ! grep -q "SPDX-FileCopyrightText: © $current_year Tenstorrent AI ULC" "$file"; then
+                missing_license_files="$missing_license_files$file "
+              fi
             fi
           done
           echo "missing_license_files=$missing_license_files" >> $GITHUB_ENV
@@ -58,3 +68,6 @@ jobs:
         run: |
           echo "Failing the workflow due to non-compliance with SPDX license requirements."
           exit 1
+
+      - name: Install yq
+        run: sudo apt-get install -y yq
