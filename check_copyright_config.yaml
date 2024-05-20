@@ -1,11 +1,10 @@
 DEFAULT:
-  perform_check: yes  # Ensure that license header check is performed
+  perform_check: yes
 
-  # List of allowed licenses for files in this section
   allowed_licenses:
     - Apache-2.0
     - MIT
-  license_for_new_files: Apache-2.0  # License to be used when inserting a new copyright notice
+  license_for_new_files: Apache-2.0
 
   new_notice_python: |
     """
@@ -14,25 +13,23 @@ DEFAULT:
     SPDX-License-Identifier: {license}
     """
 
-  # Define the template for replacing comment lines with SPDX notation
   espressif_copyright: '© {years} Tenstorrent AI ULC'
 
-  # Update the include section with the file types you want to check
   include:
     - "*.py"
 
-ignore:  # You can also select ignoring files here
-  perform_check: no  # Don't check files from that block
+ignore:
+  perform_check: no
   include:
     - .github/*
     - __pycache__
     - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/holli_src/utils.py
-    -  /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/utils.py
-    -  /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolo_v3.py
-    -  /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/holli_src/utils.py
-    -  /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolov3_base.py
-    -  /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolov3_tiny.py
-    -  /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolov3.py
-    -  /tt-buda-demos/model_demos/nlp_demos/falcon/utils/configuration_RW.py
+    - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/utils.py
+    - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolo_v3.py
+    - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/holli_src/utils.py
+    - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolov3_base.py
+    - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolov3_tiny.py
+    - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolov3.py
+    - /tt-buda-demos/model_demos/nlp_demos/falcon/utils/configuration_RW.py
     - /CONTRIBUTING.md
     - /MAINTAINERS.md
