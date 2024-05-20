@@ -26,7 +26,12 @@ ignore:  # You can also select ignoring files here
   include:
     - .github/*
     - __pycache__
-    -  /model_demos/cv_demos/yolo_v3/holli_src/
+    -  model_demos/cv_demos/yolo_v3/holli_src/utils.py
+    -  model_demos/cv_demos/yolo_v3/holli_src/yolo_v3.py
+    -  model_demos/cv_demos/yolo_v3/holli_src/holli_src/utils.py
+    -  model_demos/cv_demos/yolo_v3/holli_src/yolov3_base.py
+    -  model_demos/cv_demos/yolo_v3/holli_src/yolov3_tiny.py
+    -  model_demos/cv_demos/yolo_v3/holli_src/yolov3.py
     # - /benchmark/models/falcon/utils/configuration_RW.py
     - /CONTRIBUTING.md
     - /MAINTAINERS.md
