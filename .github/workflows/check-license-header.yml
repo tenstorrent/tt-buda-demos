@@ -1,60 +1,60 @@
-# name: Validate SPDX License year and company mention in currently changed Files
+name: Validate SPDX License year and company mention in currently changed Files
 
-# on:
-#   pull_request:
-#     branches: [main]
-#     types:
-#       - opened
-#       - reopened
-#       - synchronize
-#       - assigned
-#       - review_requested
+on:
+  pull_request:
+    branches: [main]
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - assigned
+      - review_requested
 
-# jobs:
-#   check-spdx-license:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v4
-#         with:
-#           fetch-depth: 2
+jobs:
+  check-spdx-license:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
-#       - name: Identify currently changed files and check licenses
-#         id: check-licenses
-#         run: |
-#           current_year=$(date +"%Y")  # Dynamically set current year for checking
-#           echo "current_year=$current_year" >> $GITHUB_ENV  # Export current year to environment variables
-#           missing_license_files=""
-#           for file in $(git diff --name-only HEAD^ HEAD | grep '\.py$'); do
-#             # Check if file contains the correct SPDX license identifier and the exact copyright statement with dynamic current year
-#             if ! grep -q "SPDX-License-Identifier: Apache-2.0" "$file" || ! grep -q "SPDX-FileCopyrightText: © $current_year Tenstorrent AI ULC" "$file"; then
-#               missing_license_files="$missing_license_files$file "
-#             fi
-#           done
-#           echo "missing_license_files=$missing_license_files" >> $GITHUB_ENV
-#           echo "Checked files for correct SPDX-License compliance."
+      - name: Identify currently changed files and check licenses
+        id: check-licenses
+        run: |
+          current_year=$(date +"%Y")  # Dynamically set current year for checking
+          echo "current_year=$current_year" >> $GITHUB_ENV  # Export current year to environment variables
+          missing_license_files=""
+          for file in $(git diff --name-only HEAD^ HEAD | grep '\.py$'); do
+            # Check if file contains the correct SPDX license identifier and the exact copyright statement with dynamic current year
+            if ! grep -q "SPDX-License-Identifier: Apache-2.0" "$file" || ! grep -q "SPDX-FileCopyrightText: © $current_year Tenstorrent AI ULC" "$file"; then
+              missing_license_files="$missing_license_files$file "
+            fi
+          done
+          echo "missing_license_files=$missing_license_files" >> $GITHUB_ENV
+          echo "Checked files for correct SPDX-License compliance."
 
-#       - name: Comment on PR about incorrect SPDX licenses
-#         if: env.missing_license_files != ''
-#         uses: actions/github-script@v6
-#         with:
-#           script: |
-#             const issueNumber = context.issue.number;
-#             const owner = context.repo.owner;
-#             const repo = context.repo.repo;
-#             const missingFiles = process.env.missing_license_files.trim().replace(/\s+/g, '\n');
-#             const currentYear = process.env.current_year;
-#             const commentBody = `The following files are not compliant with the required licensing standards for ${currentYear} or do not contain the correct copyright text 'Tenstorrent AI ULC' within their license header:\n\`\`\`\n${missingFiles}\n\`\`\`\nPlease update the files accordingly. Your attention and cooperation in this matter are greatly appreciated.\nThank you.`;
+      - name: Comment on PR about incorrect SPDX licenses
+        if: env.missing_license_files != ''
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issueNumber = context.issue.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const missingFiles = process.env.missing_license_files.trim().replace(/\s+/g, '\n');
+            const currentYear = process.env.current_year;
+            const commentBody = `The following files are not compliant with the required licensing standards for ${currentYear} or do not contain the correct copyright text 'Tenstorrent AI ULC' within their license header:\n\`\`\`\n${missingFiles}\n\`\`\`\nPlease update the files accordingly. Your attention and cooperation in this matter are greatly appreciated.\nThank you.`;
             
-#             github.rest.issues.createComment({
-#               issue_number: issueNumber,
-#               owner: owner,
-#               repo: repo,
-#               body: commentBody
-#             });
+            github.rest.issues.createComment({
+              issue_number: issueNumber,
+              owner: owner,
+              repo: repo,
+              body: commentBody
+            });
 
-#       - name: Fail the workflow if license issues are found
-#         if: env.missing_license_files != ''
-#         run: |
-#           echo "Failing the workflow due to non-compliance with SPDX license requirements."
-#           exit 1
+      - name: Fail the workflow if license issues are found
+        if: env.missing_license_files != ''
+        run: |
+          echo "Failing the workflow due to non-compliance with SPDX license requirements."
+          exit 1
