@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # RoBERTa demo script - Masked language modeling
 
 import pybuda
