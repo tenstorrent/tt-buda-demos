@@ -27,6 +27,7 @@ ignore: # You can also select ignoring files here
     - .github/*
     - __pycache__/*
     - docs/*
-    - model_demos/cv_demos/yolo_v3/holli_src/*
+    - /model_demos/cv_demos/yolo_v3/holli_src/*
+    - model_demos/nlp_demos/falcon/utils/configuration_RW.py
     - /CONTRIBUTING.md
     - /MAINTAINERS.md
