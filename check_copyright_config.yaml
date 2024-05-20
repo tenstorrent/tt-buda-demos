@@ -25,6 +25,8 @@ ignore: # You can also select ignoring files here
   perform_check: no # Don't check files from that block
   include:
     - .github/*
-    - __pycache__
+    - __pycache__/*
+    - docs/*
+    - model_demos/cv_demos/yolo_v3/holli_src/*
     - /CONTRIBUTING.md
     - /MAINTAINERS.md
