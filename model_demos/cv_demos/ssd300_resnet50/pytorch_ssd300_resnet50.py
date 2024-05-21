@@ -71,7 +71,7 @@ def run_pytorch_ssd300_resnet50():
     if available_devices:
         if available_devices[0] == BackendDevice.Grayskull:
             os.environ["PYBUDA_RIBBON2"] = "1"
-            os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "90112"
+            compiler_cfg.balancer_op_override("max_pool2d_14.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (2, 1))
 
         if available_devices[0] == BackendDevice.Wormhole_B0:
             compiler_cfg.place_on_new_epoch("conv2d_766.dc.matmul.11")
@@ -104,6 +104,8 @@ def run_pytorch_ssd300_resnet50():
 
     for i in range(len(output)):
         output[i] = output[i].value()
+
+    output = [o.detach().clone() for o in output]
 
     # postprocessing scripts referred from https://pytorch.org/hub/nvidia_deeplearningexamples_ssd/
 
