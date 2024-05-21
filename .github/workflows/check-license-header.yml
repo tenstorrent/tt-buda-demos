@@ -17,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history for all branches and tags
+          fetch-depth: 0 # Fetch all history for all branches and tags
 
       - name: Install yq
         run: pip install yq
@@ -26,7 +26,7 @@ jobs:
         id: read-ignored-paths
         run: |
           # Read included paths from the DEFAULT section
-          included_paths=$(yq e '.DEFAULT.include // empty' check_copyright_config.yaml)
+          included_paths=$(yq e '.DEFAULT.include[]' check_copyright_config.yaml)
           if [ -z "$included_paths" ]; then
             echo "No included paths found in DEFAULT section or .include key is missing"
             echo "included_paths=" >> $GITHUB_ENV
@@ -36,7 +36,7 @@ jobs:
           fi
 
           # Read ignored paths from the ignore section
-          ignored_paths=$(yq e '.ignore.include // empty' check_copyright_config.yaml)
+          ignored_paths=$(yq e '.ignore.include[]' check_copyright_config.yaml)
           if [ -z "$ignored_paths" ]; then
             echo "No ignored paths found in ignore section or .include key is missing"
             echo "ignored_paths=" >> $GITHUB_ENV
@@ -89,7 +89,7 @@ jobs:
             const missingFiles = process.env.missing_license_files.trim().replace(/\s+/g, '\n');
             const currentYear = process.env.current_year;
             const commentBody = `The following files are not compliant with the required licensing standards for ${currentYear} or do not contain the correct copyright text 'Tenstorrent AI ULC' within their license header:\n\`\`\`\n${missingFiles}\n\`\`\`\nPlease update the files accordingly. Your attention and cooperation in this matter are greatly appreciated.\nThank you.`;
-            
+
             github.rest.issues.createComment({
               issue_number: issueNumber,
               owner: owner,
