@@ -24,3 +24,4 @@ ignore:
     - .github/*
     - __pycache__
     - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/*
+    - /model_demos/tester.py
