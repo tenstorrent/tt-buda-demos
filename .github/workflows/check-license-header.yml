@@ -17,9 +17,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 #try to fetch all history in this PR 
+          fetch-depth: 0  # Fetch all history for all branches and tags
+
       - name: Install yq
-        run: sudo apt-get install -y yq
+        run: |
+          pip install yq
 
       - name: Read ignored paths from config
         id: read-ignored-paths
@@ -50,7 +52,7 @@ jobs:
           current_year=$(date +"%Y")  # Dynamically set current year for checking
           echo "current_year=$current_year" >> $GITHUB_ENV  # Export current year to environment variables
           missing_license_files=""
-          for file in $(git diff --name-only origin/main...HEAD | grep '\.py$'); do
+          for file in $(git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD | grep '\.py$'); do
             if [[ ! " $ignored_paths " =~ " $file " ]]; then
               # Check if file contains the correct SPDX license identifier and the exact copyright statement with dynamic current year
               if ! grep -q "SPDX-License-Identifier: Apache-2.0" "$file" || ! grep -q "SPDX-FileCopyrightText: © $current_year Tenstorrent AI ULC" "$file"; then
