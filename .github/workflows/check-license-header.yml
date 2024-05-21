@@ -26,7 +26,7 @@ jobs:
         id: read-ignored-paths
         run: |
           # Read included paths from the DEFAULT section
-          included_paths=$(yq e '.DEFAULT.include[]' check_copyright_config.yaml)
+          included_paths=$(yq e '.DEFAULT.include | .[]' check_copyright_config.yaml)
           if [ -z "$included_paths" ]; then
             echo "No included paths found in DEFAULT section or .include key is missing"
             echo "included_paths=" >> $GITHUB_ENV
@@ -36,7 +36,7 @@ jobs:
           fi
 
           # Read ignored paths from the ignore section
-          ignored_paths=$(yq e '.ignore.include[]' check_copyright_config.yaml)
+          ignored_paths=$(yq e '.ignore.include | .[]' check_copyright_config.yaml)
           if [ -z "$ignored_paths" ]; then
             echo "No ignored paths found in ignore section or .include key is missing"
             echo "ignored_paths=" >> $GITHUB_ENV
