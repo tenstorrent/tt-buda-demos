@@ -26,15 +26,18 @@ jobs:
           echo "Current year: $current_year"
           echo "current_year=$current_year" >> $GITHUB_ENV  # Export current year to environment variables
           missing_license_files=""
-          excluded_paths="/tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/utils.py /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolo_layer.py
-          "  # Add paths to be ignored here
+          excluded_paths=(
+            "tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/utils.py"
+            "tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolo_layer.py"
+          )  # Add paths to be ignored here
+
           changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD | grep '\.py$')
           echo "Changed files: $changed_files"
           for file in $changed_files; do
             # Skip ignored paths
             skip_file=false
-            for ignored in $excluded_paths; do
-              if [[ "$file" == "$ignored" || "$file" == "$ignored"/* ]]; then
+            for ignored in "${excluded_paths[@]}"; do
+              if [[ "$file" == "$ignored" || "$file" == */"$ignored" ]]; then
                 skip_file=true
                 break
               fi
@@ -71,7 +74,7 @@ jobs:
             const currentYear = process.env.current_year;
             const commentBody = `The following files are not compliant with the required licensing standards for ${currentYear} or do not contain the correct copyright text 'Tenstorrent AI ULC' within their license header:\n\`\`\`\n${missingFiles}\n\`\`\`\nPlease update the files accordingly. Your attention and cooperation in this matter are greatly appreciated.\nThank you.`;
 
-            github.rest.issues.createComment({
+            await github.rest.issues.createComment({
               issue_number: issueNumber,
               owner: owner,
               repo: repo,
