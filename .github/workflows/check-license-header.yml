@@ -1,4 +1,4 @@
-name: Validate SPDX License year and company mention in currently changed Files
+name: Validate SPDX License year and company mention in currently changed files
 
 on:
   pull_request:
@@ -29,13 +29,16 @@ jobs:
           excluded_paths=(
             "model_demos/cv_demos/yolo_v3/holli_src/utils.py"
             "model_demos/cv_demos/yolo_v3/holli_src/yolo_layer.py"
-          )  # Add paths to be ignored here
+            # Files to be ignored here
+          )
 
-          # Build the grep pattern to exclude the paths
-          exclude_pattern=$(printf "! -path ./%s " "${excluded_paths[@]}")
+          # Join excluded paths with |
+          excluded_paths_regex=$(IFS="|"; echo "${excluded_paths[*]}")
 
-          changed_files=$(eval "git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD | grep '\.py$' | grep -v -E '(${excluded_paths[@]// /|})'")
+          # Find changed Python files excluding the specified paths
+          changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD | grep '\.py$' | grep -Ev "$excluded_paths_regex" || true)
           echo "Changed files: $changed_files"
+
           for file in $changed_files; do
             # Check if file contains the correct SPDX license identifier and the exact copyright statement with dynamic current year
             if ! grep -q "SPDX-License-Identifier: Apache-2.0" "$file"; then
@@ -45,10 +48,10 @@ jobs:
               echo "Missing or incorrect SPDX-FileCopyrightText in file: $file"
             fi
             if ! grep -q "SPDX-License-Identifier: Apache-2.0" "$file" || ! grep -q "SPDX-FileCopyrightText: © $current_year Tenstorrent AI ULC" "$file"; then
-              missing_license_files="$missing_license_files$file "
+              missing_license_files="$missing_license_files$file\n"
             fi
           done
-          echo "Missing license files: $missing_license_files"
+          echo -e "Missing license files: $missing_license_files"
           echo "missing_license_files=$missing_license_files" >> $GITHUB_ENV
           echo "Checked files for correct SPDX-License compliance."
 
@@ -60,7 +63,7 @@ jobs:
             const issueNumber = context.issue.number;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            const missingFiles = process.env.missing_license_files.trim().replace(/\s+/g, '\n');
+            const missingFiles = process.env.missing_license_files.trim();
             const currentYear = process.env.current_year;
             const commentBody = `The following files are not compliant with the required licensing standards for ${currentYear} or do not contain the correct copyright text 'Tenstorrent AI ULC' within their license header:\n\`\`\`\n${missingFiles}\n\`\`\`\nPlease update the files accordingly. Your attention and cooperation in this matter are greatly appreciated.\nThank you.`;
 
