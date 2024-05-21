@@ -31,22 +31,12 @@ jobs:
             "tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolo_layer.py"
           )  # Add paths to be ignored here
 
-          changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD | grep '\.py$')
+          # Build the grep pattern to exclude the paths
+          exclude_pattern=$(printf "! -path ./%s " "${excluded_paths[@]}")
+
+          changed_files=$(eval "git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD | grep '\.py$' | xargs -I {} find {} $exclude_pattern")
           echo "Changed files: $changed_files"
           for file in $changed_files; do
-            # Skip ignored paths
-            skip_file=false
-            for ignored in "${excluded_paths[@]}"; do
-              if [[ "$file" == "$ignored" || "$file" == */"$ignored" ]]; then
-                skip_file=true
-                break
-              fi
-            done
-            if $skip_file; then
-              echo "Skipping file: $file"
-              continue
-            fi
-
             # Check if file contains the correct SPDX license identifier and the exact copyright statement with dynamic current year
             if ! grep -q "SPDX-License-Identifier: Apache-2.0" "$file"; then
               echo "Missing SPDX-License-Identifier in file: $file"
