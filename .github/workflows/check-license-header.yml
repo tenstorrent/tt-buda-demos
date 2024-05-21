@@ -34,7 +34,7 @@ jobs:
           # Build the grep pattern to exclude the paths
           exclude_pattern=$(printf "! -path ./%s " "${excluded_paths[@]}")
 
-          changed_files=$(eval "git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD | grep '\.py$' | xargs -I {} find {} $exclude_pattern")
+          changed_files=$(eval "git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD | grep '\.py$' | grep -v -E '(${excluded_paths[@]// /|})'")
           echo "Changed files: $changed_files"
           for file in $changed_files; do
             # Check if file contains the correct SPDX license identifier and the exact copyright statement with dynamic current year
