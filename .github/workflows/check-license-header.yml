@@ -17,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
 
       - name: Identify currently changed files and check licenses
         id: check-licenses
@@ -26,14 +26,14 @@ jobs:
           echo "Current year: $current_year"
           echo "current_year=$current_year" >> $GITHUB_ENV  # Export current year to environment variables
           missing_license_files=""
-          excluded_paths="/tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/  # Add paths to be ignored here
+          excluded_paths="/tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/ignore_this.py /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/and_this_too.py"  # Add paths to be ignored here
           changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD | grep '\.py$')
           echo "Changed files: $changed_files"
           for file in $changed_files; do
             # Skip ignored paths
             skip_file=false
             for ignored in $excluded_paths; do
-              if [[ "$file" == $ignored || "$file" == $ignored/* ]]; then
+              if [[ "$file" == "$ignored" || "$file" == "$ignored"/* ]]; then
                 skip_file=true
                 break
               fi
