@@ -23,10 +23,18 @@ jobs:
         run: pip install yq
 
       - name: Read ignored paths from config
-        id: read-ignored-paths
+        id: yaml-output
+        uses: christian-ci/action-yaml-github-output@v2
+        with:
+          file_path: check_copyright_config.yaml
+          format_type: simple_nested
+          main_key: DEFAULT
+          sub_key: include
+
+      - name: Set included and ignored paths
+        id: set-paths
         run: |
-          # Read included paths from the DEFAULT section
-          included_paths=$(yq e '.DEFAULT.include | .[]' check_copyright_config.yaml)
+          included_paths="${{ steps.yaml-output.outputs.DEFAULT_include }}"
           if [ -z "$included_paths" ]; then
             echo "No included paths found in DEFAULT section or .include key is missing"
             echo "included_paths=" >> $GITHUB_ENV
@@ -35,8 +43,7 @@ jobs:
             echo "included_paths=$included_paths" >> $GITHUB_ENV
           fi
 
-          # Read ignored paths from the ignore section
-          ignored_paths=$(yq e '.ignore.include | .[]' check_copyright_config.yaml)
+          ignored_paths="${{ steps.yaml-output.outputs.ignore_include }}"
           if [ -z "$ignored_paths" ]; then
             echo "No ignored paths found in ignore section or .include key is missing"
             echo "ignored_paths=" >> $GITHUB_ENV
