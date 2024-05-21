@@ -26,7 +26,8 @@ jobs:
           echo "Current year: $current_year"
           echo "current_year=$current_year" >> $GITHUB_ENV  # Export current year to environment variables
           missing_license_files=""
-          excluded_paths="/tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/ignore_this.py /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/and_this_too.py"  # Add paths to be ignored here
+          excluded_paths="/tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/utils.py /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolo_layer.py
+          "  # Add paths to be ignored here
           changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD | grep '\.py$')
           echo "Changed files: $changed_files"
           for file in $changed_files; do
