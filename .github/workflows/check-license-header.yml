@@ -27,8 +27,8 @@ jobs:
           echo "current_year=$current_year" >> $GITHUB_ENV  # Export current year to environment variables
           missing_license_files=""
           excluded_paths=(
-            "tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/utils.py"
-            "tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/yolo_layer.py"
+            "model_demos/cv_demos/yolo_v3/holli_src/utils.py"
+            "model_demos/cv_demos/yolo_v3/holli_src/yolo_layer.py"
           )  # Add paths to be ignored here
 
           # Build the grep pattern to exclude the paths
