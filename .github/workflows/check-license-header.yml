@@ -17,52 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetch all history for all branches and tags
-
-      - name: Install yq
-        run: pip install yq
-
-      - name: Read paths from config
-        id: yaml-output
-        uses: christian-ci/action-yaml-github-output@v2
-        with:
-          file_path: ./check_copyright_config.yaml
-          format_type: simple_nested
-
-      - name: Debug yaml-output
-        run: |
-          echo "YAML Output:"
-          echo "${{ toJSON(steps.yaml-output.outputs) }}"
-
-      - name: Set included and ignored paths
-        id: set-paths
-        run: |
-          included_paths="${{ steps.yaml-output.outputs.DEFAULT_include }}"
-          ignored_paths="${{ steps.yaml-output.outputs.ignore_include }}"
-
-          if [ -z "$included_paths" ]; then
-            echo "No included paths found in DEFAULT section or .include key is missing"
-            echo "included_paths=" >> $GITHUB_ENV
-          else
-            included_paths=$(echo "$included_paths" | tr '\n' ' ')
-            echo "Included paths from YAML: $included_paths"
-            echo "included_paths=$included_paths" >> $GITHUB_ENV
-          fi
-
-          if [ -z "$ignored_paths" ]; then
-            echo "No ignored paths found in ignore section or .include key is missing"
-            echo "ignored_paths=" >> $GITHUB_ENV
-          else
-            ignored_paths=$(echo "$ignored_paths" | tr '\n' ' ')
-            echo "Ignored paths from YAML: $ignored_paths"
-            echo "ignored_paths=$ignored_paths" >> $GITHUB_ENV
-          fi
-
-          # Debug output to verify paths
-          echo "Included paths: $included_paths"
-          echo "Ignored paths: $ignored_paths"
-        env:
-          GITHUB_ENV: $GITHUB_ENV
+          fetch-depth: 0
 
       - name: Identify currently changed files and check licenses
         id: check-licenses
@@ -71,12 +26,13 @@ jobs:
           echo "Current year: $current_year"
           echo "current_year=$current_year" >> $GITHUB_ENV  # Export current year to environment variables
           missing_license_files=""
+          excluded_paths="/tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/  # Add paths to be ignored here
           changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD | grep '\.py$')
           echo "Changed files: $changed_files"
           for file in $changed_files; do
             # Skip ignored paths
             skip_file=false
-            for ignored in $ignored_paths; do
+            for ignored in $excluded_paths; do
               if [[ "$file" == $ignored || "$file" == $ignored/* ]]; then
                 skip_file=true
                 break
