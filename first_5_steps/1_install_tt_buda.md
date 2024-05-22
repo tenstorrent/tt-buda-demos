@@ -145,31 +145,37 @@ This wheel file installs the Debuda tool designed for debugging purposes.
 
 Alternatively, PyBuda and its dependencies are provided as Docker images which can run in separate containers.
 
-#### Step 1. Setup a personal access token (classic)
+#### Step 1. Pull the docker image
 
-Create a personal access token from: [GitHub Tokens](https://github.com/settings/tokens).
-Give the token the permissions to read packages from the container registry `read:packages`.
-
-#### Step 2. Login to Docker Registry
+To pull the Docker image, use the following command:
 
 ```bash
-GITHUB_TOKEN=<your token>
-echo $GITHUB_TOKEN | sudo docker login ghcr.io -u <your github username> --password-stdin
+sudo docker pull ghcr.io/tenstorrent/tt-buda/<OS-VERSION>/<TT-DEVICE>:<TAG>
 ```
 
-#### Step 3. Pull the image
+Supported OS Versions:
+
+- ubuntu-20-040amd64
+- ubuntu-22-040amd64
+
+Supported Tenstorrent Devices:
+
+- gs
+- wh
+
+For example, to run on an Ubuntu version 20.04 on a Grayskull device, use this command:
 
 ```bash
-sudo docker pull ghcr.io/tenstorrent/tt-buda/<TAG>
+sudo docker pull ghcr.io/tenstorrent/tt-buda/ubuntu-20-04-amd64/gs:<TAG>
 ```
 
-#### Step 4. Run the container
+#### Step 2. Run the container
 
 ```bash
-sudo docker run --rm -ti --cap-add=sys_nice --shm-size=4g --device /dev/tenstorrent -v /dev/hugepages-1G:/dev/hugepages-1G -v `pwd`/:/home/ ghcr.io/tenstorrent/tt-buda/<TAG> bash
+sudo docker run --rm -ti --cap-add=sys_nice --shm-size=4g --device /dev/tenstorrent -v /dev/hugepages-1G:/dev/hugepages-1G -v $(pwd)/:/home/ ghcr.io/tenstorrent/tt-buda/<TAG> bash
 ```
 
-#### Step 5. Change root directory
+#### Step 3. Change root directory
 
 ```bash
 cd home/
