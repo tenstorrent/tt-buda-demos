@@ -64,7 +64,7 @@ jobs:
             const issueNumber = context.issue.number;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            const missingFiles = process.env.missing_license_files.trim().replace(/\s+/g, '\n');
+            const missingFiles = process.env.missing_license_files.replace(/\s+/g, '\n');
             const currentYear = process.env.current_year;
             const commentBody = `The following files are not compliant with the required licensing standards for ${currentYear} or do not contain the correct copyright text 'Tenstorrent AI ULC' within their license header:\n\`\`\`\n${missingFiles}\n\`\`\`\nPlease update the files accordingly. Your attention and cooperation in this matter are greatly appreciated.\nThank you.`;
 
