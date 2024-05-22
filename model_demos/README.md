@@ -40,6 +40,7 @@ python cv_demos/resnet/pytorch_resnet.py
 | [DenseNet](cv_demos/densenet/)                            |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [DistilBERT](nlp_demos/distilbert/)                       |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [DPR](nlp_demos/dpr/)                                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [DLA](cv_demos/dla/)                                      |   ✔️    |    ✔️    |    ✔️    |        v0.15.0-alpha  |
 | [EfficientNet-Lite](cv_demos/efficientnet_lite/)          |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
 | [Falcon-7B](nlp_demos/falcon/)                            |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
 | [FLAN-T5](nlp_demos/flant5/)                              |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
@@ -87,4 +88,4 @@ python cv_demos/resnet/pytorch_resnet.py
 
 ## Note:
 
-Please note that releases identified as alpha (e.g., v0.10.9-alpha) are preliminary and not considered stable. They may not offer the full functionality found in stable versions. Furthermore, alpha releases are compatible only with models specifically released under the same version, as detailed in the above table. For ensured full functionality, we strongly advise opting for a stable release.
+Please note that releases identified as alpha (e.g., v0.15.0-alpha) are preliminary and not considered stable. They may not offer the full functionality found in stable versions. Furthermore, alpha releases are compatible only with models specifically released under the same version, as detailed in the above table. For ensured full functionality, we strongly advise opting for a stable release.
