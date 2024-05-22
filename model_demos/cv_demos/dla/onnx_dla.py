@@ -1,43 +1,16 @@
 import os
 import urllib
 
+import onnx
 import pybuda
 import requests
 import torchvision.transforms as transforms
 from PIL import Image
 from pybuda._C.backend_api import BackendDevice
 
-from cv_demos.dla.utils.model import (
-    dla34,
-    dla46_c,
-    dla46x_c,
-    dla60,
-    dla60x,
-    dla60x_c,
-    dla102,
-    dla102x,
-    dla102x2,
-    dla169,
-)
 
-variants_func = {
-    "dla34": dla34,
-    "dla46_c": dla46_c,
-    "dla46x_c": dla46x_c,
-    "dla60x_c": dla60x_c,
-    "dla60": dla60,
-    "dla60x": dla60x,
-    "dla102": dla102,
-    "dla102x": dla102x,
-    "dla102x2": dla102x2,
-    "dla169": dla169,
-}
-
-
-def run_dla_pytorch(variant):
-
+def run_dla_onnx(variant):
     # Load model function
-    func = variants_func[variant]
     model_name = f"dla_{variant}_pytorch"
 
     # Set PyBuda configuration parameters
@@ -49,11 +22,8 @@ def run_dla_pytorch(variant):
     available_devices = pybuda.detect_available_devices()
     if available_devices:
         arch = available_devices[0]
-        if arch == BackendDevice.Wormhole_B0:
-            if variant == ("dla60", "dla60x"):
-                compiler_cfg.place_on_new_epoch("concatenate_776.dc.concatenate.0")
-        elif arch == BackendDevice.Grayskull:
-            if variant in ("dla102x2", "dla169"):
+        if arch == BackendDevice.Grayskull:
+            if variant == "dla102x2":
                 os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
 
     # Load data sample
@@ -72,12 +42,21 @@ def run_dla_pytorch(variant):
     )
     img_tensor = transform(image).unsqueeze(0)
 
-    # Load model and prepare for evaluation (inference)
-    pytorch_model = func(pretrained="imagenet")
-    pytorch_model.eval()
+    # Download Model
+    onnx_dir_path = "dla"
+    onnx_model_path = f"{onnx_dir_path}/{variant}_Opset18.onnx"
+    if not os.path.exists(onnx_model_path):
+        if not os.path.exists("dla"):
+            os.mkdir("dla")
+        url = f"https://github.com/onnx/models/raw/main/Computer_Vision/{variant}_Opset18_timm/{variant}_Opset18.onnx?download="
+        response = requests.get(url, stream=True)
+        with open(onnx_model_path, "wb") as f:
+            f.write(response.content)
 
-    # Create pybuda.PyTorchModule using the loaded Pytorch model
-    tt_model = pybuda.PyTorchModule(model_name, pytorch_model)
+    # Load model and prepare for evaluation (inference)
+    model_name = f"dla_{variant}_onnx"
+    onnx_model = onnx.load(onnx_model_path)
+    tt_model = pybuda.OnnxModule(model_name, onnx_model, onnx_model_path)
 
     # run inference on Tenstorrent device
     output_q = pybuda.run_inference(tt_model, inputs=[(img_tensor,)])
@@ -95,6 +74,10 @@ def run_dla_pytorch(variant):
     # Print outputs
     print(f"True Label: {label} | Predicted Label: {predicted_label}")
 
+    # Cleanup model files
+    os.remove(onnx_model_path)
+    os.rmdir(onnx_dir_path)
+
 
 if __name__ == "__main__":
-    run_dla_pytorch("dla34")
+    run_dla_onnx("dla34")
