@@ -19,6 +19,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set permissions for excluded paths file
+        run: chmod +r excluded_paths.txt
+
       - name: Read excluded paths from file
         id: read-exclusions
         run: |
