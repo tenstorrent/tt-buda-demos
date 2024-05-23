@@ -37,8 +37,7 @@ import torch
 import torch.nn as nn
 import sys
 
-sys.path.append("cv_demos/retinanet/model/")
-import backbone as backbones_mod
+import cv_demos.retinanet.model.backbone as backbones_mod
 import torch.nn.functional as F
 
 
