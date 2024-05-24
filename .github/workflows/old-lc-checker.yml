@@ -48,7 +48,7 @@ jobs:
             const repo = context.repo.repo;
       
             if (formattedOutput) {
-              const commentBody = `OLDER:  Our automated SPDX license verification process has discovered that the following files are missing a license header:\n\`\`\`\n${formattedOutput}\n\`\`\`\nPlease ensure each indicated file includes a valid SPDX license identifier. This is essential for maintaining licensing compliance. Your attention and cooperation in updating these files are greatly appreciated. Thank you.`;
+              const commentBody = `OLDER: Our automated SPDX license verification process has discovered that the following files are missing a license header:\n\`\`\`\n${formattedOutput}\n\`\`\`\nPlease ensure each indicated file includes a valid SPDX license identifier. This is essential for maintaining licensing compliance. Your attention and cooperation in updating these files are greatly appreciated. Thank you.`;
               await github.rest.issues.createComment({
                 issue_number: issueNumber,
                 owner: owner,
