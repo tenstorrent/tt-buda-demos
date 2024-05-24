@@ -32,41 +32,49 @@ jobs:
           script: |
             const { execSync } = require('child_process');
             const { existsSync } = require('fs');
-
+            
             const configFilePath = './check_copyright_config.yaml';
-
+            
             if (!existsSync(configFilePath)) {
-              throw new Error(`Config file not found: ${configFilePath}`);
+                throw new Error(`Config file not found: ${configFilePath}`);
             }
-
+            
             const command = `python -m check_copyright --verbose --dry-run --replace --config ${configFilePath} .`;
             let output;
             try {
-              output = execSync(command, { encoding: 'utf-8' }); // captures stdout
+                output = execSync(command, { encoding: 'utf-8' }); // captures stdout
             } catch (error) {
-              output = error.stdout; // captures stdout from the error, if command execution fails
+                output = error.stdout; // captures stdout from the error, if command execution fails
             }
-
-            // Filter the output to list only files needing license headers
-            const neededLicenseHeaderRegex = /Some files are without a copyright note and a license header needs to be added:\s*([^]*)\nAdditional information about this hook and copyright headers may be found here:/;
-            const match = output.match(neededLicenseHeaderRegex);
-
-            const fileList = match ? match[1].trim().split('\n').map(line => line.trim()).join('\n') : '';
-
+            
+            // Extract only file names from the output where a license header needs to be added
+            const missingLicenseHeaderIndicator = 'Some files are without a copyright note and a license header needs to be added:';
+            const additionalInfoIndicator = 'Additional information about this hook and copyright headers may be found here:';
+            const startIndex = output.indexOf(missingLicenseHeaderIndicator);
+            const endIndex = output.indexOf(additionalInfoIndicator, startIndex);
+            
+            let fileList = "";
+            if (startIndex !== -1 && endIndex !== -1) {
+                fileList = output.substring(startIndex + missingLicenseHeaderIndicator.length, endIndex).trim();
+            }
+            
+            // Normalize file list by splitting into lines, trimming each line, and joining back with new lines
+            fileList = fileList.split('\n').map(line => line.trim()).filter(line => line).join('\n');
+            
             const issueNumber = context.issue.number;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-
+            
             if (fileList) {
-              const commentBody = `The following files are missing a license header:\n\`\`\`\n${fileList}\n\`\`\`\nPlease ensure each indicated file includes a valid SPDX license identifier.`;
-              await github.rest.issues.createComment({
+                const commentBody = `Modified: The following files are missing a license header:\n\`\`\`\n${fileList}\n\`\`\`\nPlease ensure each indicated file includes a valid SPDX license identifier.`;
+                await github.rest.issues.createComment({
                 issue_number: issueNumber,
                 owner: owner,
                 repo: repo,
                 body: commentBody
-              });
-              // Fail the job if missing files are found
-              process.exit(1);
+                });
+                // Fail the job if missing files are found
+                process.exit(1);
             } else {
-              console.log("No SPDX license issues found.");
+                console.log("No SPDX license issues found.");
             }
