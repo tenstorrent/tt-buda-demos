@@ -1,3 +1,5 @@
+# Apache-2.0
+
 # port of models described in RW
 # We use the bloom model as a starting point for these model.
 # Please refer to the bloom models for usage instructions.

@@ -1,3 +1,5 @@
+# Apache-2.0
+
 """
 Model class for Falcon LLM.
 """

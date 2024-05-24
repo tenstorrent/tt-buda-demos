@@ -1,4 +1,7 @@
-# BERT Demo Script - SST-2 Text Classification
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
+#  BERT Demo Script - SST-2 Text Classification
 
 import pybuda
 from transformers import BertForSequenceClassification, BertTokenizer

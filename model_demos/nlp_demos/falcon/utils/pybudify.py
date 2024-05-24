@@ -1,3 +1,5 @@
+# Apache-2.0
+
 import os
 import sys
 
