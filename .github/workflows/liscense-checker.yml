@@ -62,6 +62,8 @@ jobs:
                 repo: repo,
                 body: commentBody
               });
+              // Fail the job if missing files are found
+              process.exit(1);
             } else {
               console.log("No SPDX license issues found.");
             }
