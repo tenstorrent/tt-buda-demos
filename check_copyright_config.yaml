@@ -28,3 +28,4 @@ ignore:  # You can also select ignoring files here
     - __pycache__/*
     - /CONTRIBUTING.md
     - /MAINTAINERS.md
+    - /model_demos/cv_demos/yolo_v3/holli_src/*

@@ -31,7 +31,7 @@ jobs:
         with:
           script: |
             const execSync = require('child_process').execSync;
-            const command = `python -m check_copyright --verbose --dry-run --replace --config ./check_copyright_config.yaml . | awk '/Some files are without a copyright note and a license header needs to be added:/{flag=1; next} /Additional information about this hook and copyright headers may be found here:/{flag=0} flag'`;
+            const command = `python -m check_copyright --verbose --dry-run --config ./check_copyright_config.yaml . | awk '/Some files are without a copyright note and a license header needs to be added:/{flag=1; next} /Additional information about this hook and copyright headers may be found here:/{flag=0} flag'`;
             let output;
             try {
               output = execSync(command, { encoding: 'utf-8' }); // captures stdout
