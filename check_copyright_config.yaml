@@ -1,0 +1,23 @@
+DEFAULT:
+  perform_check: yes
+
+  allowed_licenses:
+    - Apache-2.0
+    - MIT
+  license_for_new_files: Apache-2.0
+
+  new_notice_python: |
+    """
+    SPDX-FileCopyrightText: © {years} Tenstorrent AI ULC
+
+    SPDX-License-Identifier: {license}
+    """
+
+  espressif_copyright: '© {years} Tenstorrent AI ULC'
+
+  include:
+    - "*.py"
+
+ignore:
+  perform_check: no
+  include:
