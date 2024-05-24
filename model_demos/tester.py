@@ -1,3 +1,1 @@
-
-
-print('Hello from tester.py!')
+print("Hello from tester.py!")
