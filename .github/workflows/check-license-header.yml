@@ -41,7 +41,7 @@ jobs:
           excluded_paths_regex=$(IFS="|"; echo "${excluded_paths[*]}")
 
           # Find changed Python files excluding the specified paths
-          changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD | grep '\.py$' | grep -Ev "$excluded_paths_regex" || true)
+          changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD | grep '\.py$' | grep -Ev "$excluded_paths_regex" || true)
           echo "Changed files: $changed_files"
 
           for file in $changed_files; do
