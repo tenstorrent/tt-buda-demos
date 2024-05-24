@@ -26,11 +26,13 @@ jobs:
         run: |
           excluded_paths_regex="^(\.github|excluded_folder)/"  # Add any other paths to exclude
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            changed_files=$(git diff --name-only -r HEAD^1 HEAD | grep -Ev "$excluded_paths_regex")
+            changed_files=$(git diff --name-only -r HEAD^1 HEAD | grep -Ev "$excluded_paths_regex" || true)
           else
-            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -Ev "$excluded_paths_regex")
+            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -Ev "$excluded_paths_regex" || true)
           fi
-          echo "changed_files=$changed_files" >> $GITHUB_ENV
+          echo "changed_files<<EOF" >> $GITHUB_ENV
+          echo "$changed_files" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Identify currently changed files and check licenses
         id: check-licenses
@@ -38,14 +40,14 @@ jobs:
           current_year=$(date +"%Y")  # Dynamically set current year for checking
           echo "current_year=$current_year" >> $GITHUB_ENV  # Export current year to environment variables
           missing_license_files=""
-          for file in ${{ env.changed_files }}; do
+          while IFS= read -r file; do
             if [[ "$file" == *.py ]]; then
               # Check if file contains the correct SPDX license identifier and the exact copyright statement with dynamic current year
               if ! grep -q "SPDX-License-Identifier: Apache-2.0" "$file" || ! grep -q "SPDX-FileCopyrightText: © $current_year Tenstorrent AI ULC" "$file"; then
                 missing_license_files="$missing_license_files$file "
               fi
             fi
-          done
+          done <<< "${{ env.changed_files }}"
           echo "missing_license_files=$missing_license_files" >> $GITHUB_ENV
           echo "Checked files for correct SPDX-License compliance."
 
