@@ -19,20 +19,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
+          fetch-depth: 0  # Ensure full history for accurate diff
 
       - name: Get changed files
         id: changed-files
-        run: |
-          excluded_paths_regex="^(\.github|excluded_folder)/"  # Add any other paths to exclude
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            changed_files=$(git diff --name-only -r HEAD^1 HEAD | grep -Ev "$excluded_paths_regex" || true)
-          else
-            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -Ev "$excluded_paths_regex" || true)
-          fi
-          echo "changed_files<<EOF" >> $GITHUB_ENV
-          echo "$changed_files" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            model_demos/**.py
 
       - name: Identify currently changed files and check licenses
         id: check-licenses
@@ -51,16 +45,11 @@ jobs:
             fi
           }
 
-          # Check changed files
-          for file in ${{ env.changed_files }}; do
+          # Get the list of changed files from the GitHub Action
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             check_file "$file"
           done
-          
-          # Check all files in modeldemos/ folder
-          for file in $(find modeldemos/ -type f -name "*.py"); do
-            check_file "$file"
-          done
-          
+
           echo "missing_license_files=$missing_license_files" >> $GITHUB_ENV
           echo "Checked files for correct SPDX-License compliance."
 
@@ -75,7 +64,7 @@ jobs:
             const missingFiles = process.env.missing_license_files.trim().replace(/\s+/g, '\n');
             const currentYear = process.env.current_year;
             const commentBody = `Tester: The following files are not compliant with the required licensing standards for ${currentYear} or do not contain the correct copyright text 'Tenstorrent AI ULC' within their license header:\n\`\`\`\n${missingFiles}\n\`\`\`\nPlease update the files accordingly. Your attention and cooperation in this matter are greatly appreciated.\nThank you.`;
-            
+
             github.rest.issues.createComment({
               issue_number: issueNumber,
               owner: owner,
