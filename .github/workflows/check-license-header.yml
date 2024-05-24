@@ -40,14 +40,26 @@ jobs:
           current_year=$(date +"%Y")  # Dynamically set current year for checking
           echo "current_year=$current_year" >> $GITHUB_ENV  # Export current year to environment variables
           missing_license_files=""
-          while IFS= read -r file; do
+          check_file() {
+            local file=$1
             if [[ "$file" == *.py ]]; then
               # Check if file contains the correct SPDX license identifier and the exact copyright statement with dynamic current year
               if ! grep -q "SPDX-License-Identifier: Apache-2.0" "$file" || ! grep -q "SPDX-FileCopyrightText: © $current_year Tenstorrent AI ULC" "$file"; then
                 missing_license_files="$missing_license_files$file "
               fi
             fi
+          }
+          
+          # Check changed files
+          while IFS= read -r file; do
+            check_file "$file"
           done <<< "${{ env.changed_files }}"
+          
+          # Check all files in modeldemos/ folder
+          for file in $(find modeldemos/ -type f -name "*.py"); do
+            check_file "$file"
+          done
+          
           echo "missing_license_files=$missing_license_files" >> $GITHUB_ENV
           echo "Checked files for correct SPDX-License compliance."
 
