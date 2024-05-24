@@ -24,10 +24,11 @@ jobs:
       - name: Get changed files
         id: changed-files
         run: |
+          excluded_paths_regex="^(\.github|excluded_folder)/"  # Add any other paths to exclude
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            changed_files=$(git diff --name-only -r HEAD^1 HEAD)
+            changed_files=$(git diff --name-only -r HEAD^1 HEAD | grep -Ev "$excluded_paths_regex")
           else
-            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})
+            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -Ev "$excluded_paths_regex")
           fi
           echo "changed_files=$changed_files" >> $GITHUB_ENV
 
@@ -58,7 +59,7 @@ jobs:
             const repo = context.repo.repo;
             const missingFiles = process.env.missing_license_files.trim().replace(/\s+/g, '\n');
             const currentYear = process.env.current_year;
-            const commentBody = `New: The following files are not compliant with the required licensing standards for ${currentYear} or do not contain the correct copyright text 'Tenstorrent AI ULC' within their license header:\n\`\`\`\n${missingFiles}\n\`\`\`\nPlease update the files accordingly. Your attention and cooperation in this matter are greatly appreciated.\nThank you.`;
+            const commentBody = `Tester: The following files are not compliant with the required licensing standards for ${currentYear} or do not contain the correct copyright text 'Tenstorrent AI ULC' within their license header:\n\`\`\`\n${missingFiles}\n\`\`\`\nPlease update the files accordingly. Your attention and cooperation in this matter are greatly appreciated.\nThank you.`;
             
             github.rest.issues.createComment({
               issue_number: issueNumber,
