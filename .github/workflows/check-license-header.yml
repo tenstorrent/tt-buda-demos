@@ -19,6 +19,12 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Debug - Show Git information
+        run: |
+          git log -1
+          echo "Base SHA: ${{ github.event.pull_request.base.sha }}"
+          echo "Head SHA: ${{ github.event.pull_request.head.sha }}"
+
       - name: Identify currently changed files and check licenses
         id: check-licenses
         run: |
@@ -29,7 +35,6 @@ jobs:
           excluded_paths=(
             "model_demos/cv_demos/yolo_v3/holli_src/utils.py"
             "model_demos/cv_demos/yolo_v3/holli_src/yolo_layer.py"
-            "model_demos/cv_demos/yolo_v3/holli_src/utils.py"
             "model_demos/cv_demos/yolo_v3/holli_src/yolov3.py"
             "model_demos/cv_demos/yolo_v3/holli_src/yolov3_base.py"
             "model_demos/cv_demos/yolo_v3/holli_src/yolov3_tiny.py"
@@ -41,7 +46,7 @@ jobs:
           excluded_paths_regex=$(IFS="|"; echo "${excluded_paths[*]}")
 
           # Find changed Python files excluding the specified paths
-          changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD | grep '\.py$' | grep -Ev "$excluded_paths_regex" || true)
+          changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }} | grep '\.py$' | grep -Ev "$excluded_paths_regex" || true)
           echo "Changed files: $changed_files"
 
           for file in $changed_files; do
@@ -72,7 +77,7 @@ jobs:
             const currentYear = process.env.current_year;
             const commentBody = `The following files are not compliant with the required licensing standards for ${currentYear} or do not contain the correct copyright text 'Tenstorrent AI ULC' within their license header:\n\`\`\`\n${missingFiles}\n\`\`\`\nPlease update the files accordingly. Your attention and cooperation in this matter are greatly appreciated.\nThank you.`;
 
-            github.rest.issues.createComment({
+            await github.rest.issues.createComment({
               issue_number: issueNumber,
               owner: owner,
               repo: repo,
