@@ -40,6 +40,7 @@ jobs:
           current_year=$(date +"%Y")  # Dynamically set current year for checking
           echo "current_year=$current_year" >> $GITHUB_ENV  # Export current year to environment variables
           missing_license_files=""
+
           check_file() {
             local file=$1
             if [[ "$file" == *.py ]]; then
@@ -49,11 +50,11 @@ jobs:
               fi
             fi
           }
-          
+
           # Check changed files
-          while IFS= read -r file; do
+          for file in ${{ env.changed_files }}; do
             check_file "$file"
-          done <<< "${{ env.changed_files }}"
+          done
           
           # Check all files in modeldemos/ folder
           for file in $(find modeldemos/ -type f -name "*.py"); do
