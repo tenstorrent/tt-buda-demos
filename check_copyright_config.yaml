@@ -23,5 +23,5 @@ ignore:
   include:
     - .github/*
     - __pycache__
-    - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/
+    # - /tt-buda-demos/model_demos/cv_demos/yolo_v3/holli_src/
     - /tt-buda-demos/model_demos/tester.py
