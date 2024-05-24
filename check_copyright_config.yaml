@@ -15,9 +15,3 @@ DEFAULT:
 
   espressif_copyright: '© {years} Tenstorrent AI ULC'
 
-  include:
-    - "*.py"
-
-ignore:
-  perform_check: no
-  include:
