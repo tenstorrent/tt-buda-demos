@@ -17,8 +17,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -40,15 +38,15 @@ jobs:
             } catch (error) {
               output = error.stdout; // captures stdout from the error, if command execution fails
             }
-
+      
             // Remove ANSI color codes and prepare the output
             output = output.replace(/\u001b\[.*?m/g, '');
             const formattedOutput = output.split('\n').filter(line => line.trim() !== '').map(line => `- ${line}`).join('\n');
-
+      
             const issueNumber = context.issue.number;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-
+      
             if (formattedOutput) {
               const commentBody = `Our automated SPDX license verification process has discovered that the following files are missing a license header:\n\`\`\`\n${formattedOutput}\n\`\`\`\nPlease ensure each indicated file includes a valid SPDX license identifier. This is essential for maintaining licensing compliance. Your attention and cooperation in updating these files are greatly appreciated. Thank you.`;
               await github.rest.issues.createComment({
@@ -61,3 +59,4 @@ jobs:
             } else {
               console.log("No SPDX license issues found.");
             }
+      
