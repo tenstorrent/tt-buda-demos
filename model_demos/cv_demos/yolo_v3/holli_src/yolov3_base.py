@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2018 Olli Huotari
+# SPDX-License-Identifier: MIT
+
 import importlib
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict, defaultdict

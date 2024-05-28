@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: Copyright (c) 2018 Olli Huotari
-# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
 
 import os
 
