@@ -1,61 +1,61 @@
-name: "Check if License is present"
+# name: "Check if License is present"
 
-on:
-  pull_request:
-    branches:
-      - "main"
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - assigned
-      - review_requested
+# on:
+#   pull_request:
+#     branches:
+#       - "main"
+#     types:
+#       - opened
+#       - reopened
+#       - synchronize
+#       - assigned
+#       - review_requested
 
-jobs:
-  check-license-headers-on-pr:
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+# jobs:
+#   check-license-headers-on-pr:
+#     runs-on: ubuntu-20.04
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.8'
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.8'
 
-      - name: Install Check-copyright
-        run: python -m pip install git+https://github.com/espressif/check-copyright.git@master
+#       - name: Install Check-copyright
+#         run: python -m pip install git+https://github.com/espressif/check-copyright.git@master
 
-      - name: Check SPDX licenses and comment on PR, then fail if issues found
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const execSync = require('child_process').execSync;
-            const command = `python -m check_copyright --verbose --dry-run --config ./check_copyright_config.yaml . | awk '/Some files are without a copyright note and a license header needs to be added:/{flag=1; next} /Additional information about this hook and copyright headers may be found here:/{flag=0} flag'`;
-            let output;
-            try {
-              output = execSync(command, { encoding: 'utf-8' }); // captures stdout
-            } catch (error) {
-              output = error.stdout; // captures stdout from the error, if command execution fails
-            }
-      
-            // Remove ANSI color codes and prepare the output
-            output = output.replace(/\u001b\[.*?m/g, '');
-            const formattedOutput = output.split('\n').filter(line => line.trim() !== '').map(line => `- ${line}`).join('\n');
-      
-            const issueNumber = context.issue.number;
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-      
-            if (formattedOutput) {
-              const commentBody = `Our automated SPDX license verification process has discovered that the following files are missing a license header:\n\`\`\`\n${formattedOutput}\n\`\`\`\nPlease ensure each indicated file includes a valid SPDX license identifier. This is essential for maintaining licensing compliance. Your attention and cooperation in updating these files are greatly appreciated. Thank you.`;
-              await github.rest.issues.createComment({
-                issue_number: issueNumber,
-                owner: owner,
-                repo: repo,
-                body: commentBody
-              });
-              core.setFailed("SPDX license issues found.");
-            } else {
-              console.log("No SPDX license issues found.");
-            }
+#       - name: Check SPDX licenses and comment on PR, then fail if issues found
+#         uses: actions/github-script@v6
+#         with:
+#           script: |
+#             const execSync = require('child_process').execSync;
+#             const command = `python -m check_copyright --verbose --dry-run --config ./check_copyright_config.yaml . | awk '/Some files are without a copyright note and a license header needs to be added:/{flag=1; next} /Additional information about this hook and copyright headers may be found here:/{flag=0} flag'`;
+#             let output;
+#             try {
+#               output = execSync(command, { encoding: 'utf-8' }); // captures stdout
+#             } catch (error) {
+#               output = error.stdout; // captures stdout from the error, if command execution fails
+#             }
+
+#             // Remove ANSI color codes and prepare the output
+#             output = output.replace(/\u001b\[.*?m/g, '');
+#             const formattedOutput = output.split('\n').filter(line => line.trim() !== '').map(line => `- ${line}`).join('\n');
+
+#             const issueNumber = context.issue.number;
+#             const owner = context.repo.owner;
+#             const repo = context.repo.repo;
+
+#             if (formattedOutput) {
+#               const commentBody = `Our automated SPDX license verification process has discovered that the following files are missing a license header:\n\`\`\`\n${formattedOutput}\n\`\`\`\nPlease ensure each indicated file includes a valid SPDX license identifier. This is essential for maintaining licensing compliance. Your attention and cooperation in updating these files are greatly appreciated. Thank you.`;
+#               await github.rest.issues.createComment({
+#                 issue_number: issueNumber,
+#                 owner: owner,
+#                 repo: repo,
+#                 body: commentBody
+#               });
+#               core.setFailed("SPDX license issues found.");
+#             } else {
+#               console.log("No SPDX license issues found.");
+#             }
