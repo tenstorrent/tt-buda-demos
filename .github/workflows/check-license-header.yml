@@ -19,14 +19,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Ensure full history for accurate diff
-
+          fetch-depth: 0
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v44
         with:
           files: |
-            model_demos/**.py
+            model_demos/**/*.py
 
       - name: Identify currently changed files and check licenses
         id: check-licenses
@@ -40,7 +39,7 @@ jobs:
             if [[ "$file" == *.py ]]; then
               # Check if file contains the correct SPDX license identifier and the exact copyright statement with dynamic current year
               if ! grep -q "SPDX-License-Identifier: Apache-2.0" "$file" || ! grep -q "SPDX-FileCopyrightText: © $current_year Tenstorrent AI ULC" "$file"; then
-                missing_license_files="$missing_license_files$file "
+                missing_license_files="$missing_license_files$file\n"
               fi
             fi
           }
@@ -50,7 +49,7 @@ jobs:
             check_file "$file"
           done
 
-          echo "missing_license_files=$missing_license_files" >> $GITHUB_ENV
+          echo -e "missing_license_files=$missing_license_files" >> $GITHUB_ENV
           echo "Checked files for correct SPDX-License compliance."
 
       - name: Comment on PR about incorrect SPDX licenses
