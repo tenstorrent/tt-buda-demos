@@ -1,6 +1,7 @@
 import pytest
-from cv_demos.segformer.pytorch_segformer_semantic_segmentation import run_segformer_semseg_pytorch
+
 from cv_demos.segformer.pytorch_segformer_image_classification import run_segformer_image_classification_pytorch
+from cv_demos.segformer.pytorch_segformer_semantic_segmentation import run_segformer_semseg_pytorch
 
 variants_semseg = [
     "nvidia/segformer-b0-finetuned-ade-512-512",

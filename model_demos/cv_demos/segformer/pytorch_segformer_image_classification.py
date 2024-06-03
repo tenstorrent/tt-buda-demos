@@ -1,8 +1,9 @@
-import pybuda
-from transformers import AutoImageProcessor, SegformerForImageClassification, SegformerConfig
 import os
+
+import pybuda
 import requests
 from PIL import Image
+from transformers import AutoImageProcessor, SegformerConfig, SegformerForImageClassification
 
 
 def get_sample_data(model_name):

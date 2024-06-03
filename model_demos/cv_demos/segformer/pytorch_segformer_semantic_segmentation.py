@@ -1,9 +1,10 @@
-import pybuda
-from transformers import AutoImageProcessor, SegformerForSemanticSegmentation
-import torch
 import os
+
+import pybuda
 import requests
+import torch
 from PIL import Image
+from transformers import AutoImageProcessor, SegformerForSemanticSegmentation
 
 torch.multiprocessing.set_sharing_strategy("file_system")
 
