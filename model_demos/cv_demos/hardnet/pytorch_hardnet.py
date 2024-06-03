@@ -99,5 +99,6 @@ def run_hardnet_pytorch(variant):
     # Remove the downloaded image
     os.remove(filename)
 
+
 if __name__ == "__main__":
     run_hardnet_pytorch()

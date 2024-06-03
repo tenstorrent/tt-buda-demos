@@ -2,7 +2,6 @@ import pytest
 
 from cv_demos.perceiverio.pytorch_perceiverio import run_perceiverio_pytorch
 
-
 variants = [
     "deepmind/vision-perceiver-conv",
     "deepmind/vision-perceiver-fourier",

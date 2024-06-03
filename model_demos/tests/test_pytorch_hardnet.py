@@ -1,4 +1,5 @@
 import pytest
+
 from cv_demos.hardnet.pytorch_hardnet import run_hardnet_pytorch
 
 variants = ["hardnet68", "hardnet85", "hardnet68ds", "hardnet39ds"]

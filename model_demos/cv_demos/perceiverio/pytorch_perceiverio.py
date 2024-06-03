@@ -7,9 +7,9 @@ import requests
 from PIL import Image
 from transformers import (
     AutoImageProcessor,
-    PerceiverForImageClassificationLearned,
     PerceiverForImageClassificationConvProcessing,
     PerceiverForImageClassificationFourier,
+    PerceiverForImageClassificationLearned,
 )
 
 
