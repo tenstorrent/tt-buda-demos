@@ -83,4 +83,5 @@ markers = [
     "perceiverio: tests that involve Perceiver IO",
     "hardnet: tests that involve hardnet",
     "dla: tests that involve DLA",
+    "segformer: tests that involve SegFormer",
 ]
