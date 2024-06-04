@@ -39,14 +39,14 @@ python cv_demos/resnet/pytorch_resnet.py
 | [DeiT](cv_demos/deit/)                                    |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [DenseNet](cv_demos/densenet/)                            |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [DistilBERT](nlp_demos/distilbert/)                       |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
-| [DLA](cv_demos/dla/)                                      |   ✔️    |    ✔️    |    ✔️    |          TBD          |
+| [DLA](cv_demos/dla/)                                      |   ✔️    |    ✔️    |    ✔️    |        v0.17.0-alpha  |
 | [DPR](nlp_demos/dpr/)                                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [DLA](cv_demos/dla/)                                      |   ✔️    |    ✔️    |    ✔️    |        v0.15.0-alpha  |
 | [EfficientNet-Lite](cv_demos/efficientnet_lite/)          |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
 | [Falcon-7B](nlp_demos/falcon/)                            |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
 | [FLAN-T5](nlp_demos/flant5/)                              |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [FPN](cv_demos/fpn/)                                      |   ✔️    |    ✔️    |    ✔️    |          TBD          |
-| [Fuyu-8B](nlp_demos/fuyu8b/)                              |   ✘    |    ✘    |    ✘    |        v0.12.3        |
+| [Fuyu-8B](nlp_demos/fuyu8b/)                              |   ✘    |    ✘    |    ✘    |          TBD          |
 | [GhostNet](cv_demos/ghostnet/)                            |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [GoogLeNet](cv_demos/googlenet/)                          |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [GPT-2](nlp_demos/gpt2/)                                  |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
@@ -63,13 +63,13 @@ python cv_demos/resnet/pytorch_resnet.py
 | [OpenPose](cv_demos/openpose/)                            |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [OPT](nlp_demos/opt/)                                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [Pose Landmark](cv_demos/landmark/)                       |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
-| [Perceiver IO](cv_demos/perceiverio/)                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [Perceiver IO](cv_demos/perceiverio/)                     |   ✔️    |    ✔️    |    ✔️    |        v0.17.0-alpha  |
 | [ResNet](cv_demos/resnet/)                                |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [ResNeXt](cv_demos/resnext/)                              |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [RetinaNet](cv_demos/retinanet/)                          |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [RoBERTa](nlp_demos/roberta/)                             |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
-| [SSD300RESNET50](cv_demos/ssd300_resnet50/)               |   ✔️    |    ✔️    |    ✔️    |          TBD          |
-| [SegFormer](cv_demos/segformer/)                          |   ✔️    |    ✔️    |    ✔️    |          TBD          |
+| [SSD300 ResNet50](cv_demos/ssd300_resnet50/)              |   ✔️    |    ✔️    |    ✔️    |          TBD          |
+| [SegFormer](cv_demos/segformer/)                          |   ✔️    |    ✔️    |    ✔️    |        v0.17.0-alpha  |
 | [SqueezeBERT](nlp_demos/squeezebert/)                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [Stable Diffusion](cv_demos/stable_diffusion/)            |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
 | [T5](nlp_demos/t5/)                                       |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
@@ -91,6 +91,6 @@ python cv_demos/resnet/pytorch_resnet.py
 - ✔️: Supported on the device
 - ✘: Not supported on the device
 
-## Note:
+## Note
 
 Please note that releases identified as alpha (e.g., v0.15.0-alpha) are preliminary and not considered stable. They may not offer the full functionality found in stable versions. Furthermore, alpha releases are compatible only with models specifically released under the same version, as detailed in the above table. For ensured full functionality, we strongly advise opting for a stable release.
