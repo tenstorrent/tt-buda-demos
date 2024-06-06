@@ -87,4 +87,5 @@ markers = [
     "ssd300_resnet50: tests that involve ssd300_resnet50",
     "yolov6: tests that involve yolov6",
     "segformer: tests that involve SegFormer",
+    "monodle: tests that involve Monodle",
 ]
