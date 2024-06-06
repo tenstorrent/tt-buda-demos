@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # GPT2 demo script - Text generation
 import pybuda
 from pybuda.transformers.pipeline import pipeline as pybuda_pipeline

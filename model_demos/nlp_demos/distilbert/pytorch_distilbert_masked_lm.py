@@ -1,4 +1,7 @@
-# DistilBERT Demo Script - Masked LM
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
+#  DistilBERT Demo Script - Masked LM
 
 import pybuda
 from transformers import DistilBertForMaskedLM, DistilBertTokenizer
