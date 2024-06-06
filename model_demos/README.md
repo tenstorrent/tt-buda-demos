@@ -45,7 +45,7 @@ python cv_demos/resnet/pytorch_resnet.py
 | [EfficientNet-Lite](cv_demos/efficientnet_lite/)          |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
 | [Falcon-7B](nlp_demos/falcon/)                            |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
 | [FLAN-T5](nlp_demos/flant5/)                              |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
-| [FPN](cv_demos/fpn/)                                      |   ✔️    |    ✔️    |    ✔️    |          TBD          |
+| FPN                                                       |   ✘    |    ✘    |    ✘    |          TBD          |
 | [Fuyu-8B](nlp_demos/fuyu8b/)                              |   ✘    |    ✘    |    ✘    |          TBD          |
 | [GhostNet](cv_demos/ghostnet/)                            |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [GoogLeNet](cv_demos/googlenet/)                          |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
@@ -68,7 +68,7 @@ python cv_demos/resnet/pytorch_resnet.py
 | [ResNeXt](cv_demos/resnext/)                              |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [RetinaNet](cv_demos/retinanet/)                          |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [RoBERTa](nlp_demos/roberta/)                             |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
-| [SSD300 ResNet50](cv_demos/ssd300_resnet50/)              |   ✔️    |    ✔️    |    ✔️    |          TBD          |
+| SSD300 ResNet50                                           |   ✘    |    ✘    |    ✘    |          TBD          |
 | [SegFormer](cv_demos/segformer/)                          |   ✔️    |    ✔️    |    ✔️    |        v0.17.0-alpha  |
 | [SqueezeBERT](nlp_demos/squeezebert/)                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [Stable Diffusion](cv_demos/stable_diffusion/)            |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
@@ -84,7 +84,7 @@ python cv_demos/resnet/pytorch_resnet.py
 | [XGLM](nlp_demos/xglm/)                                   |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [YOLOv3](cv_demos/yolo_v3/)                               |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [YOLOv5](cv_demos/yolo_v5/)                               |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
-| [YOLOv6](cv_demos/yolo_v6/)                               |   ✔️    |    ✔️    |    ✔️    |          TBD          |
+| YOLOv6                                                    |   ✘    |    ✘    |    ✘    |          TBD          |
 
 ### Legend
 
