@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 # SPDX-License-Identifier: Apache-2.0
 
-# Perceiver IO Convolutional Processing Demo Script
+# Perceiver IO Demo Script
 
 import os
 
@@ -11,30 +11,21 @@ from PIL import Image
 from transformers import AutoImageProcessor, PerceiverForImageClassificationConvProcessing
 
 
-def run_perceiverio_conv_pytorch():
+def run_perceiverio_pytorch(variant="deepmind/vision-perceiver-conv"):
 
-    # Load feature extractor and model checkpoint from HuggingFace
-    model_ckpt = "deepmind/vision-perceiver-conv"
+    # Load ResNet feature extractor and model checkpoint from HuggingFace
+    model_ckpt = variant
     image_processor = AutoImageProcessor.from_pretrained(model_ckpt)
-    model = PerceiverForImageClassificationConvProcessing.from_pretrained(model_ckpt)
-    model.eval()
+    model = PerceiverForImageClassificationConvProcessing.from_pretrained(model_ckpt).eval()
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "Ribbon"
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
-    os.environ["PYBUDA_RIBBON2"] = "1"
-    compiler_cfg.enable_auto_fusing = False
-
     compiler_cfg.default_dram_parameters = False
+    compiler_cfg.enable_auto_fusing = False
+    os.environ["PYBUDA_RIBBON2"] = "1"
     os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{10*1024}"
-
-    available_devices = pybuda.detect_available_devices()
-    if available_devices:
-        if available_devices[0] == pybuda.BackendDevice.Wormhole_B0:
-            compiler_cfg.balancer_op_override(
-                "max_pool2d_33.dc.reshape.10.dc.sparse_matmul.13.lc2", "t_stream_shape", (1, 1)
-            )
 
     # Load data sample
     url = "http://images.cocodataset.org/val2017/000000039769.jpg"
@@ -46,9 +37,7 @@ def run_perceiverio_conv_pytorch():
     pixel_values = inputs["pixel_values"]
 
     # Run inference on Tenstorrent device
-    output_q = pybuda.run_inference(
-        pybuda.PyTorchModule("pt_" + str(model_ckpt.split("/")[-1].replace("-", "_")), model), inputs=[(pixel_values,)]
-    )
+    output_q = pybuda.run_inference(pybuda.PyTorchModule("pt_perceiver_io", model), inputs=[(pixel_values,)])
     output = output_q.get()  # return last queue object
 
     # Data postprocessing
@@ -59,4 +48,4 @@ def run_perceiverio_conv_pytorch():
 
 
 if __name__ == "__main__":
-    run_perceiverio_conv_pytorch()
+    run_perceiverio_pytorch()

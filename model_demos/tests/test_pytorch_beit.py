@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 
 from cv_demos.beit.pytorch_beit_classify_16_224_hf import run_beit_classify_224_hf_pytorch
