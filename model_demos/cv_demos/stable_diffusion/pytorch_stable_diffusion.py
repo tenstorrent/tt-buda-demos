@@ -113,6 +113,8 @@ def initialize_compiler_overrides():
     os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
     os.environ["PYBUDA_RIBBON2"] = "1"
     os.environ["PYBUDA_DECOMPOSE_SIGMOID"] = "1"
+    os.environ["PYBUDA_DRAM_PICK_CAPACITY"]="1"
+    os.environ["PYBUDA_DRAM_FLIP_FLOP"]="1"
 
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.enable_tvm_constant_prop = True
