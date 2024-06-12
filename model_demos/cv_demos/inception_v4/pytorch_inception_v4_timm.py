@@ -52,6 +52,7 @@ def run_inception_v4_timm_pytorch():
         compiler_cfg.balancer_op_override("_fused_op_2", "t_stream_shape", (676, 1))  # TM error (ref pybuda#1527)
     elif pybuda.detect_available_devices()[0] == BackendDevice.Wormhole_B0:
         # STEP 1: Set PyBuda configuration parameters
+        compiler_cfg.balancer_op_override("_fused_op_2", "t_stream_shape", (676, 1))  # TM error
         compiler_cfg.balancer_op_override(
             "conv2d_551.dc.sparse_matmul.10.dc.sparse_matmul.1.lc2",
             "grid_shape",
