@@ -64,18 +64,19 @@ def run_pytorch_ssd300_resnet50():
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "Ribbon"
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
-    compiler_cfg.amp_level = 1
 
     # Device specific configurations
     available_devices = pybuda.detect_available_devices()
     if available_devices:
         if available_devices[0] == BackendDevice.Grayskull:
             os.environ["PYBUDA_RIBBON2"] = "1"
+            compiler_cfg.amp_level = 1
             compiler_cfg.balancer_op_override("max_pool2d_14.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (2, 1))
 
         if available_devices[0] == BackendDevice.Wormhole_B0:
             compiler_cfg.place_on_new_epoch("conv2d_766.dc.matmul.11")
-            os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "45056"
+            os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "12288"
+            compiler_cfg.balancer_op_override("max_pool2d_14.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (2, 1))
 
     # STEP 2 : prepare model
     model = torch.hub.load("NVIDIA/DeepLearningExamples:torchhub", "nvidia_ssd", pretrained=False)
