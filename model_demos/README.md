@@ -59,6 +59,7 @@ python cv_demos/resnet/pytorch_resnet.py
 | [MobileNetV1](cv_demos/mobilenet_v1/)                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [MobileNetV2](cv_demos/mobilenet_v2/)                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [MobileNetV3](cv_demos/mobilenet_v3/)                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
+| [Monodle](cv_demos/monodle/)                              |   ✘    |    ✘    |    ✔️    |          TBD          |
 | [OpenPose](cv_demos/openpose/)                            |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [OPT](nlp_demos/opt/)                                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [Pose Landmark](cv_demos/landmark/)                       |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
