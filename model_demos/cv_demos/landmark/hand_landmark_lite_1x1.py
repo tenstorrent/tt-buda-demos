@@ -31,6 +31,7 @@ def run_hand_landmark_lite_1x1():
     os.environ["PYBUDA_OVERRIDE_DEVICE_YAML"] = "wormhole_b0_1x1.yaml"
     os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
     os.environ["PYBUDA_ENABLE_SINGLE_BUFFER_FALLBACK"] = "1"
+    compiler_cfg.place_on_new_epoch("conv2d_14.dc.conv2d.3.dc.depthwise.9")
 
     # Download model weights
     url = "https://storage.googleapis.com/mediapipe-assets/hand_landmark_lite.tflite"
@@ -51,7 +52,6 @@ def run_hand_landmark_lite_1x1():
 
     # Remove weight file
     os.remove(tflite_path)
-
 
 if __name__ == "__main__":
     run_hand_landmark_lite_1x1()
