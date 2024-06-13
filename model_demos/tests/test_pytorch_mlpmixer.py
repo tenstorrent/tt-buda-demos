@@ -7,5 +7,5 @@ from cv_demos.mlpmixer.timm_mlpmixer import run_mlpmixer_timm
 
 
 @pytest.mark.mlpmixer
-def test_mlpmixer_timm(clear_pybuda):
+def test_mlpmixer_timm(clear_pybuda, test_device):
     run_mlpmixer_timm()

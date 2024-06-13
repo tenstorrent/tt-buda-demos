@@ -7,5 +7,5 @@ from cv_demos.resnet.onnx_resnet import run_resnet_onnx
 
 
 @pytest.mark.resnet
-def test_resnet_onnx(clear_pybuda):
+def test_resnet_onnx(clear_pybuda, test_device):
     run_resnet_onnx()

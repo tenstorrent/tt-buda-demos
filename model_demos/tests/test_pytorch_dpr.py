@@ -14,17 +14,17 @@ variants_reader = ["facebook/dpr-reader-single-nq-base", "facebook/dpr-reader-mu
 
 @pytest.mark.parametrize("variant", variants_ctx, ids=variants_ctx)
 @pytest.mark.dpr
-def test_dpr_context_encoder_pytorch(clear_pybuda, variant):
+def test_dpr_context_encoder_pytorch(clear_pybuda, test_device, variant):
     run_dpr_context_encoder_pytorch(variant)
 
 
 @pytest.mark.parametrize("variant", variants_qe, ids=variants_qe)
 @pytest.mark.dpr
-def test_dpr_question_encoder_pytorch(clear_pybuda, variant):
+def test_dpr_question_encoder_pytorch(clear_pybuda, test_device, variant):
     run_dpr_question_encoder_pytorch(variant)
 
 
 @pytest.mark.parametrize("variant", variants_reader, ids=variants_reader)
 @pytest.mark.dpr
-def test_dpr_reader_pytorch(clear_pybuda, variant):
+def test_dpr_reader_pytorch(clear_pybuda, test_device, variant):
     run_dpr_reader_pytorch(variant)

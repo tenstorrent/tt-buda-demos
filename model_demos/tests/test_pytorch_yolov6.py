@@ -8,5 +8,5 @@ variants = ["yolov6n", "yolov6s", "yolov6m", "yolov6l"]
 
 @pytest.mark.parametrize("variant", variants)
 @pytest.mark.yolov6
-def test_yolov6_pytorch(variant, clear_pybuda):
+def test_yolov6_pytorch(variant, clear_pybuda, test_device):
     run_yolov6_pytorch(variant)

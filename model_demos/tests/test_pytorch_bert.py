@@ -10,20 +10,20 @@ from nlp_demos.bert.pytorch_bert_token_classification import run_bert_token_clas
 
 
 @pytest.mark.bert
-def test_bert_masked_lm_pytorch(clear_pybuda):
+def test_bert_masked_lm_pytorch(clear_pybuda, test_device):
     run_bert_masked_lm_pytorch()
 
 
 @pytest.mark.bert
-def test_bert_question_answering_pytorch(clear_pybuda):
+def test_bert_question_answering_pytorch(clear_pybuda, test_device):
     run_bert_question_answering_pytorch()
 
 
 @pytest.mark.bert
-def test_bert_sequence_classification_pytorch(clear_pybuda):
+def test_bert_sequence_classification_pytorch(clear_pybuda, test_device):
     run_bert_sequence_classification_pytorch()
 
 
 @pytest.mark.bert
-def test_bert_token_classification_pytorch(clear_pybuda):
+def test_bert_token_classification_pytorch(clear_pybuda, test_device):
     run_bert_token_classification_pytorch()

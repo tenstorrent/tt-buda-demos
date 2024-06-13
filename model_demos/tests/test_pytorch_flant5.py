@@ -10,5 +10,5 @@ variants = ["google/flan-t5-small", "google/flan-t5-base", "google/flan-t5-large
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.flant5
-def test_flan_t5_generation_pytorch(clear_pybuda, variant):
+def test_flan_t5_generation_pytorch(clear_pybuda, test_device, variant):
     run_flan_t5_pybuda_pipeline(variant)

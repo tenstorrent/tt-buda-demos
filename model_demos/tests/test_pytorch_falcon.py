@@ -7,5 +7,5 @@ from nlp_demos.falcon.pytorch_falcon import run_falcon_pytorch
 
 
 @pytest.mark.falcon
-def test_falcon_pytorch(clear_pybuda):
+def test_falcon_pytorch(clear_pybuda, test_device):
     run_falcon_pytorch()
