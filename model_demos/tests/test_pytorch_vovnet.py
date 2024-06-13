@@ -16,30 +16,30 @@ sys.path.append("cv_demos/vovnet")
 
 
 @pytest.mark.vovnet
-def test_vovnet_v1_27s_osmr_pytorch(clear_pybuda):
+def test_vovnet_v1_27s_osmr_pytorch(clear_pybuda, test_device):
     run_vovnet_v1_27s_osmr_pytorch()
 
 
 @pytest.mark.vovnet
-def test_vovnet_v1_39_osmr_pytorch(clear_pybuda):
+def test_vovnet_v1_39_osmr_pytorch(clear_pybuda, test_device):
     run_vovnet_v1_39_osmr_pytorch()
 
 
 @pytest.mark.vovnet
-def test_vovnet_v1_57_osmr_pytorch(clear_pybuda):
+def test_vovnet_v1_57_osmr_pytorch(clear_pybuda, test_device):
     run_vovnet_v1_57_osmr_pytorch()
 
 
 @pytest.mark.vovnet
-def test_vovnet_ese_19bdw_timm_pytorch(clear_pybuda):
+def test_vovnet_ese_19bdw_timm_pytorch(clear_pybuda, test_device):
     run_vovnet_ese_19bdw_timm_pytorch()
 
 
 @pytest.mark.vovnet
-def test_vovnet_ese_39b_timm_pytorch(clear_pybuda):
+def test_vovnet_ese_39b_timm_pytorch(clear_pybuda, test_device):
     run_vovnet_ese_39b_timm_pytorch()
 
 
 @pytest.mark.vovnet
-def test_vovnet_ese_99b_timm_pytorch(clear_pybuda):
+def test_vovnet_ese_99b_timm_pytorch(clear_pybuda, test_device):
     run_vovnet_ese_99b_timm_pytorch()

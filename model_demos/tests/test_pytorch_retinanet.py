@@ -6,5 +6,5 @@ variants = ["retinanet_rn18fpn", "retinanet_rn34fpn", "retinanet_rn50fpn", "reti
 
 @pytest.mark.retinanet
 @pytest.mark.parametrize("variant", variants)
-def test_retinanet_pytorch(variant, clear_pybuda):
+def test_retinanet_pytorch(variant, clear_pybuda, test_device):
     run_retinanet_pytorch(variant)

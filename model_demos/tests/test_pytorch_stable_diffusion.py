@@ -7,5 +7,5 @@ from cv_demos.stable_diffusion.pytorch_stable_diffusion import run_stable_diffus
 
 
 @pytest.mark.stablediffusion
-def test_stable_diffusion_pytorch(clear_pybuda):
+def test_stable_diffusion_pytorch(clear_pybuda, test_device):
     run_stable_diffusion_pytorch()

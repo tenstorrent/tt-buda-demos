@@ -11,11 +11,11 @@ variants = ["wide_resnet50_2", "wide_resnet101_2"]
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.wideresnet
-def test_wideresnet_torchhub_pytorch(clear_pybuda, variant):
+def test_wideresnet_torchhub_pytorch(clear_pybuda, test_device, variant):
     run_wideresnet_torchhub_pytorch(variant)
 
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.wideresnet
-def test_wideresnet_timm_pytorch(clear_pybuda, variant):
+def test_wideresnet_timm_pytorch(clear_pybuda, test_device, variant):
     run_wideresnet_timm_pytorch(variant)

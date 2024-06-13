@@ -16,5 +16,5 @@ variants = [
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.whisper
-def test_whisper_generation_pytorch(clear_pybuda, variant):
+def test_whisper_generation_pytorch(clear_pybuda, test_device, variant):
     run_whisper_generation(variant)
