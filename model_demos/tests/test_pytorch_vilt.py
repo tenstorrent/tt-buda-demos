@@ -8,10 +8,10 @@ from cv_demos.vilt.pytorch_vilt_question_answering import run_vilt_for_question_
 
 
 @pytest.mark.vilt
-def test_vilt_for_question_answering_pytorch(clear_pybuda):
+def test_vilt_for_question_answering_pytorch(clear_pybuda, test_device):
     run_vilt_for_question_answering_pytorch()
 
 
 @pytest.mark.vilt
-def test_vilt_maskedlm_pytorch(clear_pybuda):
+def test_vilt_maskedlm_pytorch(clear_pybuda, test_device):
     run_vilt_maskedlm_pytorch()

@@ -15,22 +15,22 @@ variants = ["v1", "v2"]
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.parametrize("size", sizes, ids=sizes)
 @pytest.mark.albert
-def test_albert_masked_lm_pytorch(clear_pybuda, size, variant):
+def test_albert_masked_lm_pytorch(clear_pybuda, test_device, size, variant):
     run_albert_masked_lm_pytorch(size, variant)
 
 
 @pytest.mark.albert
-def test_albert_question_answering_pytorch(clear_pybuda):
+def test_albert_question_answering_pytorch(clear_pybuda, test_device):
     run_albert_question_answering_pytorch()
 
 
 @pytest.mark.albert
-def test_albert_sequence_classification_pytorch(clear_pybuda):
+def test_albert_sequence_classification_pytorch(clear_pybuda, test_device):
     run_albert_sequence_classification_pytorch()
 
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.parametrize("size", sizes, ids=sizes)
 @pytest.mark.albert
-def test_albert_token_classification_pytorch(clear_pybuda, size, variant):
+def test_albert_token_classification_pytorch(clear_pybuda, test_device, size, variant):
     run_albert_token_classification_pytorch(size, variant)

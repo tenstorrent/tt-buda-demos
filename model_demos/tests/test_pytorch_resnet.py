@@ -18,10 +18,10 @@ variants = [
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.resnet
-def test_resnet_pytorch(clear_pybuda, variant):
+def test_resnet_pytorch(clear_pybuda, test_device, variant):
     run_resnet_pytorch(variant)
 
 
 @pytest.mark.resnet
-def test_resnet_timm(clear_pybuda):
+def test_resnet_timm(clear_pybuda, test_device):
     run_resnet_timm()
