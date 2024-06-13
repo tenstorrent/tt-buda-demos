@@ -15,11 +15,11 @@ variants = [
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.gptneo
-def test_gptneo_causal_lm_pytorch(clear_pybuda, variant):
+def test_gptneo_causal_lm_pytorch(clear_pybuda, test_device, variant):
     run_gptneo_causal_lm(variant)
 
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.gptneo
-def test_gptneo_sequence_classification_pytorch(clear_pybuda, variant):
+def test_gptneo_sequence_classification_pytorch(clear_pybuda, test_device, variant):
     run_gptneo_sequence_classification(variant)

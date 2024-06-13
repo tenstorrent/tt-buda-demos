@@ -17,5 +17,5 @@ variants = [
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.codegen
-def test_codegen_causal_lm(clear_pybuda, variant):
+def test_codegen_causal_lm(clear_pybuda, test_device, variant):
     run_codegen_causal_lm(variant)
