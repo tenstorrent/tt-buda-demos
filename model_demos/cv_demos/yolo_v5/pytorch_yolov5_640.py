@@ -52,6 +52,7 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
                     compiler_cfg.place_on_new_epoch("conv2d_210.dc.matmul.11")
                     os.environ["PYBUDA_TEMP_BALANCER_DISABLE_TARGET_PROXIMITY"] = "1"
                     os.environ["PYBUDA_TEMP_RIBBON2_LEGACY_UTIL_EVAL"] = "1"
+                    compiler_cfg.place_on_new_epoch("concatenate_40.dc.concatenate.30.dc.concatenate.0.dc.concatenate.12")
             if model_ckpt in ["yolov5m"]:
                 os.environ["PYBUDA_RIBBON2"] = "1"
                 os.environ["PYBUDA_INSERT_SLICE_FOR_CONCAT"] = "1"
@@ -60,7 +61,7 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
                 compiler_cfg.place_on_new_epoch("conv2d_27.dc.matmul.8")
             if model_ckpt in ["yolov5l"]:
                 compiler_cfg.place_on_new_epoch("conv2d_313.dc.matmul.8")
-                os.environ["PYBUDA_TEMP_DISABLE_MODEL_KB_PROLOGUE_BW"] = "1"
+                os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "74752"
 
         elif available_devices[0] == BackendDevice.Wormhole_B0:
             os.environ["PYBUDA_PAD_SPARSE_MM"] = "{13:16, 3:4}"
@@ -93,6 +94,9 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
                 compiler_cfg.enable_tm_cpu_fallback = True
                 compiler_cfg.balancer_op_override("conv2d_328.dc.matmul.8", "grid_shape", (5, 2))
                 os.environ["PYBUDA_RIBBON2"] = "1"
+                os.environ["PYBUDA_FORK_JOIN_BUF_QUEUES"] = "1"
+                os.environ["PYBUDA_FORK_JOIN_EXPAND_OUTPUT_BUFFERS"] = "1"
+                os.environ["PYBUDA_FORK_JOIN_SKIP_EXPANDING_BUFFERS"] = "1"                
             if model_ckpt == "yolov5x":
                 compiler_cfg.balancer_op_override("concatenate_363.dc.concatenate.0", "grid_shape", (1, 1))
                 compiler_cfg.balancer_op_override("conv2d_41.dc.matmul.8", "t_stream_shape", (1, 1))
