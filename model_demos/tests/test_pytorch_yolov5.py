@@ -18,17 +18,17 @@ variants = [
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.yolov5
-def test_pytorch_yolov5_320(clear_pybuda, variant):
+def test_pytorch_yolov5_320(clear_pybuda, test_device, variant):
     run_pytorch_yolov5_320(variant)
 
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.yolov5
-def test_pytorch_yolov5_640(clear_pybuda, variant):
+def test_pytorch_yolov5_640(clear_pybuda, test_device, variant):
     run_pytorch_yolov5_640(variant)
 
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.yolov5
-def test_pytorch_yolov5_480(clear_pybuda, variant):
+def test_pytorch_yolov5_480(clear_pybuda, test_device, variant):
     run_pytorch_yolov5_480(variant)

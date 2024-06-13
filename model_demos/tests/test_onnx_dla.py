@@ -21,5 +21,5 @@ variants = [
 
 @pytest.mark.dla
 @pytest.mark.parametrize("variant", variants, ids=variants)
-def test_dla_onnx(clear_pybuda, variant):
+def test_dla_onnx(clear_pybuda, test_device, variant):
     run_dla_onnx(variant)
