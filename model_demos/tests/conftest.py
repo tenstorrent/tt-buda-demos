@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+from typing import List, Optional
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -60,7 +61,6 @@ DEVICE_CONFIG_TO_BACKEND_DEVICE_TYPE = {
     "wh_n300": BackendDevice.Wormhole_B0,
     "galaxy": BackendDevice.Wormhole_B0,
 }
-
 
 @dataclass
 class TestDevice:
@@ -148,7 +148,6 @@ class TestDevice:
 
         if self.devtype == BackendType.Model:
             return bool(int(os.environ.get("PYBUDA_ENABLE_MODEL_DEVICE", "0")))
-
         if self.devtype == BackendType.Versim:
             return bool(int(os.environ.get("PYBUDA_ENABLE_VERSIM_DEVICE", "0")))
 
@@ -238,7 +237,6 @@ def pytest_runtest_logreport(report):
     if report.when == "setup":
         global environ_before_test
         environ_before_test = os.environ.copy()
-
         global device_cfg_global
         if device_cfg_global:
             pybuda.set_configuration_options(device_config=device_cfg_global)
