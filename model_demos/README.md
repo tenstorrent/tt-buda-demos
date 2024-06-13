@@ -41,7 +41,6 @@ python cv_demos/resnet/pytorch_resnet.py
 | [DistilBERT](nlp_demos/distilbert/)                       |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [DLA](cv_demos/dla/)                                      |   ✔️    |    ✔️    |    ✔️    |        v0.17.0-alpha  |
 | [DPR](nlp_demos/dpr/)                                     |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
-| [DLA](cv_demos/dla/)                                      |   ✔️    |    ✔️    |    ✔️    |        v0.15.0-alpha  |
 | [EfficientNet-Lite](cv_demos/efficientnet_lite/)          |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
 | [Falcon-7B](nlp_demos/falcon/)                            |   ✘    |    ✘    |    ✔️    |        v0.12.3        |
 | [FLAN-T5](nlp_demos/flant5/)                              |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
