@@ -34,8 +34,8 @@ def run_gptneo_causal_lm(variant="EleutherAI/gpt-neo-125M"):
 
         if available_devices:
             if available_devices[0] == BackendDevice.Grayskull:
+                compiler_cfg.enable_auto_fusing = False
                 compiler_cfg.balancer_policy = "Ribbon"
-                os.environ["PYBUDA_FORCE_EMULATE_HARVESTED"] = "1"
 
     # Modify Config
     config = GPTNeoConfig.from_pretrained(model_ckpt)
