@@ -29,7 +29,8 @@ def run_pytorch_yolov5_480(variant="yolov5s"):
     if available_devices:
         if available_devices[0] == BackendDevice.Grayskull:
             # Set PyBUDA environment variables
-            os.environ["PYBUDA_PAD_SPARSE_MM"] = "{113:128}"
+            if variant != "yolov5n":
+                os.environ["PYBUDA_PAD_SPARSE_MM"] = "{113:128}"
             os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{16*1024}"
             os.environ["PYBUDA_FORK_JOIN_SKIP_EXPANDING_BUFFERS"] = "1"
             if variant == "yolov5m":
@@ -47,6 +48,7 @@ def run_pytorch_yolov5_480(variant="yolov5s"):
                     "concatenate_40.dc.concatenate.30.dc.concatenate.1.dc.buffer.0", "t_stream_shape", (6, 1)
                 )
                 compiler_cfg.balancer_op_override("conv2d_41.dc.matmul.8", "grid_shape", (5, 5))
+                compiler_cfg.place_on_new_epoch("conv2d_44.dc.matmul.11")
         elif available_devices[0] == BackendDevice.Wormhole_B0:
             # Set PyBUDA environment variables
             compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b

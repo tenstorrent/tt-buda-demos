@@ -46,6 +46,8 @@ def run_retinanet_r101_640x480_onnx():
         if available_devices[0] == pybuda.BackendDevice.Grayskull:
             os.environ["PYBUDA_RIBBON2"] = "1"
             os.environ["PYBUDA_FORCE_EMULATE_HARVESTED"] = "1"
+        elif available_devices[0] == pybuda.BackendDevice.Wormhole_B0:
+            compiler_cfg.place_on_new_epoch("conv2d_1557.dc.matmul.11")
 
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.balancer_policy = "Ribbon"
