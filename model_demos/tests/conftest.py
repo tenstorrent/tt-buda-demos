@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
-import shutil
+
 import subprocess
 from datetime import datetime
 from pathlib import Path
-
+import shutil
 import pybuda
 import pytest
 
