@@ -17,9 +17,6 @@ from pybuda._C.backend_api import BackendType, BackendDevice, DeviceMode
 from pybuda.run.api import detect_available_devices
 
 
-environ_before_test = None
-
-
 @pytest.fixture(autouse=True)
 def clear_pybuda():
     yield
@@ -33,18 +30,6 @@ def clear_pybuda():
     # )
     archive_files()
     _ = subprocess.run(["make", "clean_tt"])
-
-
-def pytest_runtest_logreport(report):
-    if report.when == "setup":
-        global environ_before_test
-        environ_before_test = os.environ.copy()
-    elif report.when == "teardown":
-        environ_before_test_keys = set(environ_before_test.keys())
-        environ_after_test_keys = set(os.environ.keys())
-        added_flags = environ_before_test_keys ^ environ_after_test_keys
-        for f in added_flags:
-            os.environ.pop(f, None)
 
 
 def archive_files(src_directory=Path("./"), dest_directory=Path("archive")):
@@ -175,41 +160,44 @@ device_cfg_global = None
 def pytest_generate_tests(metafunc):
     global device_cfg_global
 
-    names = ["Golden", "Model", "Versim", "Emulation", "Grayskull", "Wormhole_B0", "Blackhole"]
-
-    # Set device-mode for the test
-    compile_only = metafunc.config.getoption("--compile-only")
-    run_only = metafunc.config.getoption("--run-only")
-    devtype = metafunc.config.getoption("--devtype")
-    devtype = BackendType.from_string(devtype.capitalize()) if devtype else None
-
-    devmode = DeviceMode.CompileAndRun
-    if compile_only:
-        devmode = DeviceMode.CompileOnly
-        if devtype is None:
-            assert False, "Backend device type needs to be specified when running tests with compile-only mode"
-    elif run_only:
-        devmode = DeviceMode.RunOnly
-
-    # Configure TTI-path only if compile/run-only is set
-    tti_path = None
-    if compile_only or run_only:
-        tti_path = metafunc.config.getoption("--tti-path")
-
-    devices = [(TestDevice.from_str(s, devmode, tti_path, device_cfg_global), s) for s in names]
-    silicon_only = metafunc.config.getoption("--silicon-only")
-    no_silicon = metafunc.config.getoption("--no-silicon")
-    device_list = []
-    if not no_silicon:
-        device_list = detect_available_devices()
-    enabled_devices = [(d, name) for (d, name) in devices if d.is_available(device_list, silicon_only, no_silicon, devtype, devmode)]
-    params = [pytest.param(d) for (d, _) in enabled_devices]
-    ids = [name for (_, name) in enabled_devices]
-    
-    metafunc.parametrize("test_device", params, ids=ids)
-
     # Configure backend runtime yaml
     device_cfg_global = metafunc.config.getoption("--device-config")
+
+    if "test_device" in metafunc.fixturenames:
+
+        names = ["Golden", "Model", "Versim", "Emulation", "Grayskull", "Wormhole_B0", "Blackhole"]
+
+        # Set device-mode for the test
+        compile_only = metafunc.config.getoption("--compile-only")
+        run_only = metafunc.config.getoption("--run-only")
+        devtype = metafunc.config.getoption("--devtype")
+        devtype = BackendType.from_string(devtype.capitalize()) if devtype else None
+
+        devmode = DeviceMode.CompileAndRun
+        if compile_only:
+            devmode = DeviceMode.CompileOnly
+            if devtype is None:
+                assert False, "Backend device type needs to be specified when running tests with compile-only mode"
+        elif run_only:
+            devmode = DeviceMode.RunOnly
+
+        # Configure TTI-path only if compile/run-only is set
+        tti_path = None
+        if compile_only or run_only:
+            tti_path = metafunc.config.getoption("--tti-path")
+
+        devices = [(TestDevice.from_str(s, devmode, tti_path, device_cfg_global), s) for s in names]
+        silicon_only = metafunc.config.getoption("--silicon-only")
+        no_silicon = metafunc.config.getoption("--no-silicon")
+        device_list = []
+        if not no_silicon:
+            device_list = detect_available_devices()
+        enabled_devices = [(d, name) for (d, name) in devices if d.is_available(device_list, silicon_only, no_silicon, devtype, devmode)]
+        params = [pytest.param(d) for (d, _) in enabled_devices]
+        ids = [name for (_, name) in enabled_devices]
+
+        metafunc.parametrize("test_device", params, ids=ids)
+
 
 environ_before_test = None
 def pytest_runtest_logreport(report):
