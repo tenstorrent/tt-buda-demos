@@ -77,6 +77,7 @@ def run_pytorch_yolov5_480(variant="yolov5s"):
                 compiler_cfg.balancer_op_override(
                     "concatenate_40.dc.concatenate.30.dc.concatenate.0.dc.concatenate.12", "t_stream_shape", (3, 1)
                 )
+                os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "167936"
 
         else:
             print("not a supported device!")

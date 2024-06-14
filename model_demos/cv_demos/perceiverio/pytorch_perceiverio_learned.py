@@ -31,6 +31,8 @@ def run_perceiverio_learned_pytorch():
     if available_devices:
         if available_devices[0] == pybuda.BackendDevice.Grayskull:
             os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{101*1024}"
+        elif available_devices[0] == pybuda.BackendDevice.Wormhole_B0:
+            os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "40960"
 
     # Load data sample
     url = "http://images.cocodataset.org/val2017/000000039769.jpg"
