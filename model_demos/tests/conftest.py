@@ -1,15 +1,14 @@
 # SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 # SPDX-License-Identifier: Apache-2.0
 
-import pybuda
-import pytest
 import os
 import shutil
 import subprocess
 from datetime import datetime
 from pathlib import Path
 
-
+import pybuda
+import pytest
 
 environ_before_test = None
 
