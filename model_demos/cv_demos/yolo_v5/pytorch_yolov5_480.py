@@ -7,8 +7,10 @@ import os
 import sys
 
 import pybuda
-import requests
 import torch
+import subprocess
+import cv2
+import numpy as np
 from PIL import Image
 from pybuda._C.backend_api import BackendDevice
 
@@ -98,10 +100,19 @@ def run_pytorch_yolov5_480(variant="yolov5s"):
 
     # Load data sample
     url = "https://raw.githubusercontent.com/pytorch/hub/master/images/dog.jpg"
-    image = Image.open(requests.get(url, stream=True).raw).convert("RGB")
+    downloaded_path = "/tmp/"
+    process = subprocess.Popen(['wget','-P', downloaded_path, url ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stderr, stdout = process.communicate()
+    assert process.returncode == 0 , "Invalid image. Please check the url"
+    for line in stdout.decode().split('\n'):
+        if line.startswith('Saving to:'):
+            downloaded_path = line.split(' ')[-1][1:-1]  # Remove single quotes from path
+       
+    image_sample = cv2.imread(downloaded_path)
+    image_sample = Image.fromarray(np.uint8(image_sample)).convert('RGB')
 
     # Data preprocessing on Host
-    ims, n, files, shape0, shape1, pixel_values = data_preprocessing(image, size=(pixel_size, pixel_size))
+    ims, n, files, shape0, shape1, pixel_values = data_preprocessing(image_sample, size=(pixel_size, pixel_size))
 
     # Run inference on Tenstorrent device
     output_q = pybuda.run_inference(
