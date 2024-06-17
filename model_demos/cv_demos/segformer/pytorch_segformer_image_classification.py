@@ -34,6 +34,9 @@ def run_segformer_image_classification_pytorch(variant="nvidia/mit-b0"):
 
                 os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
 
+            if variant == "nvidia/mit-b0":
+                os.environ["PYBUDA_FORK_JOIN_BUF_QUEUES"] = "1"
+
     # Set model configurations
     config = SegformerConfig.from_pretrained(variant)
     config_dict = config.to_dict()
