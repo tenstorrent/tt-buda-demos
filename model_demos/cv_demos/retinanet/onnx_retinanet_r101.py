@@ -38,6 +38,13 @@ def img_preprocess(scal_val=1):
 def run_retinanet_r101_640x480_onnx():
 
     # Set PyBuda configuration parameters
+    compiler_cfg = pybuda.config._get_global_compiler_config()
+    compiler_cfg.balancer_policy = "Ribbon"
+    compiler_cfg.graph_solver_self_cut_type = "ConsumerOperandDataEdgesFirst"
+    compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
+    compiler_cfg.enable_auto_fusing = False
+    compiler_cfg.conv_multi_op_fracture_factor_override["conv2d_356"] = 3
+
     os.environ["PYBUDA_DECOMPOSE_SIGMOID"] = "1"
     os.environ["PYBUDA_DISABLE_CONV_MULTI_OP_FRACTURE"] = "1"
     os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{75*1024}"
@@ -48,13 +55,6 @@ def run_retinanet_r101_640x480_onnx():
             os.environ["PYBUDA_FORCE_EMULATE_HARVESTED"] = "1"
         elif available_devices[0] == pybuda.BackendDevice.Wormhole_B0:
             compiler_cfg.place_on_new_epoch("conv2d_1557.dc.matmul.11")
-
-    compiler_cfg = pybuda.config._get_global_compiler_config()
-    compiler_cfg.balancer_policy = "Ribbon"
-    compiler_cfg.graph_solver_self_cut_type = "ConsumerOperandDataEdgesFirst"
-    compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
-    compiler_cfg.enable_auto_fusing = False
-    compiler_cfg.conv_multi_op_fracture_factor_override["conv2d_356"] = 3
 
     # Download model weights
     url = "https://github.com/onnx/models/raw/main/validated/vision/object_detection_segmentation/retinanet/model/retinanet-9.onnx?download="
