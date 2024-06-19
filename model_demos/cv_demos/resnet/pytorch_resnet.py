@@ -10,8 +10,10 @@ import requests
 from PIL import Image
 from transformers import AutoFeatureExtractor, ResNetForImageClassification
 
+from utils.config import Config
 
-def run_resnet_pytorch(variant="microsoft/resnet-50"):
+
+def run_resnet_pytorch(variant="microsoft/resnet-50", config=Config(device="e150", chip_mode="single", batch_size=1)):
 
     # Load ResNet feature extractor and model checkpoint from HuggingFace
     model_ckpt = variant
@@ -25,10 +27,17 @@ def run_resnet_pytorch(variant="microsoft/resnet-50"):
     os.environ["PYBUDA_DISABLE_STREAM_OUTPUT"] = "1"
     os.environ["PYBUDA_PAD_OUTPUT_BUFFER"] = "1"
 
+    # Check for dual-chip mode
+    if config.device == "n300" and config.chip_mode == "dual":
+        os.environ["PYBUDA_N300_DATA_PARALLEL"] = "1"
+
     # Load data sample
     url = "https://images.rawpixel.com/image_1300/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA1L3BkMTA2LTA0Ny1jaGltXzEuanBn.jpg"
     image = Image.open(requests.get(url, stream=True).raw)
     label = "tiger"
+
+    # Adjust for batch size
+    image = [image] * config.batch_size
 
     # Data preprocessing
     inputs = feature_extractor(image, return_tensors="pt")
@@ -39,10 +48,11 @@ def run_resnet_pytorch(variant="microsoft/resnet-50"):
     output = output_q.get()  # return last queue object
 
     # Data postprocessing
-    predicted_value = output[0].value().argmax(-1).item()
-    predicted_label = model.config.id2label[predicted_value]
+    predicted_value = output[0].value().argmax(-1)
+    for idx, value in enumerate(predicted_value):
+        predicted_label = model.config.id2label[value.item()]
 
-    print(f"True Label: {label} | Predicted Label: {predicted_label}")
+        print(f"Sample: {idx} | True Label: {label} | Predicted Label: {predicted_label}")
 
 
 if __name__ == "__main__":
