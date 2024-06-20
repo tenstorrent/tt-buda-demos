@@ -76,7 +76,8 @@ def run_pytorch_ssd300_resnet50():
 
         if available_devices[0] == BackendDevice.Wormhole_B0:
             compiler_cfg.place_on_new_epoch("conv2d_766.dc.matmul.11")
-            os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "36864"
+            os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "24576"
+            compiler_cfg.balancer_op_override("max_pool2d_14.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (1, 1))
 
     # STEP 2 : prepare model
     model = torch.hub.load("NVIDIA/DeepLearningExamples:torchhub", "nvidia_ssd", pretrained=False)

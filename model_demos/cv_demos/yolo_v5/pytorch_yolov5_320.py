@@ -37,6 +37,9 @@ def run_pytorch_yolov5_320(variant="yolov5s"):
             # Set PyBUDA environment variables
             compiler_cfg.enable_tm_cpu_fallback = True
             os.environ["PYBUDA_FORK_JOIN_SKIP_EXPANDING_BUFFERS"] = "1"
+            if variant == "yolov5x":
+                os.environ["PYBUDA_FORK_JOIN_BUF_QUEUES"] = "1"
+                os.environ["PYBUDA_FORK_JOIN_EXPAND_OUTPUT_BUFFERS"] = "1"
         elif available_devices[0] == BackendDevice.Wormhole_B0:
             if variant == "yolov5m":
                 os.environ["PYBUDA_FORK_JOIN_SKIP_EXPANDING_BUFFERS"] = "1"

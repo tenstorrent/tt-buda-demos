@@ -14,6 +14,7 @@ from PIL import Image
 from pybuda._C.backend_api import BackendDevice
 from timm.data import resolve_data_config
 from timm.data.transforms_factory import create_transform
+torch.multiprocessing.set_sharing_strategy("file_system")
 
 
 def run_xception_timm(variant="xception"):
@@ -36,9 +37,9 @@ def run_xception_timm(variant="xception"):
             compiler_cfg.balancer_policy = "CNN"
         elif available_devices[0] == BackendDevice.Grayskull:
             os.environ["PYBUDA_TEMP_DISABLE_MODEL_KB_PROLOGUE_BW"] = "1"
+            compiler_cfg.amp_level = 1
     if available_devices[0] == BackendDevice.Grayskull:
         compiler_cfg.balancer_policy = "Ribbon"
-        compiler_cfg.place_on_new_epoch("max_pool2d_153.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2")
 
     os.environ["PYBUDA_RIBBON2"] = "1"
     os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
