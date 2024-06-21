@@ -58,7 +58,7 @@ def run_efficientnet_lite0_1x1():
     print(output)
 
     # Remove remanent files
-    shutil.rmtree(extract_to + "/" + MODEL)
+    shutil.rmtree(extract_to + "/" + MODEL,ignore_errors=True)
 
 
 if __name__ == "__main__":
