@@ -17,7 +17,7 @@ variants_semseg = [
 
 @pytest.mark.parametrize("variant", variants_semseg, ids=variants_semseg)
 @pytest.mark.segformer
-def test_segformer_semseg_pytorch(variant, clear_pybuda, test_device):
+def test_segformer_seg_pytorch(variant, clear_pybuda, test_device):
     run_segformer_semseg_pytorch(variant)
 
 
