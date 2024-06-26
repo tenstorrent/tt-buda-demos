@@ -91,7 +91,7 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
                 os.environ["PYBUDA_RIBBON2"] = "1"
                 os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{112*1024}"
                 os.environ["PYBUDA_TEMP_RIBBON2_LEGACY_UTIL_EVAL"] = "1"
-                compiler_cfg.place_on_new_epoch("concatenate_40.dc.concatenate.30.dc.concatenate.0.dc.concatenate.12")
+                compiler_cfg.place_on_new_epoch("concatenate_26.dc.concatenate.30.dc.concatenate.0.dc.concatenate.12") 
             if model_ckpt == "yolov5l":
                 compiler_cfg.enable_auto_transposing_placement = True
                 compiler_cfg.enable_tm_cpu_fallback = True
