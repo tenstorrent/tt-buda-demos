@@ -57,7 +57,7 @@ def postprocess(predictions: torch.tensor) -> tuple:
     """
 
     # Get probabilities
-    probabilities = torch.nn.functional.softmax(predictions, dim=0)
+    probabilities = torch.nn.functional.softmax(predictions, dim=1)
 
     # Get top-k prediction
     top1_prob, top1_catid = torch.topk(probabilities, 1)
@@ -65,7 +65,7 @@ def postprocess(predictions: torch.tensor) -> tuple:
     return top1_prob, top1_catid
 
 
-def run_resnet_onnx():
+def run_resnet_onnx(batch_size=1):
 
     # Download model weights
     url = "https://github.com/onnx/models/raw/main/validated/vision/classification/resnet/model/resnet50-v1-7.onnx?download="
@@ -86,29 +86,39 @@ def run_resnet_onnx():
     # Load data sample
     url = "https://images.rawpixel.com/image_1300/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA1L3BkMTA2LTA0Ny1jaGltXzEuanBn.jpg"
     image = Image.open(requests.get(url, stream=True).raw)
-    label = "tiger"
+    label = ["tiger"] * batch_size
 
     # Data preprocessing
-    pixel_values = preprocess(image)
+    pixel_values = [preprocess(image)] * batch_size
+    batch_input = torch.cat(pixel_values, dim=0)
 
     # Run inference on Tenstorrent device
     output_q = pybuda.run_inference(
         pybuda.OnnxModule("onnx_resnet50", model, load_path),
-        inputs=[(pixel_values,)],
+        inputs=[(batch_input,)],
     )
     output = output_q.get()
 
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
     # Data postprocessing
-    top1_prob, top1_catid = postprocess(output[0].value()[0])
+    top1_prob, top1_catid = postprocess(output[0].value())
 
     # Get ImageNet class mappings
     url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
     image_classes = urllib.request.urlopen(url)
     categories = [s.decode("utf-8").strip() for s in image_classes.readlines()]
-    predicted_label = categories[top1_catid]
+    predicted_label = [categories[cat_id] for cat_id in top1_catid]
 
     # Results
-    print(f"True Label: {label} | Predicted Label: {predicted_label} | Predicted Probability: {top1_prob.item():.2f}")
+    for sample in range(batch_size):
+        print(
+            f"True Label: {label[sample]} | Predicted Label: {predicted_label[sample]} | Predicted Probability: {top1_prob[sample].item():.2f}"
+        )
 
     # Remove weight file
     os.remove(load_path)

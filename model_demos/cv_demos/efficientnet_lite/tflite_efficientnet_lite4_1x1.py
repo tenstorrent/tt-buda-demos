@@ -54,8 +54,15 @@ def run_efficientnet_lite4_1x1():
     input_tensor = torch.rand(input_shape)
 
     output_q = pybuda.run_inference(tt_model, inputs=([input_tensor]))
-    output = output_q.get()[0].value().detach().float().numpy()
-    print(output)
+    output = output_q.get()
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
+    print(output[0].value().detach().float().numpy())
 
     # Remove remanent files
     shutil.rmtree(extract_to + "/" + MODEL)

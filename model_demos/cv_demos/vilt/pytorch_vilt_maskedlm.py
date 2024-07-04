@@ -9,10 +9,10 @@ import torch
 from PIL import Image
 from transformers import ViltConfig, ViltForMaskedLM, ViltProcessor
 
-from .vilt_model import ViLtEmbeddingWrapper, ViltModelWrapper
+from cv_demos.vilt.vilt_model import ViLtEmbeddingWrapper, ViltModelWrapper
 
 
-def run_vilt_maskedlm_pytorch(variant="dandelin/vilt-b32-mlm"):
+def run_vilt_maskedlm_pytorch(variant="dandelin/vilt-b32-mlm", batch_size=1):
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -25,9 +25,10 @@ def run_vilt_maskedlm_pytorch(variant="dandelin/vilt-b32-mlm"):
     # Sample Image
     url = "http://images.cocodataset.org/val2017/000000039769.jpg"
     sample_image = Image.open(requests.get(url, stream=True).raw)
+    batch_image = [sample_image] * batch_size
 
     # Sample text
-    sample_text = "a bunch of cats laying on a [MASK]."
+    batch_text = ["a bunch of cats laying on a [MASK]."] * batch_size
 
     model_ckpt = variant
 
@@ -43,7 +44,7 @@ def run_vilt_maskedlm_pytorch(variant="dandelin/vilt-b32-mlm"):
     model.eval()
 
     # prepare inputs
-    encoding = processor(sample_image, sample_text, return_tensors="pt")
+    encoding = processor(batch_image, batch_text, return_tensors="pt")
 
     # Wrapper
     text_vision_embedding_model = ViLtEmbeddingWrapper(model)
@@ -56,19 +57,26 @@ def run_vilt_maskedlm_pytorch(variant="dandelin/vilt-b32-mlm"):
 
     # Run inference on Tenstorrent device
     output_q = pybuda.run_inference(_sequential=True)
-    mlm_logits = output_q.get()[0].value().detach().float()
+    output = output_q.get()
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
 
     # PostProcessing
-    input_ids = encoding["input_ids"][0][1:-1]
-    mlm_logits = mlm_logits[0, 1 : encoding.input_ids.shape[1] - 1, :]
+    for batch_idx in range(batch_size):
+        input_ids = encoding["input_ids"][batch_idx][1:-1]
+        mlm_logits_sample = output[0].value().detach().float()[batch_idx, 1 : encoding.input_ids.shape[1] - 1, :]
 
-    mlm_values, mlm_ids = mlm_logits.softmax(dim=-1).max(dim=-1)
-    mlm_values[input_ids != 103] = 0
-    select = mlm_values.argmax().item()
-    inferred_token = processor.decode(mlm_ids[select].item())
+        mlm_values, mlm_ids = mlm_logits_sample.softmax(dim=-1).max(dim=-1)
+        mlm_values[input_ids != 103] = 0  # Mask positions that are not [MASK]
+        select = mlm_values.argmax().item()
+        inferred_token = processor.decode(mlm_ids[select].item())
 
-    # Model Output (i.e Masked token: Couch)
-    print("Masked token: ", inferred_token)
+        # Model Output for each sample
+        print(f"Sample {batch_idx} Masked token: ", inferred_token)
 
 
 if __name__ == "__main__":

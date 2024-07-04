@@ -12,7 +12,7 @@ from pybuda._C.backend_api import BackendDevice
 from torchvision import transforms
 
 
-def run_hardnet_pytorch(variant):
+def run_hardnet_pytorch(variant, batch_size=1):
 
     # STEP 1: Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -79,14 +79,21 @@ def run_hardnet_pytorch(variant):
         ]
     )
     input_tensor = preprocess(input_image)
-    input_batch = input_tensor.unsqueeze(0)
+    input_batch = [input_tensor.unsqueeze(0)] * batch_size
+    batch_tensor = torch.cat(input_batch, dim=0)
 
     # run inference on Tenstorrent device
-    output_q = pybuda.run_inference(tt_model, inputs=([input_batch]))
-    output = output_q.get()[0].value()
+    output_q = pybuda.run_inference(tt_model, inputs=([batch_tensor]))
+    output = output_q.get()
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
 
     # Data postprocessing
-    probabilities = torch.nn.functional.softmax(output[0], dim=0)
+    probabilities = torch.nn.functional.softmax(output[0].value(), dim=1)
     # Get imagenet class mappings
     url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
     image_classes = urllib.request.urlopen(url)
@@ -94,8 +101,12 @@ def run_hardnet_pytorch(variant):
 
     # Print top categories per image
     top5_prob, top5_catid = torch.topk(probabilities, 5)
-    for i in range(top5_prob.size(0)):
-        print(categories[top5_catid[i]], top5_prob[i].item())
+    top5_prob, top5_catid = torch.topk(probabilities, 5)
+    for sample in range(batch_size):
+        result = {}  # reset at the start of each new sample
+        for i in range(top5_prob.size(1)):
+            result[categories[top5_catid[sample][i]]] = top5_prob[sample][i].item()
+        print("Sample ID: ", sample, "| Result: ", result)
 
     # Remove the weights file
     os.remove(checkpoint_path)
@@ -105,4 +116,4 @@ def run_hardnet_pytorch(variant):
 
 
 if __name__ == "__main__":
-    run_hardnet_pytorch()
+    run_hardnet_pytorch(variant="hardnet85")

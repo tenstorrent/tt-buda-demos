@@ -180,8 +180,6 @@ class BottleneckX(nn.Module):
     def __init__(self, inplanes, planes, stride=1, dilation=1):
         super(BottleneckX, self).__init__()
         cardinality = BottleneckX.cardinality
-        # dim = int(math.floor(planes * (BottleneckV5.expansion / 64.0)))
-        # bottle_planes = dim * cardinality
         bottle_planes = planes * cardinality // 32
         self.conv1 = nn.Conv2d(inplanes, bottle_planes, kernel_size=1, bias=False)
         self.bn1 = BatchNorm(bottle_planes)

@@ -10,7 +10,7 @@ from pybuda.transformers.pipeline import pipeline as pybuda_pipeline
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, T5Config
 
 
-def run_flan_t5_pybuda_pipeline(variant="google/flan-t5-small"):
+def run_flan_t5_pybuda_pipeline(variant="google/flan-t5-small", batch_size=1):
 
     # Add PyBUDA configurations
     os.environ["PYBUDA_DISABLE_STREAM_OUTPUT"] = "1"
@@ -43,13 +43,14 @@ def run_flan_t5_pybuda_pipeline(variant="google/flan-t5-small"):
     tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
 
     # Sample prompt
-    prefix_text = "A step by step recipe to make bolognese pasta:"
+    prefix_text = ["A step by step recipe to make bolognese pasta:"] * batch_size
 
     # Initialize text2text generator
     text2text_generator = pybuda_pipeline(
         "text2text-generation",
         model=model,
         tokenizer=tokenizer,
+        batch_size=batch_size,
         pybuda_max_length=32,
     )
 
@@ -63,10 +64,10 @@ def run_flan_t5_pybuda_pipeline(variant="google/flan-t5-small"):
     )
 
     # Report output
-    print(f"Prefix text: {prefix_text}")
-    print("Generated text:")
-    for sequence in answer:
-        print(sequence.values())
+    for sample_id in range(batch_size):
+        print(f"Sample ID: {sample_id}")
+        print(f"Prefix text: {prefix_text[sample_id]}")
+        print(f"Generated text: {answer[sample_id]['generated_text']}")
 
 
 if __name__ == "__main__":

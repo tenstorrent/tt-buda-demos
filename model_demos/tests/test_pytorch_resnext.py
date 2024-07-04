@@ -18,5 +18,5 @@ variants = [
 
 @pytest.mark.parametrize("variant", variants)
 @pytest.mark.resnext
-def test_resnext_pytorch(clear_pybuda, test_device, variant):
-    run_resnext_pytorch(variant)
+def test_resnext_pytorch(clear_pybuda, test_device, variant, batch_size):
+    run_resnext_pytorch(variant, batch_size=batch_size)

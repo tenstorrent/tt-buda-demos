@@ -30,15 +30,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
 
-import os.path
-import numpy as np
 import math
-import torch
-import torch.nn as nn
+import os.path
 import sys
 
-import cv_demos.retinanet.model.backbone as backbones_mod
+import numpy as np
+import torch
+import torch.nn as nn
 import torch.nn.functional as F
+
+import cv_demos.retinanet.model.backbone as backbones_mod
 
 
 class FocalLoss(nn.Module):

@@ -32,10 +32,11 @@ def preprocess_timm_model(model_name):
     return model, img_tensor
 
 
-def run_inception_v4_timm_pytorch():
+def run_inception_v4_timm_pytorch(batch_size=1):
 
     model_name = "inception_v4"
     model, img_tensor = preprocess_timm_model(model_name)
+    batch_tensor = torch.cat([img_tensor] * batch_size, dim=0)
 
     # Configurations
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -69,26 +70,35 @@ def run_inception_v4_timm_pytorch():
     # Run inference on Tenstorrent device
     output_q = pybuda.run_inference(
         tt_model,
-        inputs=([img_tensor]),
+        inputs=([batch_tensor]),
         _verify_cfg=pybuda.VerifyConfig(
             verify_post_placer=False,
             verify_post_autograd_passes=False,
         ),
     )
-    output = output_q.get()[0].value()
+    output = output_q.get()
 
-    # Postprocessing
-    probabilities = torch.nn.functional.softmax(output[0], dim=0)
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
 
-    # Get ImageNet class mappings
+    # Data postprocessing
+    probabilities = torch.nn.functional.softmax(output[0].value(), dim=1)
+    # Get imagenet class mappings
     url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
     image_classes = urllib.request.urlopen(url)
     categories = [s.decode("utf-8").strip() for s in image_classes.readlines()]
 
     # Print top categories per image
     top5_prob, top5_catid = torch.topk(probabilities, 5)
-    for i in range(top5_prob.size(0)):
-        print(categories[top5_catid[i]], top5_prob[i].item())
+    top5_prob, top5_catid = torch.topk(probabilities, 5)
+    for sample in range(batch_size):
+        result = {}  # reset at the start of each new sample
+        for i in range(top5_prob.size(1)):
+            result[categories[top5_catid[sample][i]]] = top5_prob[sample][i].item()
+        print("Sample ID: ", sample, "| Result: ", result)
 
 
 if __name__ == "__main__":

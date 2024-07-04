@@ -1,18 +1,19 @@
 # yolo_v6 demo script
 
-import pybuda
-import os
-import requests
 import math
+import os
+
 import cv2
 import numpy as np
+import pybuda
+import requests
 import torch
 from PIL import Image
+from pybuda._C.backend_api import BackendDevice
 from yolov6 import YOLOV6
-from yolov6.utils.nms import non_max_suppression
 from yolov6.core.inferer import Inferer
 from yolov6.utils.events import load_yaml
-from pybuda._C.backend_api import BackendDevice
+from yolov6.utils.nms import non_max_suppression
 
 # preprocessing & postprocessing steps referred form https://github.com/meituan/YOLOv6/blob/main/inference.ipynb
 
@@ -81,7 +82,7 @@ def process_image(path, img_size, stride, half):
     return image, img_src
 
 
-def run_yolov6_pytorch(variant):
+def run_yolov6_pytorch(variant, batch_size=1):
 
     # STEP 1 : Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -146,13 +147,20 @@ def run_yolov6_pytorch(variant):
     img_size = check_img_size(input_size, s=stride)
     img, img_src = process_image(url, img_size, stride, half=False)
     input_batch = img.unsqueeze(0)
+    batch_input = torch.cat([input_batch] * batch_size, dim=0)
 
     # STEP 4 : Inference
-    output_q = pybuda.run_inference(tt_model, inputs=([input_batch]))
-    output = output_q.get()[0].value()
+    output_q = pybuda.run_inference(tt_model, inputs=([batch_input]))
+    output = output_q.get()
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
 
     # STEP 5 : Postprocess
-    det = non_max_suppression(output)[0]
+    det = non_max_suppression(output[0].value())
 
     # Send a GET request to fetch the YAML file
     response = requests.get("https://github.com/meituan/YOLOv6/raw/main/data/coco.yaml")
@@ -164,18 +172,21 @@ def run_yolov6_pytorch(variant):
     class_names = load_yaml("coco.yaml")["names"]
 
     if len(det):
-        det[:, :4] = Inferer.rescale(input_batch.shape[2:], det[:, :4], img_src.shape).round()
+        for sample in range(batch_size):
+            print("Sample ID: ", sample)
+            det[sample][:, :4] = Inferer.rescale(input_batch.shape[2:], det[sample][:, :4], img_src.shape).round()
 
-        for *xyxy, conf, cls in reversed(det):
-            class_num = int(cls)  # Convert class index to integer
-            conf_value = conf.item()  # Get the confidence value
-            coordinates = [int(x.item()) for x in xyxy]  # Convert tensor to list of integers
+            for *xyxy, conf, cls in reversed(det[sample]):
+                class_num = int(cls)  # Convert class index to integer
+                conf_value = conf.item()  # Get the confidence value
+                coordinates = [int(x.item()) for x in xyxy]  # Convert tensor to list of integers
 
-            # Get the class label
-            label = class_names[class_num]
+                # Get the class label
+                label = class_names[class_num]
 
-            # Detections
-            print(f"Coordinates: {coordinates}, Class: {label}, Confidence: {conf_value:.2f}")
+                # Detections
+                print(f"Coordinates: {coordinates}, Class: {label}, Confidence: {conf_value:.2f}")
+            print("\n")
 
     # STEP 6 : remove downloaded weights and YAML file
     os.remove(weights)
@@ -183,4 +194,4 @@ def run_yolov6_pytorch(variant):
 
 
 if __name__ == "__main__":
-    run_yolov6_pytorch()
+    run_yolov6_pytorch(variant="yolov6m")

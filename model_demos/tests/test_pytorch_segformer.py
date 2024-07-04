@@ -17,8 +17,8 @@ variants_semseg = [
 
 @pytest.mark.parametrize("variant", variants_semseg, ids=variants_semseg)
 @pytest.mark.segformer
-def test_segformer_seg_pytorch(variant, clear_pybuda, test_device):
-    run_segformer_semseg_pytorch(variant)
+def test_segformer_seg_pytorch(variant, clear_pybuda, test_device, batch_size):
+    run_segformer_semseg_pytorch(variant, batch_size=batch_size)
 
 
 variants_img_classification = [
@@ -33,5 +33,5 @@ variants_img_classification = [
 
 @pytest.mark.parametrize("variant", variants_img_classification, ids=variants_img_classification)
 @pytest.mark.segformer
-def test_segformer_image_classification_pytorch(variant, clear_pybuda, test_device):
-    run_segformer_image_classification_pytorch(variant)
+def test_segformer_image_classification_pytorch(variant, clear_pybuda, test_device, batch_size):
+    run_segformer_image_classification_pytorch(variant, batch_size=batch_size)
