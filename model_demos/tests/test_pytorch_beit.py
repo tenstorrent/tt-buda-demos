@@ -10,5 +10,5 @@ variants = ["microsoft/beit-base-patch16-224", "microsoft/beit-large-patch16-224
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.beit
-def test_beit_classify_224_hf_pytorch(clear_pybuda, test_device, variant):
-    run_beit_classify_224_hf_pytorch(variant)
+def test_beit_classify_224_hf_pytorch(clear_pybuda, test_device, variant, batch_size):
+    run_beit_classify_224_hf_pytorch(variant, batch_size=batch_size)

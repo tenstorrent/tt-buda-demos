@@ -8,10 +8,10 @@ from nlp_demos.roberta.pytorch_roberta_sentiment import run_roberta_sentiment_py
 
 
 @pytest.mark.roberta
-def test_roberta_mlm_pytorch(clear_pybuda, test_device):
-    run_roberta_mlm_pytorch()
+def test_roberta_mlm_pytorch(clear_pybuda, test_device, batch_size):
+    run_roberta_mlm_pytorch(batch_size=batch_size)
 
 
 @pytest.mark.roberta
-def test_roberta_sentiment_pytorch(clear_pybuda, test_device):
-    run_roberta_sentiment_pytorch()
+def test_roberta_sentiment_pytorch(clear_pybuda, test_device, batch_size):
+    run_roberta_sentiment_pytorch(batch_size=batch_size)

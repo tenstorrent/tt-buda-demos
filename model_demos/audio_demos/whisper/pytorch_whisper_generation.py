@@ -12,7 +12,7 @@ from pybuda.transformers.pipeline import pipeline as pybuda_pipeline
 from transformers import WhisperForConditionalGeneration, WhisperProcessor
 
 
-def run_whisper_generation(variant="openai/whisper-small"):
+def run_whisper_generation(variant="openai/whisper-small", batch_size=1):
 
     # PyBuda configurations
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -76,7 +76,7 @@ def run_whisper_generation(variant="openai/whisper-small"):
 
     # Load sample from datasets
     ds = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")
-    sample_audio = ds[0]["audio"]["array"]
+    sample_audio = [ds[0]["audio"]["array"]] * batch_size
 
     # Initialize automatic-speech-recognition generator
     asr_pipeline = pybuda_pipeline(
@@ -84,13 +84,14 @@ def run_whisper_generation(variant="openai/whisper-small"):
         model=model,
         tokenizer=processor.tokenizer,
         feature_extractor=processor.feature_extractor,
+        batch_size=batch_size,
     )
 
     # Run inference on Tenstorrent device
     answer = asr_pipeline(sample_audio)
 
     # Report output
-    print("Generated text:", answer["text"])
+    print("Generated text:", answer)
 
 
 if __name__ == "__main__":

@@ -1,14 +1,16 @@
-import pybuda
-from pybuda._C.backend_api import BackendDevice
 import os
+
+import pybuda
 import requests
+import torch
 import torchvision.transforms as transforms
 from PIL import Image
+from pybuda._C.backend_api import BackendDevice
 
 from cv_demos.monodle.utils.model import CenterNet3D
 
 
-def run_monodle_pytorch():
+def run_monodle_pytorch(batch_size=1):
     model_name = "monodle_pytorch"
 
     # Set PyBuda configuration parameters
@@ -40,7 +42,8 @@ def run_monodle_pytorch():
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
     )
-    img_tensor = transform(image).unsqueeze(0)
+    img_tensor = [transform(image).unsqueeze(0)] * batch_size
+    batch_input = torch.cat(img_tensor, dim=0)
 
     # Load model and prepare for evaluation (inference)
     pytorch_model = CenterNet3D(backbone="dla34")
@@ -50,6 +53,18 @@ def run_monodle_pytorch():
     tt_model = pybuda.PyTorchModule(model_name, pytorch_model)
 
     # run inference on Tenstorrent device
-    output_q = pybuda.run_inference(tt_model, inputs=[(img_tensor,)])
-    output = output_q.get()[0].value()
-    print(output)
+    output_q = pybuda.run_inference(tt_model, inputs=[(batch_input,)])
+    output = output_q.get()
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
+    for sample in range(batch_size):
+        print(f"Sampled ID: {sample} | Output: {output[0].value()[sample]}")
+
+
+if __name__ == "__main__":
+    run_monodle_pytorch()

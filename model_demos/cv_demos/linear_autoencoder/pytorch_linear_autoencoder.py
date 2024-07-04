@@ -3,6 +3,8 @@
 
 # Linear Autoencoder Demo Script
 
+import os
+
 import pybuda
 import torch
 import torchvision.transforms as transforms
@@ -50,7 +52,7 @@ class LinearAE(torch.nn.Module):
         return act
 
 
-def run_linear_ae_pytorch():
+def run_linear_ae_pytorch(batch_size=1):
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -74,17 +76,25 @@ def run_linear_ae_pytorch():
     # Load sample from MNIST dataset
     dataset = load_dataset("mnist")
     sample = dataset["train"][0]["image"]
-    sample_tensor = transform(sample).squeeze(0)
+    sample_tensor = [transform(sample).squeeze(0)] * batch_size
+    batch_tensor = torch.cat(sample_tensor, dim=0)
 
     # Run inference on Tenstorrent device
     output_q = pybuda.run_inference(
         pybuda.PyTorchModule("pt_linear_ae", model),
-        inputs=[sample_tensor],
+        inputs=[batch_tensor],
     )
     output = output_q.get()
 
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
     # Print output
-    print("Output:", output[0].value())
+    for sample in range(batch_size):
+        print("Sample ID: ", sample, "| Output: ", output[0].value()[sample])
 
 
 if __name__ == "__main__":

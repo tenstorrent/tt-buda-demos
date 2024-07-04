@@ -58,7 +58,10 @@ def delta2box(deltas, anchors, size, stride):
 
     m = torch.zeros([2], device=deltas.device, dtype=deltas.dtype)
     M = torch.tensor([size], device=deltas.device, dtype=deltas.dtype) * stride - 1
-    clamp = lambda t: torch.max(m, torch.min(t, M))
+
+    def clamp(t):
+        return torch.max(m, torch.min(t, M))
+
     return torch.cat([clamp(pred_ctr - 0.5 * pred_wh), clamp(pred_ctr + 0.5 * pred_wh - 1)], 1)
 
 
@@ -179,7 +182,9 @@ def detection_postprocess(image, cls_heads, box_heads):
         # Generate level's anchors
         stride = image.shape[-1] // cls_head.shape[-1]
         if stride not in anchors:
-            anchors[stride] = generate_anchors(stride, ratio_vals=[1.0, 2.0, 0.5], scales_vals=[4 * 2 ** (i / 3) for i in range(3)])
+            anchors[stride] = generate_anchors(
+                stride, ratio_vals=[1.0, 2.0, 0.5], scales_vals=[4 * 2 ** (i / 3) for i in range(3)]
+            )
         # Decode and filter boxes
         decoded.append(decode(cls_head, box_head, stride, threshold=0.5, top_n=1000, anchors=anchors[stride]))
 

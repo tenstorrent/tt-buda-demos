@@ -1,15 +1,17 @@
-import pybuda
-from PIL import Image
-import requests
-from torchvision import transforms
 import os
+import shutil
 import sys
+import zipfile
+
+import pybuda
+import requests
 import torch
+from PIL import Image
+from pybuda._C.backend_api import BackendDevice
+from torchvision import transforms
+
 from cv_demos.retinanet.model.model_implementation import Model
 from cv_demos.retinanet.post_process.post_process import detection_postprocess
-from pybuda._C.backend_api import BackendDevice
-import zipfile
-import shutil
 
 torch.multiprocessing.set_sharing_strategy("file_system")
 
@@ -31,7 +33,7 @@ def img_preprocess():
     return img
 
 
-def run_retinanet_pytorch(variant):
+def run_retinanet_pytorch(variant, batch_size=1):
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -114,19 +116,21 @@ def run_retinanet_pytorch(variant):
     tt_model = pybuda.PyTorchModule(f"pt_{variant}", model)
 
     # Prepare input
-    input_batch = img_preprocess()
+    input_batch = [img_preprocess()] * batch_size
+    batch_input = torch.cat(input_batch, dim=0)
 
     # Run inference on Tenstorrent device
-    output_q = pybuda.run_inference(tt_model, inputs=([input_batch]))
+    output_q = pybuda.run_inference(tt_model, inputs=([batch_input]))
     output = output_q.get()
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
 
     for i in range(len(output)):
         output[i] = output[i].value()
-
-    cls_heads = output[:5]
-    box_heads = output[5:]
-
-    scores, boxes, labels = detection_postprocess(input_batch, cls_heads, box_heads)
 
     # URL to download the classes text file
     url = "https://github.com/matlab-deep-learning/Object-Detection-Using-Pretrained-YOLO-v2/blob/main/+helper/coco-classes.txt?raw=true"
@@ -139,16 +143,29 @@ def run_retinanet_pytorch(variant):
     # Create a dictionary from the lines with indices as keys
     class_names = {i: line for i, line in enumerate(lines)}
 
-    print("Detections :\n")
-    for i in range(scores.size(1)):
-        score = scores[0, i].item()
-        if score == 0:
-            break
-        label = int(labels[0, i].item())
-        box = boxes[0, i, :].tolist()
-        class_name = class_names[label]
+    cls_heads = output[:5]
+    box_heads = output[5:]
 
-        print(f"Class: {class_name}, Score: {score:.4f}, Box Coordinates: [{box[0]:.2f}, {box[1]:.2f}, {box[2]:.2f}, {box[3]:.2f}]")
+    for sample_id in range(batch_size):
+
+        scores, boxes, labels = detection_postprocess(
+            input_batch[sample_id],
+            [tensor[sample_id].unsqueeze(0) for tensor in cls_heads],
+            [tensor[sample_id].unsqueeze(0) for tensor in box_heads],
+        )
+
+        print(f"Sample {sample_id} Detections :\n")
+        for i in range(scores.size(1)):
+            score = scores[0, i].item()
+            if score == 0:
+                break
+            label = int(labels[0, i].item())
+            box = boxes[0, i, :].tolist()
+            class_name = class_names[label]
+
+            print(
+                f"Class: {class_name}, Score: {score:.4f}, Box Coordinates: [{box[0]:.2f}, {box[1]:.2f}, {box[2]:.2f}, {box[3]:.2f}]"
+            )
 
     # Delete the extracted folder and the zip file
     shutil.rmtree(extracted_path)

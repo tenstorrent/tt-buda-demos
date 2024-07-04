@@ -31,7 +31,7 @@ def preprocess_timm_model(model_name):
     return model, img_tensor
 
 
-def run_vgg_bn19_timm_pytorch(variant="vgg19_bn"):
+def run_vgg_bn19_timm_pytorch(variant="vgg19_bn", batch_size=1):
     """
     Variants = {
      'vgg11':
@@ -46,6 +46,8 @@ def run_vgg_bn19_timm_pytorch(variant="vgg19_bn"):
     """
     model_name = variant
     model, img_tensor = preprocess_timm_model(model_name)
+    img_tensor = [img_tensor] * batch_size
+    batch_input = torch.cat(img_tensor, dim=0)
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -63,10 +65,16 @@ def run_vgg_bn19_timm_pytorch(variant="vgg19_bn"):
     tt_model = pybuda.PyTorchModule(model_name + "_timm_pt", model)
 
     # Run inference on Tenstorrent device
-    output_q = pybuda.run_inference(tt_model, inputs=([img_tensor]))
-    output = output_q.get()[0].value()
+    output_q = pybuda.run_inference(tt_model, inputs=([batch_input]))
+    output = output_q.get()
 
-    probabilities = torch.nn.functional.softmax(output[0], dim=0)
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
+    probabilities = torch.nn.functional.softmax(output[0].value(), dim=1)
 
     # Get ImageNet class mappings
     url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
@@ -75,8 +83,11 @@ def run_vgg_bn19_timm_pytorch(variant="vgg19_bn"):
 
     # Print top categories per image
     top5_prob, top5_catid = torch.topk(probabilities, 5)
-    for i in range(top5_prob.size(0)):
-        print(categories[top5_catid[i]], top5_prob[i].item())
+    for sample in range(batch_size):
+        result = {}  # reset at the start of each new sample
+        for i in range(top5_prob.size(1)):
+            result[categories[top5_catid[sample][i]]] = top5_prob[sample][i].item()
+        print("Sample ID: ", sample, "| Result: ", result)
 
 
 if __name__ == "__main__":

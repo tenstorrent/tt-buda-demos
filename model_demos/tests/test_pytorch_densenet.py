@@ -11,10 +11,10 @@ variants = ["densenet121", "densenet161", "densenet169", "densenet201"]
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.densenet
-def test_densenet_pytorch(clear_pybuda, test_device, variant):
-    run_densenet_pytorch(variant)
+def test_densenet_pytorch(clear_pybuda, test_device, variant, batch_size):
+    run_densenet_pytorch(variant, batch_size=batch_size)
 
 
 @pytest.mark.densenet
-def test_densenet_121_hf_xray_pytorch(clear_pybuda, test_device):
-    run_densenet_121_hf_xray_pytorch()
+def test_densenet_121_hf_xray_pytorch(clear_pybuda, test_device, batch_size):
+    run_densenet_121_hf_xray_pytorch(batch_size=batch_size)

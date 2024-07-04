@@ -3,12 +3,14 @@
 
 # BERT Demo Script - NER
 
+import os
+
 import pybuda
 import torch
 from transformers import BertForTokenClassification, BertTokenizer
 
 
-def run_bert_token_classification_pytorch():
+def run_bert_token_classification_pytorch(batch_size=1):
 
     # Load Bert tokenizer and model from HuggingFace
     model_ckpt = "dbmdz/bert-large-cased-finetuned-conll03-english"
@@ -19,7 +21,7 @@ def run_bert_token_classification_pytorch():
     compiler_cfg.default_df_override = pybuda._C.DataFormat.Float16_b
 
     # Load data sample
-    sample_text = "HuggingFace is a company based in Paris and New York"
+    sample_text = ["HuggingFace is a company based in Paris and New York"] * batch_size
 
     # Data preprocessing
     input_tokens = tokenizer(
@@ -37,14 +39,24 @@ def run_bert_token_classification_pytorch():
     )
     output = output_q.get()
 
-    # Data postprocessing
-    predicted_token_class_ids = output[0].value()[0].argmax(-1)
-    predicted_token_class_ids = torch.masked_select(predicted_token_class_ids, (input_tokens["attention_mask"][0] == 1))
-    predicted_tokens_classes = [model.config.id2label[t.item()] for t in predicted_token_class_ids]
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
 
-    # Answer - ['O', 'I-ORG', 'I-ORG', 'I-ORG', 'O', 'O', 'O', 'O', 'O', 'I-LOC', 'O', 'I-LOC', 'I-LOC']
-    print(f"Context: {sample_text}")
-    print(f"Answer: {predicted_tokens_classes}")
+    for sample_id in range(batch_size):
+        # Data postprocessing
+        predicted_token_class_ids = output[0].value()[sample_id].argmax(-1)
+        predicted_token_class_ids = torch.masked_select(
+            predicted_token_class_ids, (input_tokens["attention_mask"][sample_id] == 1)
+        )
+        predicted_tokens_classes = [model.config.id2label[t.item()] for t in predicted_token_class_ids]
+
+        # Answer - ['O', 'I-ORG', 'I-ORG', 'I-ORG', 'O', 'O', 'O', 'O', 'O', 'I-LOC', 'O', 'I-LOC', 'I-LOC']
+        print(f"Sample ID: {sample_id}")
+        print(f"Context: {sample_text[sample_id]}")
+        print(f"Answer: {predicted_tokens_classes}")
 
 
 if __name__ == "__main__":

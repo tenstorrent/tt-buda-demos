@@ -8,10 +8,10 @@ from cv_demos.inception_v4.pytorch_inception_v4_timm import run_inception_v4_tim
 
 
 @pytest.mark.inceptionv4
-def test_inceptionv4_osmr(clear_pybuda, test_device):
-    run_inception_v4_osmr_pytorch()
+def test_inceptionv4_osmr(clear_pybuda, test_device, batch_size):
+    run_inception_v4_osmr_pytorch(batch_size=batch_size)
 
 
 @pytest.mark.inceptionv4
-def test_inceptionv4_timm(clear_pybuda, test_device):
-    run_inception_v4_timm_pytorch()
+def test_inceptionv4_timm(clear_pybuda, test_device, batch_size):
+    run_inception_v4_timm_pytorch(batch_size=batch_size)

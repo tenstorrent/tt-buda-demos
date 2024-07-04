@@ -15,5 +15,5 @@ variants = [
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.deit
-def test_deit_classify_224_hf_pytorch(clear_pybuda, test_device, variant):
-    run_deit_classify_224_hf_pytorch(variant)
+def test_deit_classify_224_hf_pytorch(clear_pybuda, test_device, variant, batch_size):
+    run_deit_classify_224_hf_pytorch(variant, batch_size=batch_size)

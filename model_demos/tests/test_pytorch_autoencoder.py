@@ -8,10 +8,10 @@ from cv_demos.linear_autoencoder.pytorch_linear_autoencoder import run_linear_ae
 
 
 @pytest.mark.autoencoder
-def test_linear_ae_pytorch(clear_pybuda, test_device):
-    run_linear_ae_pytorch()
+def test_linear_ae_pytorch(clear_pybuda, test_device, batch_size):
+    run_linear_ae_pytorch(batch_size=batch_size)
 
 
 @pytest.mark.autoencoder
-def test_conv_ae_pytorch(clear_pybuda, test_device):
-    run_conv_ae_pytorch()
+def test_conv_ae_pytorch(clear_pybuda, test_device, batch_size):
+    run_conv_ae_pytorch(batch_size=batch_size)
