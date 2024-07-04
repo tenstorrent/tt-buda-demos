@@ -14,10 +14,10 @@ variants = [
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.mobilenetv1
-def test_mobilenetv1_hf_pytorch(clear_pybuda, test_device, variant):
-    run_mobilenetv1_hf(variant)
+def test_mobilenetv1_hf_pytorch(clear_pybuda, test_device, variant, batch_size):
+    run_mobilenetv1_hf(variant, batch_size=batch_size)
 
 
 @pytest.mark.mobilenetv1
-def test_mobilenetv1_basic_pytorch(clear_pybuda, test_device):
-    run_mobilenetv1_basic()
+def test_mobilenetv1_basic_pytorch(clear_pybuda, test_device, batch_size):
+    run_mobilenetv1_basic(batch_size=batch_size)

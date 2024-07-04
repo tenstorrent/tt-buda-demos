@@ -4,20 +4,20 @@
 # YOLOv5 Demo - PyTorch
 
 import os
+import subprocess
 import sys
 
-import pybuda
-import torch
-import subprocess
 import cv2
 import numpy as np
+import pybuda
+import torch
 from PIL import Image
 from pybuda._C.backend_api import BackendDevice
 
 from cv_demos.yolo_v5.utils.processing import data_postprocessing, data_preprocessing
 
 
-def run_pytorch_yolov5_640(variant="yolov5s"):
+def run_pytorch_yolov5_640(variant="yolov5s", batch_size=1):
 
     # Load YOLOv5 model
     # Variants: yolov5n, yolov5s, yolov5m, yolov5l, yolov5x
@@ -54,7 +54,9 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
                     compiler_cfg.place_on_new_epoch("conv2d_210.dc.matmul.11")
                     os.environ["PYBUDA_TEMP_BALANCER_DISABLE_TARGET_PROXIMITY"] = "1"
                     os.environ["PYBUDA_TEMP_RIBBON2_LEGACY_UTIL_EVAL"] = "1"
-                    compiler_cfg.place_on_new_epoch("concatenate_40.dc.concatenate.30.dc.concatenate.0.dc.concatenate.12")
+                    compiler_cfg.place_on_new_epoch(
+                        "concatenate_40.dc.concatenate.30.dc.concatenate.0.dc.concatenate.12"
+                    )
             if model_ckpt in ["yolov5m"]:
                 os.environ["PYBUDA_RIBBON2"] = "1"
                 os.environ["PYBUDA_INSERT_SLICE_FOR_CONCAT"] = "1"
@@ -91,7 +93,7 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
                 os.environ["PYBUDA_RIBBON2"] = "1"
                 os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{112*1024}"
                 os.environ["PYBUDA_TEMP_RIBBON2_LEGACY_UTIL_EVAL"] = "1"
-                compiler_cfg.place_on_new_epoch("concatenate_26.dc.concatenate.30.dc.concatenate.0.dc.concatenate.12") 
+                compiler_cfg.place_on_new_epoch("concatenate_26.dc.concatenate.30.dc.concatenate.0.dc.concatenate.12")
             if model_ckpt == "yolov5l":
                 compiler_cfg.enable_auto_transposing_placement = True
                 compiler_cfg.enable_tm_cpu_fallback = True
@@ -99,7 +101,7 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
                 os.environ["PYBUDA_RIBBON2"] = "1"
                 os.environ["PYBUDA_FORK_JOIN_BUF_QUEUES"] = "1"
                 os.environ["PYBUDA_FORK_JOIN_EXPAND_OUTPUT_BUFFERS"] = "1"
-                os.environ["PYBUDA_FORK_JOIN_SKIP_EXPANDING_BUFFERS"] = "1"                
+                os.environ["PYBUDA_FORK_JOIN_SKIP_EXPANDING_BUFFERS"] = "1"
             if model_ckpt == "yolov5x":
                 compiler_cfg.balancer_op_override("concatenate_363.dc.concatenate.0", "grid_shape", (1, 1))
                 compiler_cfg.balancer_op_override("conv2d_41.dc.matmul.8", "t_stream_shape", (1, 1))
@@ -127,26 +129,35 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
     # Load data sample
     url = "https://raw.githubusercontent.com/pytorch/hub/master/images/dog.jpg"
     downloaded_path = "/tmp/"
-    process = subprocess.Popen(['wget','-P', downloaded_path, url ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(["wget", "-P", downloaded_path, url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stderr, stdout = process.communicate()
-    assert process.returncode == 0 , "Invalid image. Please check the url"
-    for line in stdout.decode().split('\n'):
-        if line.startswith('Saving to:'):
-            downloaded_path = line.split(' ')[-1][1:-1]  # Remove single quotes from path
+    assert process.returncode == 0, "Invalid image. Please check the url"
+    for line in stdout.decode().split("\n"):
+        if line.startswith("Saving to:"):
+            downloaded_path = line.split(" ")[-1][1:-1]  # Remove single quotes from path
 
     image_sample = cv2.imread(downloaded_path)
-    image_sample = Image.fromarray(np.uint8(image_sample)).convert('RGB')
-    
+    image_sample = Image.fromarray(np.uint8(image_sample)).convert("RGB")
+
     # Data preprocessing on Host
     ims, n, files, shape0, shape1, pixel_values = data_preprocessing(image_sample, size=(pixel_size, pixel_size))
+
+    pixel_tensor = [pixel_values] * batch_size
+    batch_pixels = torch.cat(pixel_tensor, dim=0)
 
     # Run inference on Tenstorrent device
     output_q = pybuda.run_inference(
         pybuda.PyTorchModule(f"pt_{model_ckpt}_{pixel_size}", model),
-        inputs=([pixel_values]),
+        inputs=([batch_pixels]),
         _verify_cfg=pybuda.verify.VerifyConfig(verify_pybuda_codegen_vs_framework=True),
     )
     output = output_q.get()
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
 
     # Data postprocessing on Host
     results = data_postprocessing(
@@ -161,7 +172,8 @@ def run_pytorch_yolov5_640(variant="yolov5s"):
     )
 
     # Print results
-    print("Predictions:\n", results.pandas().xyxy[0])
+    for sample in range(batch_size):
+        print("Sample ID: ", sample, "| Predictions:\n", results.pandas().xyxy[sample])
 
 
 if __name__ == "__main__":

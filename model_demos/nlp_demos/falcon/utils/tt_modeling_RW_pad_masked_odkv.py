@@ -77,8 +77,6 @@ class RotaryEmbeddingTT(torch.nn.Module):
             dtype=self.inv_freq.dtype,
         )
         freqs = torch.einsum("i,j->ij", t, self.inv_freq)
-        #        freqs = torch.mul(t.view((t.shape[0], 1)), self.inv_freq.view((1, self.inv_freq.shape[0]))) # einsum free implementation
-        # Different from paper, but it uses a different permutation in order to obtain the same calculation
         emb = torch.cat((freqs, freqs), dim=-1)
         self.register_buffer("cos_cached", emb.cos()[None, None, :, :], persistent=False)
         self.register_buffer("sin_cached", emb.sin()[None, None, :, :], persistent=False)
@@ -140,9 +138,6 @@ class TT_functional:
             assert (
                 attn_mask is not None
             ), "attn_mask must be provided if user_batch is True. L, S above will not be correct"
-            # query: [num_batch, users, num_heads, head_dim]
-            # key: [num_batches, users, context, head_dim]
-            # value: [num_batches, users, context, head_dim]
 
         def make_mask(L, S, DTYPE):
             attn_mask = torch.ones(L, S, dtype=DTYPE).tril(diagonal=0).to(K.device)
@@ -155,8 +150,6 @@ class TT_functional:
         if attn_mask is None or is_causal:
             attn_mask = make_mask(L, S, DTYPE)
 
-        # attn_weight = torch.softmax((Q @ K.transpose(-2, -1) / torch.sqrt(torch.tensor(Q.size(-1), dtype=DTYPE))) + attn_mask, dim=-1)
-        # attn_weight = torch.dropout(attn_weight, dropout_p, train)
         ATT = Q @ K.transpose(-2, -1) / torch.tensor(Q.size(-1) ** (1 / 2), dtype=DTYPE).to(K.device)
         attn_weight = F.softmax(ATT + attn_mask, dim=-1, dtype=DTYPE)
         attn_weight = nn.Dropout(p=dropout_p)(attn_weight)
@@ -197,9 +190,6 @@ class PaddedAttentionTT(nn.Module):
 
         self.init_padding = False
         self.did_split = False
-
-        # self.kv_mask = torch.range(0, 256-1, dtype=torch.long)
-        # self.kv_mask = self.kv_mask.unsqueeze(1).unsqueeze(0).unsqueeze(0).repeat(1, 32, 1, 64)
 
     def make_pad_weights(self, make_kvs=False):
         """
@@ -250,7 +240,6 @@ class PaddedAttentionTT(nn.Module):
         cos=None,
         sin=None,
     ):
-        # query_layer: [batch, seqlen, num_heads, head_dim]
         query_layer = self.wq(hidden_states).view(
             hidden_states.shape[0],
             hidden_states.shape[1],
@@ -276,9 +265,6 @@ class PaddedAttentionTT(nn.Module):
 
         if layer_past is not None and layer_past[0] is not None:
             past_key, past_value = layer_past
-            # concatenate along seq_length dimension:
-            #  - key: [batch_size * self.num_heads, head_dim, kv_length]
-            #  - value: [batch_size * self.num_heads, kv_length, head_dim]
             past_key = past_key.view(batch_size, 1, -1, self.head_dim)
             past_value = past_value.view(batch_size, 1, -1, self.head_dim)
             key_layer = torch.cat((past_key, key_layer), dim=-2)
@@ -288,16 +274,10 @@ class PaddedAttentionTT(nn.Module):
 
         if layer_past is not None and layer_past[0] is not None:
             assert q_length == 1, "Input can only have one token if we're passing in a layer_past"
-            # attention_mask = torch.ones(1, kv_length, dtype=torch.bool)
             is_causal = False
         else:
             is_causal = True
             attention_mask = None
-
-        # if self.use_cache:
-        #     present = (key_layer.reshape(batch_size, kv_length, self.head_dim), value_layer.reshape(batch_size, kv_length, self.head_dim))
-        # else:
-        #     present = None
 
         if attention_mask is not None:
             attention_mask = attention_mask.view(batch_size, 1, q_length, kv_length)
@@ -311,15 +291,11 @@ class PaddedAttentionTT(nn.Module):
             is_causal=is_causal,
         )
 
-        # x = attn_output.view(batch_size, self.num_heads, q_length, self.head_dim)
         x = attn_output.permute(0, 2, 1, 3)
         attn_output = x.reshape(batch_size, q_length, self.num_heads * self.head_dim)
 
         output_tensor = self.dense(attn_output)
 
-        # outputs = (output_tensor, present) if present is not None else output_tensor
-
-        # return output_tensor, present[0], present[1]
         return output_tensor, key_layer_ret, value_layer_ret
 
     def attn_user_batch(
@@ -331,14 +307,9 @@ class PaddedAttentionTT(nn.Module):
         output_attentions: bool = False,
         cos=None,
         sin=None,
-        # num_tokens=None,
         kv_read_mask=None,
         kv_write_mask=None,
     ):
-
-        # import pdb; pdb.set_trace()
-
-        # hidden_states: [num_batch, users, hidden_size]
 
         num_batch, users = hidden_states.size()[:2]
         query_layer = self.wq(hidden_states).view(num_batch, users, self.num_heads, self.head_dim)
@@ -348,14 +319,7 @@ class PaddedAttentionTT(nn.Module):
         key_layer = key_layer.unsqueeze(1)  # [num_batch, 1, users, head_dim]
         value_layer = value_layer.unsqueeze(2)  # [num_batch, users, 1, head_dim]
 
-        # query: [num_batch, users, num_heads, head_dim]
-        # key: [num_batch, users, 1, head_dim]
-        # value: [num_batch, users, 1, head_dim]
-
-        # cos, sin must match query, key in user dimension. cos: [num_batch, 1, users, head_dim]
-        # cos, sin = cos.transpose(-2,-3), sin.transpose(-2,-3)
         query_layer = query_layer.transpose(1, 2)  # [num_batch, num_heads, users, head_dim]
-        # TODO: rotary embeds correct for user batch?
         query_layer, key_layer = apply_rotary_pos_emb(query_layer, key_layer, cos, sin)
 
         query_layer, key_layer = query_layer.transpose(1, 2), key_layer.transpose(1, 2)
@@ -365,26 +329,8 @@ class PaddedAttentionTT(nn.Module):
             value_layer,
         )  # num_batch, users, 1, head_dim
 
-        # kv_read_mask = kv_read_mask.view(1, 1, 2048, 1)
-        # kv_write_mask = kv_write_mask.view(1, 1, 2048, 1)
-
         if layer_past is not None and layer_past[0] is not None:
             past_key, past_value = layer_past
-            # concatenate along seq_length dimension:
-            #  - key: [batch_size * self.num_heads, head_dim, kv_length]
-            #  - value: [batch_size * self.num_heads, kv_length, head_dim]
-            # past_key = past_key.view(num_batch, users, -1, self.head_dim)
-            # past_value = past_value.view(num_batch, users, -1, self.head_dim)
-
-            # key_layer = torch.cat((past_key, key_layer), dim=-2)
-            # value_layer = torch.cat((past_value, value_layer), dim=-2)
-
-            # new way to get correct kv
-
-            # import pdb; pdb.set_trace()
-
-            # kv_read_mask2 = torch.where(self.kv_mask != num_tokens.unsqueeze(0).unsqueeze(0).repeat(1, 32, 256, 64), 1, 0)
-            # kv_write_mask2 = torch.where(self.kv_mask == num_tokens.unsqueeze(0).unsqueeze(0).repeat(1, 32, 256, 64), 1, 0)
 
             past_key = past_key * kv_read_mask  # zero out k/v for index where we will write current token
             past_value = past_value * kv_read_mask
@@ -394,13 +340,8 @@ class PaddedAttentionTT(nn.Module):
             )  # broadcast current k/v to k/v cache size and mask out locations where we won't be writing
             value_layer = value_layer * kv_write_mask
 
-            # import pdb; pdb.set_trace()
-
             key_layer = key_layer + past_key  # add the two and this should get us the correct current K and V
             value_layer = value_layer + past_value
-
-        # how do we want to use k and v cache?
-        # k_all: [num_batches, users, context, head_dim]
 
         kv_length = key_layer.shape[-2]
 
@@ -410,29 +351,9 @@ class PaddedAttentionTT(nn.Module):
             is_causal = True
             attention_mask = None
 
-        # query: [num_batch, user, num_heads, head_dim]
-        # key: [num_batches, users, context, head_dim]
-        # value: [num_batches, users, context, head_dim]
-
-        # Need extra dimensions? TODO: check
-        # attention_mask = attention_mask.view(num_batch, users, 1, kv_length).expand(num_batch, users, self.num_heads, kv_length)
-
-        # num_batch = 1
-        # users = 32
         seq_len = key_layer.shape[2]
-        # import pdb; pdb.set_trace()
 
-        # FIX ME! This is assuming the same attentino mask for all users
-        # attention_mask = attention_mask.view(num_batch, 1, 1, seq_len).expand(num_batch, users, self.num_heads, seq_len)
-        # attention_mask = attention_mask.view(1, self.num_heads, users, seq_len).transpose(1, 2)
-
-        # [1, 1, 2048, 64x32] -> [1, 2048, 32, 64] -> [1, 32, 2048, 64]
-        # past_key_values[i*2+1].view(1, seq_len, user_rows, self.head_dim).transpose(1, 2)
-
-        # [1, 32, 72, 2048] -> [1, 1, 72, 2048x32]
         attention_mask = attention_mask.view(1, self.num_heads, users, seq_len).transpose(1, 2)
-        # import pdb; pdb.set_trace()
-        # past_key_values[i*2].view(1, seq_len, user_rows, self.head_dim).transpose(1, 2)
 
         attn_output = TT_functional.scaled_dot_product_attention(
             query_layer,
@@ -444,15 +365,9 @@ class PaddedAttentionTT(nn.Module):
             user_batch=True,
         )
 
-        # attn_output: [num_batch, users, num_heads, head_dim]
-
         attn_output = attn_output.reshape(num_batch, users, self.num_heads * self.head_dim)
-        # attn_output: [num_batch, users, num_heads * head_dim]
         output_tensor = self.dense(attn_output)
 
-        # outputs = (output_tensor, present) if present is not None else output_tensor
-
-        # return output_tensor, present[0], present[1]
         return output_tensor, key_layer, value_layer
 
     def forward(
@@ -464,7 +379,6 @@ class PaddedAttentionTT(nn.Module):
         output_attentions: bool = False,
         cos=None,
         sin=None,
-        # num_tokens=None,
         kv_read_mask=None,
         kv_write_mask=None,
     ):
@@ -530,8 +444,6 @@ class Attention(nn.Module):
                 f" {self.num_heads})."
             )
 
-        # self.maybe_rotary = RotaryEmbedding(config.head_dim) if config.rotary else lambda q, k: (q, k)
-
         # Layer-wise attention scaling
         self.inv_norm_factor = 1.0 / math.sqrt(self.head_dim)
         self.beta = self.inv_norm_factor
@@ -573,7 +485,6 @@ class Attention(nn.Module):
         output_attentions: bool = False,
         cos=None,
         sin=None,
-        # num_tokens=None,
         kv_read_mask=None,
         kv_write_mask=None,
     ):
@@ -582,7 +493,6 @@ class Attention(nn.Module):
             self.did_split
         ), "Attention weights have not been split yet. Call `split_qkv_weights()` before using this layer."
 
-        # query_layer: [batch, seqlen, num_heads, head_dim]
         query_layer = self.wq(hidden_states).view(
             hidden_states.shape[0],
             hidden_states.shape[1],
@@ -602,16 +512,12 @@ class Attention(nn.Module):
         key_layer = key_layer.transpose(1, 2)  # [batch_size, 1, seq_length, head_dim]
         value_layer = value_layer.transpose(1, 2)  # [batch_size, 1, seq_length, head_dim]
 
-        # query_layer, key_layer = self.maybe_rotary(query_layer, key_layer)
         query_layer, key_layer = apply_rotary_pos_emb(query_layer, key_layer, cos, sin)
 
         key_layer_ret, value_layer_ret = key_layer.squeeze(2), value_layer.squeeze(2)
 
         if layer_past is not None and layer_past[0] is not None:
             past_key, past_value = layer_past
-            # concatenate along seq_length dimension:
-            #  - key: [batch_size * self.num_heads, head_dim, kv_length]
-            #  - value: [batch_size * self.num_heads, kv_length, head_dim]
             past_key = past_key.view(batch_size, 1, -1, self.head_dim)
             past_value = past_value.view(batch_size, 1, -1, self.head_dim)
             key_layer = torch.cat((past_key, key_layer), dim=-2)
@@ -621,16 +527,10 @@ class Attention(nn.Module):
 
         if layer_past is not None and layer_past[0] is not None:
             assert q_length == 1, "Input can only have one token if we're passing in a layer_past"
-            # attention_mask = torch.ones(1, kv_length, dtype=torch.bool)
             is_causal = False
         else:
             is_causal = True
             attention_mask = None
-
-        # if self.use_cache:
-        #     present = (key_layer.reshape(batch_size, kv_length, self.head_dim), value_layer.reshape(batch_size, kv_length, self.head_dim))
-        # else:
-        #     present = None
 
         attn_output = TT_functional.scaled_dot_product_attention(
             query_layer,
@@ -641,15 +541,11 @@ class Attention(nn.Module):
             is_causal=is_causal,
         )
 
-        # x = attn_output.view(batch_size, self.num_heads, q_length, self.head_dim)
         x = attn_output.permute(0, 2, 1, 3)
         attn_output = x.reshape(batch_size, q_length, self.num_heads * self.head_dim)
 
         output_tensor = self.dense(attn_output)
 
-        # outputs = (output_tensor, present) if present is not None else output_tensor
-
-        # return output_tensor, present[0], present[1]
         return output_tensor, key_layer, value_layer
 
 
@@ -763,19 +659,11 @@ class DecoderLayer(nn.Module):
         output_attentions: bool = False,
         cos=None,
         sin=None,
-        # num_tokens=None,
         kv_read_mask=None,
         kv_write_mask=None,
     ):
 
-        # import pdb; pdb.set_trace()
-
-        # attention_mask = attention_mask.view(1, 32, 1, 2048).repeat(1, 1, 72, 1)
-        # kv_read_mask = kv_read_mask.repeat(1, 32, 1, 64)
-        # kv_write_mask = kv_write_mask.repeat(1, 32, 1, 64)
-
         layernorm_output = self.input_layernorm(hidden_states)
-        # residual = hidden_states
         residual = hidden_states * self.input_layernorm.mask  # padding requires this
 
         # Self attention.
@@ -787,7 +675,6 @@ class DecoderLayer(nn.Module):
             output_attentions=output_attentions,
             cos=cos,
             sin=sin,
-            # num_tokens=num_tokens,
             kv_read_mask=kv_read_mask,
             kv_write_mask=kv_write_mask,
         )
@@ -937,8 +824,6 @@ class SequentialCaller(nn.Module):
     def __init__(self, layers):  # , norm, lm_head):
         super().__init__()
         self.layers = layers
-        # self.norm = norm
-        # self.lm_head = lm_head
         self.num_heads = layers[0].self_attention.num_heads
         self.hidden_size = layers[0].self_attention.hidden_size
         self.head_dim = self.hidden_size // self.num_heads
@@ -956,19 +841,11 @@ class SequentialCaller(nn.Module):
     ):
         result = []
 
-        # import pdb; pdb.set_trace()
-
         user_rows = hidden_states.shape[1]
         seq_len = past_key_values[0].shape[2]
 
-        # print(f'user_rows: {user_rows}')
-        # print(f'seq_len: {seq_len}')
-
-        # import pdb; pdb.set_trace()
-
         for i, block in enumerate(self.layers):
             if len(past_key_values) > 0:
-                # layer_past = past_key_values[i*2], past_key_values[i*2+1]
                 layer_past = past_key_values[i * 2].view(1, seq_len, user_rows, self.head_dim).transpose(
                     1, 2
                 ), past_key_values[i * 2 + 1].view(1, seq_len, user_rows, self.head_dim).transpose(1, 2)
@@ -981,7 +858,6 @@ class SequentialCaller(nn.Module):
                 attention_mask=attention_mask,
                 cos=cos,
                 sin=sin,
-                # num_tokens=num_tokens,
                 kv_read_mask=kv_read_mask,
                 kv_write_mask=kv_write_mask,
             )
@@ -989,23 +865,15 @@ class SequentialCaller(nn.Module):
             key_past_ret = key_past
             value_past_ret = value_past
 
-            # # [1, 32, 2048, 64] -> transpose = [1, 2048, 32, 64] -> reshape = [1, 1, 2048, 64x32]
-            # key_past = key_past.transpose(1, 2).reshape(1, -1, self.head_dim*user_rows)
-            # value_past = value_past.transpose(1, 2).reshape(1, -1, self.head_dim*user_rows)
-
-            # [1, 32, 2048, 64] -> transpose [1, 2048, 32, 64] -> transpose
             key_past = key_past.transpose(1, 2).reshape(1, 1, seq_len, self.head_dim * user_rows)
             value_past = value_past.transpose(1, 2).reshape(1, 1, seq_len, self.head_dim * user_rows)
 
-            # TODO: return only new_key, new_value
             hidden_states = output
             result.extend([key_past, value_past])
 
-        # result.insert(0, key_past_ret)
-        # result.insert(0, value_past_ret)
         result.insert(0, hidden_states)
 
-        return tuple(result)  # + [key_past_ret] + [value_past_ret])
+        return tuple(result)
 
 
 class PaddedLayerNorm(nn.Module):
@@ -1149,7 +1017,6 @@ class RWModel(RWPreTrainedModel):
 
     def forward(self, *args, **kwargs):
         output = self.main_forward_part(*args, **kwargs)
-        # import pdb; pdb.set_trace()
         return self.final_forward_part(output)
 
     def main_forward_part(
@@ -1163,7 +1030,6 @@ class RWModel(RWPreTrainedModel):
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
         position_ids=None,
-        # num_tokens=None,
         kv_read_mask=None,
         kv_write_mask=None,
         **deprecated_arguments,
@@ -1177,8 +1043,6 @@ class RWModel(RWPreTrainedModel):
             )
         if len(deprecated_arguments) > 0:
             raise ValueError(f"Got unexpected arguments: {deprecated_arguments}")
-
-        # import pdb; pdb.set_trace()
 
         output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
         output_hidden_states = (
@@ -1196,13 +1060,6 @@ class RWModel(RWPreTrainedModel):
         else:
             raise ValueError("You have to specify either input_ids or inputs_embeds")
 
-        # if past_key_values is None:
-        # past_key_values = tuple([None] * len(self.h))
-
-        # Prepare head mask if needed
-        # 1.0 in head_mask indicate we keep the head
-        # attention_probs has shape batch_size x num_heads x N x N
-        # head_mask has shape n_layer x batch x num_heads x N x N
         head_mask = self.get_head_mask(head_mask, self.config.n_layer)
 
         if inputs_embeds is None:
@@ -1220,18 +1077,6 @@ class RWModel(RWPreTrainedModel):
         if past_key_values is not None:
             past_key_values_length = past_key_values[0][0].shape[2]
             seq_length_with_past = seq_length_with_past + past_key_values_length
-        # if attention_mask is None:
-        #     attention_mask = torch.ones((batch_size, seq_length_with_past), device=hidden_states.device)
-        # else:
-        #     attention_mask = attention_mask.to(hidden_states.device)
-
-        # causal_mask = self._prepare_attn_mask(
-        #     attention_mask,
-        #     input_shape=(batch_size, seq_length),
-        #     past_key_values_length=past_key_values_length,
-        # )
-
-        # import pdb; pdb.set_trace()
 
         # Invert mask
         if attention_mask is not None:
@@ -1241,13 +1086,6 @@ class RWModel(RWPreTrainedModel):
                 torch.finfo(hidden_states.dtype).min,
             )
             if self.user_rows >= 1:
-                # num_batch, users, kv_length = attention_mask.size()
-                # num_batch = 1
-                # users = 32
-                # kv_length = 2048
-                # attention_mask = attention_mask.view(1, 1, 1, kv_length)
-                # attention_mask = attention_mask.view(num_batch, 1, 1, kv_length).expand(num_batch, users, self.head_total, kv_length)
-                # import pdb; pdb.set_trace()
                 num_batch, users, kv_length = attention_mask.size()
                 attention_mask = attention_mask.view(num_batch, users, 1, kv_length).expand(
                     num_batch, users, self.head_total, kv_length
@@ -1256,13 +1094,6 @@ class RWModel(RWPreTrainedModel):
                     [attention_mask[:, [n], :, :] for n in range(attention_mask.shape[1])],
                     dim=3,
                 )
-                # att_mask_stacked = attention_mask
-                # [1, 1, 32*72, 2048]
-
-            #     num_batch = 1
-            #     users = 32
-            #     kv_length = 1024
-            #     # attention_mask = attention_mask.view(num_batch, 1, 1, kv_length).expand(num_batch, users, self.head_total, kv_length)
 
         # Rotary Embeddings
         cos, sin = self.rotary_emb()
@@ -1279,14 +1110,10 @@ class RWModel(RWPreTrainedModel):
         hidden_states_padded[:, :, : self.config.hidden_size] = hidden_states
         hidden_states = hidden_states_padded
 
-        # import pdb; pdb.set_trace()
-
         if past_key_values is not None and attention_mask is not None:
             flattened_kv = []
             for k, v in past_key_values:
                 flattened_kv.extend([k, v])
-            # outputs = self.blocks(hidden_states, cos, sin, attention_mask, *flattened_kv)
-            # import pdb; pdb.set_trace()
             outputs = self.blocks(
                 hidden_states,
                 cos,
@@ -1300,8 +1127,6 @@ class RWModel(RWPreTrainedModel):
             outputs = self.blocks(hidden_states, cos, sin)
         else:
             raise ValueError("XNOR past_key_values and attention_mask")
-
-        # import pdb; pdb.set_trace()
 
         assert (
             return_dict == self.config.use_return_dict
@@ -1317,13 +1142,8 @@ class RWModel(RWPreTrainedModel):
 
         # Unpad outputs from model
         hidden_states = outputs[0]
-        # print(f'hidden_states.shape: {hidden_states.shape}')
-
-        # import pdb; pdb.set_trace()
 
         hidden_states = hidden_states.view(32, 4608)
-        # hidden_states = hidden_states.unsqueeze(0)
-        # hidden_states = hidden_states[:,:,:self.config.hidden_size]
         hidden_states = hidden_states[:, : self.config.hidden_size]
 
         presents = outputs[1:]
@@ -1409,7 +1229,6 @@ class RWForCausalLM(RWPreTrainedModel):
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
         position_ids=None,
-        # num_tokens=None,
         kv_read_mask=None,
         kv_write_mask=None,
         **deprecated_arguments,
@@ -1420,8 +1239,6 @@ class RWForCausalLM(RWPreTrainedModel):
             `labels = input_ids` Indices are selected in `[-100, 0, ..., config.vocab_size]` All labels set to `-100`
             are ignored (masked), the loss is only computed for labels in `[0, ..., config.vocab_size]`
         """
-
-        # import pdb; pdb.set_trace()
 
         if deprecated_arguments.pop("position_ids", False) is not False:
             # `position_ids` could have been `torch.Tensor` or `None` so defaulting pop to `False` allows to detect if users were passing explicitly `None`
@@ -1445,7 +1262,6 @@ class RWForCausalLM(RWPreTrainedModel):
             output_hidden_states=output_hidden_states,
             return_dict=return_dict,
             position_ids=position_ids,
-            # num_tokens=num_tokens,
             kv_read_mask=kv_read_mask,
             kv_write_mask=kv_write_mask,
         )

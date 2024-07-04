@@ -9,5 +9,5 @@ from nlp_demos.squeezebert.pytorch_squeezebert_sequence_classification import (
 
 
 @pytest.mark.squeezebert
-def test_squeezebert_sequence_classification_pytorch(clear_pybuda, test_device):
-    run_squeezebert_sequence_classification_pytorch()
+def test_squeezebert_sequence_classification_pytorch(clear_pybuda, test_device, batch_size):
+    run_squeezebert_sequence_classification_pytorch(batch_size=batch_size)

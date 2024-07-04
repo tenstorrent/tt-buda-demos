@@ -3,6 +3,8 @@
 
 # MobileNetV1 Demo Script - Basic
 
+import os
+
 import pybuda
 import torch
 import torch.nn as nn
@@ -129,7 +131,7 @@ class MobileNetV1(nn.Module):
         return out
 
 
-def run_mobilenetv1_basic():
+def run_mobilenetv1_basic(batch_size=1):
 
     # Set PyBUDA configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -142,11 +144,20 @@ def run_mobilenetv1_basic():
 
     # Run inference on Tenstorrent device
     input_shape = (1, 3, 64, 64)
-    output_q = pybuda.run_inference(tt_model, inputs=([torch.rand(*input_shape)]))
+    input_tensor = [torch.rand(*input_shape)] * batch_size
+    batch_tensor = torch.cat(input_tensor, dim=0)
+    output_q = pybuda.run_inference(tt_model, inputs=([batch_tensor]))
     output = output_q.get(timeout=0.5)
 
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
     # Data postprocessing
-    print(output[0])
+    for sample in range(batch_size):
+        print(f"Sampled ID: {sample} | Output: {output[0].value()[sample]}")
 
 
 if __name__ == "__main__":

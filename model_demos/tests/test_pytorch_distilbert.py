@@ -15,20 +15,20 @@ variants = ["distilbert-base-uncased", "distilbert-base-cased", "distilbert-base
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.distilbert
-def test_distilbert_masked_lm_pytorch(clear_pybuda, test_device, variant):
-    run_distilbert_masked_lm_pytorch(variant)
+def test_distilbert_masked_lm_pytorch(clear_pybuda, test_device, variant, batch_size):
+    run_distilbert_masked_lm_pytorch(variant, batch_size=batch_size)
 
 
 @pytest.mark.distilbert
-def test_distilbert_question_answering_pytorch(clear_pybuda, test_device):
-    run_distilbert_question_answering_pytorch()
+def test_distilbert_question_answering_pytorch(clear_pybuda, test_device, batch_size):
+    run_distilbert_question_answering_pytorch(batch_size=batch_size)
 
 
 @pytest.mark.distilbert
-def test_distilbert_sequence_classification_pytorch(clear_pybuda, test_device):
-    run_distilbert_sequence_classification_pytorch()
+def test_distilbert_sequence_classification_pytorch(clear_pybuda, test_device, batch_size):
+    run_distilbert_sequence_classification_pytorch(batch_size=batch_size)
 
 
 @pytest.mark.distilbert
-def test_distilbert_token_classification_pytorch(clear_pybuda, test_device):
-    run_distilbert_token_classification_pytorch()
+def test_distilbert_token_classification_pytorch(clear_pybuda, test_device, batch_size):
+    run_distilbert_token_classification_pytorch(batch_size=batch_size)

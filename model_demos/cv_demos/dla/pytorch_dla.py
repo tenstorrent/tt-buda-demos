@@ -6,6 +6,7 @@ import urllib
 
 import pybuda
 import requests
+import torch
 import torchvision.transforms as transforms
 from PIL import Image
 from pybuda._C.backend_api import BackendDevice
@@ -37,7 +38,7 @@ variants_func = {
 }
 
 
-def run_dla_pytorch(variant):
+def run_dla_pytorch(variant, batch_size=1):
 
     # Load model function
     func = variants_func[variant]
@@ -62,7 +63,7 @@ def run_dla_pytorch(variant):
     # Load data sample
     url = "https://images.rawpixel.com/image_1300/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA1L3BkMTA2LTA0Ny1jaGltXzEuanBn.jpg"
     image = Image.open(requests.get(url, stream=True).raw)
-    label = "tiger"
+    label = ["tiger"] * batch_size
 
     # Preprocessing
     transform = transforms.Compose(
@@ -73,7 +74,8 @@ def run_dla_pytorch(variant):
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
     )
-    img_tensor = transform(image).unsqueeze(0)
+    n_img_tensor = [transform(image).unsqueeze(0) for _ in range(batch_size)]
+    batch_tensor = torch.cat(n_img_tensor, dim=0)
 
     # Load model and prepare for evaluation (inference)
     pytorch_model = func(pretrained="imagenet")
@@ -83,8 +85,14 @@ def run_dla_pytorch(variant):
     tt_model = pybuda.PyTorchModule(model_name, pytorch_model)
 
     # run inference on Tenstorrent device
-    output_q = pybuda.run_inference(tt_model, inputs=[(img_tensor,)])
-    output = output_q.get()[0].value()
+    output_q = pybuda.run_inference(tt_model, inputs=[(batch_tensor,)])
+    output = output_q.get()
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
 
     # Get ImageNet class mappings
     url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
@@ -92,11 +100,12 @@ def run_dla_pytorch(variant):
     categories = [s.decode("utf-8").strip() for s in image_classes.readlines()]
 
     # Post processing
-    predicted_value = output.argmax(-1).item()
-    predicted_label = categories[predicted_value]
+    predicted_value = output[0].value().argmax(-1)
+    predicted_label = [categories[idx] for idx in predicted_value]
 
     # Print outputs
-    print(f"True Label: {label} | Predicted Label: {predicted_label}")
+    for idx, pred in enumerate(predicted_label):
+        print(f"Sampled ID: {idx} | True Label: {label[idx]} | Predicted Label: {pred}")
 
 
 if __name__ == "__main__":

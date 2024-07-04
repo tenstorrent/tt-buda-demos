@@ -1,13 +1,13 @@
 # ssd300_resnet50 demo script
 
-import pybuda
-import numpy as np
-import torch
 import os
-import skimage
-import requests
-from pybuda._C.backend_api import BackendDevice
 
+import numpy as np
+import pybuda
+import requests
+import skimage
+import torch
+from pybuda._C.backend_api import BackendDevice
 
 # preprocessing scripts referred from https://github.com/NVIDIA/DeepLearningExamples/blob/master/PyTorch/Detection/SSD/examples/SSD300_inference.py
 
@@ -58,7 +58,7 @@ def prepare_input(img_uri):
     return img
 
 
-def run_pytorch_ssd300_resnet50():
+def run_pytorch_ssd300_resnet50(batch_size=1):
 
     # STEP 1 : Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -72,12 +72,16 @@ def run_pytorch_ssd300_resnet50():
             os.environ["PYBUDA_RIBBON2"] = "1"
             compiler_cfg.place_on_new_epoch("reshape_769.dc.matmul.13")
             compiler_cfg.place_on_new_epoch("reshape_769.dc.matmul.7")
-            compiler_cfg.balancer_op_override("max_pool2d_14.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (2, 1))
+            compiler_cfg.balancer_op_override(
+                "max_pool2d_14.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (2, 1)
+            )
 
         if available_devices[0] == BackendDevice.Wormhole_B0:
             compiler_cfg.place_on_new_epoch("conv2d_766.dc.matmul.11")
             os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "24576"
-            compiler_cfg.balancer_op_override("max_pool2d_14.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (1, 1))
+            compiler_cfg.balancer_op_override(
+                "max_pool2d_14.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (1, 1)
+            )
 
     # STEP 2 : prepare model
     model = torch.hub.load("NVIDIA/DeepLearningExamples:torchhub", "nvidia_ssd", pretrained=False)
@@ -98,11 +102,18 @@ def run_pytorch_ssd300_resnet50():
     HWC = prepare_input(img)
     CHW = np.swapaxes(np.swapaxes(HWC, 0, 2), 1, 2)
     batch = np.expand_dims(CHW, axis=0)
-    input_batch = torch.from_numpy(batch).float()
+    input_batch = [torch.from_numpy(batch).float()] * batch_size
+    batch_input = torch.cat(input_batch, dim=0)
 
     # STEP 4 : Inference
-    output_q = pybuda.run_inference(tt_model, inputs=([input_batch]))
+    output_q = pybuda.run_inference(tt_model, inputs=([batch_input]))
     output = output_q.get()
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
 
     for i in range(len(output)):
         output[i] = output[i].value()
@@ -118,6 +129,7 @@ def run_pytorch_ssd300_resnet50():
     best_results_per_input = [utils.pick_best(results, 0.40) for results in results_per_input]
 
     for image_idx in range(len(best_results_per_input)):
+        print(f"Sampled ID: {image_idx}: ")
         bboxes, classes, confidences = best_results_per_input[image_idx]
         for idx in range(len(bboxes)):
             left, bot, right, top = bboxes[idx]
@@ -126,6 +138,7 @@ def run_pytorch_ssd300_resnet50():
             class_info = f"Class: {classes_to_labels[classes[idx] - 1]}"
             confidence_info = f"Confidence: {confidences[idx]*100:.2f}%"
             print(f"{box_info}, {class_info}, {confidence_info}")
+        print("\n")
 
     # STEP 6 : remove the downloaded weights
     os.remove(checkpoint_path)

@@ -5,6 +5,7 @@ import os
 
 import pybuda
 import requests
+import torch
 from PIL import Image
 from transformers import AutoImageProcessor, SegformerConfig, SegformerForImageClassification
 
@@ -18,7 +19,7 @@ def get_sample_data(model_name):
     return pixel_values
 
 
-def run_segformer_image_classification_pytorch(variant="nvidia/mit-b0"):
+def run_segformer_image_classification_pytorch(variant="nvidia/mit-b0", batch_size=1):
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -48,19 +49,29 @@ def run_segformer_image_classification_pytorch(variant="nvidia/mit-b0"):
     model.eval()
 
     # Load the sample image
-    pixel_values = get_sample_data(variant)
+    pixel_values = [get_sample_data(variant)] * batch_size
+    batch_input = torch.cat(pixel_values, dim=0)
 
     # Create PyBuda module from PyTorch model
     tt_model = pybuda.PyTorchModule("pt_" + str(variant.split("/")[-1].replace("-", "_")), model)
 
     # run inference on Tenstorrent device
-    output_q = pybuda.run_inference(tt_model, inputs=[(pixel_values,)])
+    output_q = pybuda.run_inference(tt_model, inputs=[(batch_input,)])
     output = output_q.get()
 
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
     # Print output
-    predicted_value = output[0].value().argmax(-1).item()
-    predicted_label = model.config.id2label[predicted_value]
-    print("Predicted label : ", predicted_label)
+    predicted_value = output[0].value().argmax(-1)
+    predicted_label = [model.config.id2label[idx.item()] for idx in predicted_value]
+
+    # Print outputs
+    for idx, pred in enumerate(predicted_label):
+        print(f"Sampled ID: {idx} | Predicted Label: {pred}")
 
 
 if __name__ == "__main__":

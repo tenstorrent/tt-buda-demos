@@ -10,5 +10,5 @@ variants = ["xception", "xception41", "xception65", "xception71"]
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.xception
-def test_xception_timm_pytorch(clear_pybuda, test_device, variant):
-    run_xception_timm(variant)
+def test_xception_timm_pytorch(clear_pybuda, test_device, variant, batch_size):
+    run_xception_timm(variant, batch_size=batch_size)

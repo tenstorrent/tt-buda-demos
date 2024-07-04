@@ -150,8 +150,6 @@ class Falcon:
         prompt_token_counts = [sum(mask) for mask in tokenized.attention_mask]
 
         # initial attention mask, rows will be overwritten for prefill users
-        # attention_mask = torch.ones((args.batch_size, args.user_rows, args.seqlen), dtype=torch.long, device=tokenized_attention_mask.device)
-        # initial attention mask, rows will be overwritten for prefill users
         attention_mask = torch.zeros((self.batch_size, self.user_rows, self.max_length), dtype=torch.long)
         input_ids = tokenized_input_ids[:, :, 0].clone()
 
@@ -184,12 +182,6 @@ class Falcon:
 
         end_token_pos = [None for _ in range(self.user_rows)]
 
-        # Prepare attention_mask and position_ids for decode mode. We will override these for users still in prefill mode.
-        # in decode phase we pay attention to all new tokens so concat 1 to attention_mask for the latest token
-        # and shift out oldest tokens attention mask FIFO style similar to odkv cache logic
-        # attention_mask = torch.cat((attention_mask, torch.ones((1, args.user_rows, 1))), dim=2)
-        # attention_mask = attention_mask[:, :, 1:]
-
         while True:
             if self.num_tokens and num_tokens >= self.num_tokens:
                 break
@@ -200,13 +192,8 @@ class Falcon:
                 if num_tokens < prompt_token_counts[i]:
                     # at the very least we have 1 prefill token so seqlen - 1 are the unused tokens. and then subtract num_tokens as we prefill them
                     # mask out tokens which haven't been prefilled
-                    # attention_mask[:, i, :args.seqlen - num_tokens - 1] = 0
 
                     attention_mask[:, i, num_tokens] = tokenized_attention_mask[:, i, num_tokens]
-
-                    # we get and set the prefill tokens attention mask according to the tokeniser which will mask out padded tokens for us
-                    # attention_mask[:, i, args.seqlen - num_tokens - 1:] = tokenized_attention_mask[:, i, :num_tokens + 1]
-                    # attention_mask[:, i, :num_tokens+1] = tokenized_attention_mask[:, i, :num_tokens+1]
 
                     # prefill mode picks input_ids from the prompt tokens
                     input_ids[:, i] = tokenized_input_ids[:, i, num_tokens]
@@ -266,6 +253,7 @@ class Falcon:
 
         return all_output
 
+
 def top_k_top_p_filtering(
     logits: torch.Tensor,
     top_k: int = 0,
@@ -305,6 +293,7 @@ def top_k_top_p_filtering(
         indices_to_remove = sorted_indices_to_remove.scatter(1, sorted_indices, sorted_indices_to_remove)
         logits[indices_to_remove] = filter_value
     return logits
+
 
 def sample_kp_logits(logits, k, p):
     next_token_logscores = top_k_top_p_filtering(logits, top_k=k, top_p=p)

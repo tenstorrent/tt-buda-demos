@@ -7,7 +7,7 @@ import pybuda
 from transformers import DPRReader, DPRReaderTokenizer
 
 
-def run_dpr_reader_pytorch(variant="facebook/dpr-reader-multiset-base"):
+def run_dpr_reader_pytorch(variant="facebook/dpr-reader-multiset-base", batch_size=1):
 
     # Load Bert tokenizer and model from HuggingFace
     # Variants: facebook/dpr-reader-single-nq-base, facebook/dpr-reader-multiset-base
@@ -20,9 +20,9 @@ def run_dpr_reader_pytorch(variant="facebook/dpr-reader-multiset-base"):
 
     # Data preprocessing
     input_tokens = tokenizer(
-        questions=["What is love?"],
-        titles=["Haddaway"],
-        texts=["'What Is Love' is a song recorded by the artist Haddaway"],
+        questions=["What is love?"] * batch_size,
+        titles=["Haddaway"] * batch_size,
+        texts=["'What Is Love' is a song recorded by the artist Haddaway"] * batch_size,
         max_length=128,
         padding="max_length",
         truncation=True,
@@ -41,10 +41,11 @@ def run_dpr_reader_pytorch(variant="facebook/dpr-reader-multiset-base"):
     end_logits = output[1].value()
     relevance_logits = output[2].value()
 
-    # Print outputs
-    print(f"Start Logits: {start_logits}")
-    print(f"End Logits: {end_logits}")
-    print(f"Relevance Logits: {relevance_logits}")
+    # Print Outputs
+    for sample_id in range(batch_size):
+        print(
+            f"Sample ID: {sample_id} | Start Logits: {start_logits[sample_id]} | End Logits: {end_logits[sample_id]} | Relevance Logits: {relevance_logits[sample_id]}"
+        )
 
 
 if __name__ == "__main__":

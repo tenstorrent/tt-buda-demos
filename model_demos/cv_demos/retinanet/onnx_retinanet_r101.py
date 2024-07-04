@@ -35,7 +35,7 @@ def img_preprocess(scal_val=1):
     return img
 
 
-def run_retinanet_r101_640x480_onnx():
+def run_retinanet_r101_640x480_onnx(batch_size=1):
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -68,14 +68,22 @@ def run_retinanet_r101_640x480_onnx():
     tt_model = pybuda.OnnxModule("onnx_retinanet", model, load_path)
 
     # Image preprocessing
-    img_tensor = img_preprocess()
+    img_tensor = [img_preprocess()] * batch_size
+    batch_input = torch.cat(img_tensor, dim=0)
 
     # Run inference on Tenstorrent device
-    output_q = pybuda.run_inference(tt_model, inputs=([img_tensor]))
+    output_q = pybuda.run_inference(tt_model, inputs=([batch_input]))
     output = output_q.get()
 
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
     # Print outputs
-    print(output)
+    for sample in range(batch_size):
+        print("Sample ID: ", sample, "| Result: ", output[sample], "\n")
 
     # Remove weight file
     os.remove(load_path)
