@@ -85,6 +85,7 @@ python cv_demos/resnet/pytorch_resnet.py
 | [YOLOv3](cv_demos/yolo_v3/)                               |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | [YOLOv5](cv_demos/yolo_v5/)                               |   ✔️    |    ✔️    |    ✔️    |        v0.12.3        |
 | YOLOv6                                                    |   ✘    |    ✘    |    ✘    |          TBD          |
+| [YOLOX](cv_demos/yolo_x/)                                 |   ✘    |    ✘    |    ✔️    |          TBD          |
 
 ### Legend
 
