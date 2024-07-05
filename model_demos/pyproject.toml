@@ -87,4 +87,5 @@ markers = [
     "yolov6: tests that involve yolov6",
     "segformer: tests that involve SegFormer",
     "monodle: tests that involve Monodle",
+    "yolox: tests that involve YOLOX",
 ]
