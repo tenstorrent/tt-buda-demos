@@ -40,17 +40,33 @@ PyBuda can be installed using two methods: Docker or Python virtualenv.
 
 If you would like to run PyBuda in a Docker container, then follow the instructions for [PCI Driver Installation](#pci-driver-installation) and [Device Firmware Update](#device-firmware-update) and followed by [Docker Container Installation](#docker-container-installation).
 
-If you would like to run PyBuda in a Python virtualenv, then follow the instructions for the [Setup HugePages](#setup-hugepages), [PCI Driver Installation](#pci-driver-installation), [Device Firmware Update](#device-firmware-update), and [Backend Compiler Dependencies](#backend-compiler-dependencies), followed by the [Tenstorrent Software Package](#tenstorrent-software-package).
+If you would like to run PyBuda in a Python virtualenv, then follow the instructions for the [Setup HugePages](#setup-hugepages), [PCI Driver Installation](#pci-driver-installation), [Device Firmware Update](#device-firmware-update), and [Backend Compiler Dependencies](#backend-compiler-dependencies), followed by the [Python Environment Installation](#python-environment-installation).
 
 ### Setup HugePages
 
-```bash
-NUM_DEVICES=$(lspci -d 1e52: | wc -l)
-sudo sed -i "s/^GRUB_CMDLINE_LINUX_DEFAULT=.*$/GRUB_CMDLINE_LINUX_DEFAULT=\"hugepagesz=1G hugepages=${NUM_DEVICES} nr_hugepages=${NUM_DEVICES} iommu=pt\"/g" /etc/default/grub
-sudo update-grub
-sudo sed -i "/\s\/dev\/hugepages-1G\s/d" /etc/fstab; echo "hugetlbfs /dev/hugepages-1G hugetlbfs pagesize=1G,rw,mode=777 0 0" | sudo tee -a /etc/fstab
-sudo reboot
-```
+1. Download latest [setup_hugepages.py](https://github.com/tenstorrent/tt-metal/blob/main/infra/machine_setup/scripts/setup_hugepages.py) script.
+
+    ```sh
+    wget https://raw.githubusercontent.com/tenstorrent/tt-metal/main/infra/machine_setup/scripts/setup_hugepages.py
+    ```
+
+2. Run first setup script.
+
+    ```sh
+    sudo -E python3 setup_hugepages.py first_pass
+    ```
+
+3. Reboot
+
+    ```sh
+    sudo reboot now
+    ```
+
+4. Run second setup script & check setup.
+
+    ```sh
+    sudo -E python3 setup_hugepages.py enable && sudo -E python3 setup_hugepages.py check
+    ```
 
 ### PCI Driver Installation
 
@@ -106,15 +122,17 @@ Python dependencies. Creating a new virtual environment with PyBuda and librarie
 
 #### Step 1. Navigate to [Releases](https://github.com/tenstorrent/tt-buda/releases)
 
-#### Step 2. Under the latest release, download the `pybuda` and `tvm` and `torchvison` wheel files
+#### Step 2. Scroll to find the latest release package in `.zip` format under "Assets" that corresponds to your device and operating system
 
-#### Step 3. Create your Python environment in desired directory
+#### Step 3. Download the `.zip` package and unzip to find the `pybuda`, `tvm` and `torchvison` wheel files
+
+#### Step 4. Create your Python environment in desired directory
 
 ```bash
 python3 -m venv env
 ```
 
-#### Step 4. Activate environment
+#### Step 5. Activate environment
 
 ```bash
 source env/bin/activate
@@ -143,7 +161,7 @@ This wheel file installs the Debuda tool designed for debugging purposes.
 
 ### Docker Container Installation
 
-Alternatively, PyBuda and its dependencies are provided as Docker images which can run in separate containers.
+Alternatively, PyBuda and its dependencies are provided as Docker images which can run in separate containers. The Docker containers can be found under: <https://github.com/orgs/tenstorrent/packages?repo_name=tt-buda>
 
 #### Step 1. Pull the docker image
 
@@ -153,15 +171,15 @@ To pull the Docker image, use the following command:
 sudo docker pull ghcr.io/tenstorrent/tt-buda/<OS-VERSION>/<TT-DEVICE>:<TAG>
 ```
 
-Supported OS Versions:
+Supported OS `<OS-VERSION>` Versions:
 
-- ubuntu-20-040amd64
-- ubuntu-22-040amd64
+- ubuntu-20-04-amd64
+- ubuntu-22-04-amd64
 
-Supported Tenstorrent Devices:
+Supported Tenstorrent `<TT-DEVICE>` Devices:
 
 - gs
-- wh
+- wh_b0
 
 For example, to run on an Ubuntu version 20.04 on a Grayskull device, use this command:
 
@@ -169,10 +187,12 @@ For example, to run on an Ubuntu version 20.04 on a Grayskull device, use this c
 sudo docker pull ghcr.io/tenstorrent/tt-buda/ubuntu-20-04-amd64/gs:<TAG>
 ```
 
+where `<TAG>` is the version number i.e. `v0.12.3`.
+
 #### Step 2. Run the container
 
 ```bash
-sudo docker run --rm -ti --cap-add=sys_nice --shm-size=4g --device /dev/tenstorrent -v /dev/hugepages-1G:/dev/hugepages-1G -v $(pwd)/:/home/ ghcr.io/tenstorrent/tt-buda/<TAG> bash
+sudo docker run --rm -ti --cap-add=sys_nice --shm-size=4g --device /dev/tenstorrent -v /dev/hugepages-1G:/dev/hugepages-1G -v $(pwd)/:/home/ ghcr.io/tenstorrent/tt-buda/<OS-VERSION>/<TT-DEVICE>:<TAG> bash
 ```
 
 #### Step 3. Change root directory
