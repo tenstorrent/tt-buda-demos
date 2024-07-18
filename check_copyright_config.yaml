@@ -5,6 +5,7 @@ DEFAULT:
   allowed_licenses:
     - Apache-2.0
     - MIT
+    - GPL-3.0-only
 
   license_for_new_files: Apache-2.0  # License to be used when inserting a new copyright notice
 
