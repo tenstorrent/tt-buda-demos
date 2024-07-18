@@ -29,4 +29,4 @@ ignore:  # You can also select ignoring files here
     - /CONTRIBUTING.md
     - /MAINTAINERS.md
     - /model_demos/nlp_demos/falcon/utils/configuration_RW.py
-    
+    - /model_demos/cv_demos/monodle/utils/model.py

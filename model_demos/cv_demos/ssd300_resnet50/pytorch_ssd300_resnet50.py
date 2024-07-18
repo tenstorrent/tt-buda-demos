@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Copyright (c) 2018-2019, NVIDIA CORPORATION.
+# from https://github.com/NVIDIA/DeepLearningExamples/blob/master/PyTorch/Detection/SSD/examples/SSD300_inference.py
+
 # ssd300_resnet50 demo script
 
 import os
@@ -8,8 +12,6 @@ import requests
 import skimage
 import torch
 from pybuda._C.backend_api import BackendDevice
-
-# preprocessing scripts referred from https://github.com/NVIDIA/DeepLearningExamples/blob/master/PyTorch/Detection/SSD/examples/SSD300_inference.py
 
 
 def load_image(image_path):
@@ -119,8 +121,6 @@ def run_pytorch_ssd300_resnet50(batch_size=1):
         output[i] = output[i].value()
 
     output = [o.detach().clone() for o in output]
-
-    # postprocessing scripts referred from https://pytorch.org/hub/nvidia_deeplearningexamples_ssd/
 
     # STEP 5 : Postprocess
     utils = torch.hub.load("NVIDIA/DeepLearningExamples:torchhub", "nvidia_ssd_processing_utils")

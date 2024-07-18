@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# SPDX-FileCopyrightText: Copyright (c) meituan
+# letterbox, check_img_size, process_image from https://github.com/meituan/YOLOv6/blob/main/inference.ipynb
+
 # yolo_v6 demo script
 
 import math
@@ -14,8 +18,6 @@ from yolov6 import YOLOV6
 from yolov6.core.inferer import Inferer
 from yolov6.utils.events import load_yaml
 from yolov6.utils.nms import non_max_suppression
-
-# preprocessing & postprocessing steps referred form https://github.com/meituan/YOLOv6/blob/main/inference.ipynb
 
 
 def letterbox(im, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleup=True, stride=32):
