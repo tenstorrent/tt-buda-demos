@@ -198,3 +198,6 @@ distributed as part of the software:
 
 - Olli Huotari - [License available here](https://github.com/holli/yolov3_pytorch/blob/master/LICENSE)
 - transformers - [License available here](https://github.com/huggingface/transformers/blob/main/LICENSE)
+- monodle - [License available here](https://github.com/xinzhuma/monodle/blob/main/LICENSE)
+- NVIDIA Corporation - [License available here](https://github.com/NVIDIA/DeepLearningExamples/blob/master/PyTorch/Detection/SSD/LICENSE.md)
+- Meituan - [License available here](https://github.com/meituan/YOLOv6/blob/main/LICENSE)

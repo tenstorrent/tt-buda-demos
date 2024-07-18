@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 
 from cv_demos.ssd300_resnet50.pytorch_ssd300_resnet50 import run_pytorch_ssd300_resnet50

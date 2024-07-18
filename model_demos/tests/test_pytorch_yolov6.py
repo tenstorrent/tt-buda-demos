@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 
 from cv_demos.yolo_v6.pytorch_yolov6 import run_yolov6_pytorch
