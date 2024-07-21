@@ -166,8 +166,10 @@ class AttentionMaskConverter:
         if sliding_window is not None:
             diagonal = past_key_values_length - sliding_window - 1
 
-            context_mask = torch.tril(torch.ones_like(mask, dtype=torch.bool), diagonal=diagonal)
-            mask.masked_fill_(context_mask, torch.finfo(dtype).min)
+            # context_mask = torch.tril(torch.ones_like(mask, dtype=torch.bool), diagonal=diagonal)
+            # mask.masked_fill_(context_mask, torch.finfo(dtype).min)
+            context_mask = torch.tril(torch.ones_like(mask), diagonal=diagonal)
+            mask = torch.where(context_mask == 1, torch.finfo(dtype).min, mask)
 
         return mask[None, None, :, :].expand(bsz, 1, tgt_len, tgt_len + past_key_values_length)
 

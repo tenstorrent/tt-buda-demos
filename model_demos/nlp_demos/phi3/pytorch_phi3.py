@@ -1,6 +1,8 @@
 import pybuda
 from pybuda.transformers.pipeline import pipeline as pybuda_pipeline
-from transformers import AutoModelForCausalLM, AutoTokenizer, Phi3Config
+from transformers import AutoTokenizer, Phi3Config
+# from transformers import AutoModelForCausalLM
+from nlp_demos.phi3.utils.modeling_phi3 import Phi3ForCausalLM
 
 
 def run_phi3_causal_lm(variant="microsoft/Phi-3-mini-4k-instruct", batch_size=1):
@@ -21,7 +23,8 @@ def run_phi3_causal_lm(variant="microsoft/Phi-3-mini-4k-instruct", batch_size=1)
     config = Phi3Config(**config_dict)
 
     # Load tokenizer and model from HuggingFace
-    model = AutoModelForCausalLM.from_pretrained(model_ckpt, config=config)
+    # model = AutoModelForCausalLM.from_pretrained(model_ckpt, config=config)
+    model = Phi3ForCausalLM.from_pretrained(model_ckpt, config=config)
     model.eval()
     tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
     tokenizer.pad_token = tokenizer.eos_token
