@@ -11,6 +11,7 @@ def run_phi3_causal_lm(variant="microsoft/Phi-3-mini-4k-instruct", batch_size=1)
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
     compiler_cfg.enable_auto_fusing = False
     compiler_cfg.enable_enumerate_u_kt = False
+    compiler_cfg.balancer_policy = "Ribbon"
 
     # Variants: "microsoft/Phi-3-mini-4k-instruct", "microsoft/Phi-3-mini-128k-instruct"
     model_ckpt = variant
