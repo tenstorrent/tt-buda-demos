@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 import os
 
 import pybuda
@@ -5,8 +8,6 @@ import requests
 import torch
 from PIL import Image
 from transformers import CLIPModel, CLIPProcessor
-
-# from transformers.models.clip.modeling_clip import _expand_mask, _make_causal_mask
 from transformers.modeling_attn_mask_utils import _create_4d_causal_attention_mask, _prepare_4d_attention_mask
 
 
@@ -124,7 +125,7 @@ def download_model(download_func, *args, num_retries=3, timeout=120, **kwargs):
     assert False, "Failed to download the model after multiple retries."
 
 
-def run_clip_pytorch(variant="openai/clip-vit-base-patch32"):
+def run_clip_pytorch(variant="openai/clip-vit-base-patch32", batch_size=1):
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -141,13 +142,14 @@ def run_clip_pytorch(variant="openai/clip-vit-base-patch32"):
     # Load image from the IAM dataset
     url = "http://images.cocodataset.org/val2017/000000039769.jpg"
     image = Image.open(requests.get(url, stream=True).raw)
+    n_images = [image] * batch_size
 
     # Process image
     text = [
         "a photo of a cat",
         "a photo of a dog",
     ]
-    inputs = processor(text=text, images=image, return_tensors="pt")
+    inputs = processor(text=text, images=n_images, return_tensors="pt")
 
     inputs = [
         inputs["input_ids"],
@@ -163,16 +165,27 @@ def run_clip_pytorch(variant="openai/clip-vit-base-patch32"):
     tt0 = pybuda.TTDevice("tt0", module=pybuda.PyTorchModule("pt_clip_text_model", text_model))
     tt0.push_to_inputs(inputs[0], inputs[2])
     output_q = pybuda.run_inference(_sequential=True)
-    text_outputs = output_q.get()
-    text_outputs = [o.value().float() for o in text_outputs]
+    output = output_q.get()
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
+    text_outputs = [o.value().float() for o in output]
 
     post_processed_outputs = post_processing_model(inputs[0], vision_outputs, *text_outputs)
     probs = post_processed_outputs[0].softmax(dim=1)
 
     processed_output = list(zip(text, probs[0].tolist()))
+    processed_output = [list(zip(text, probs[i].tolist())) for i in range(len(probs))]
     print("RESULTS")
-    for item in processed_output:
-        print(f"{item[0]}: {item[1]*100:.1f}%")
+    for idx, pred in enumerate(processed_output):
+        print("Sample ID: ", idx)
+        for item in pred:
+            print(f"{item[0]}: {item[1]*100:.1f}%")
+        print("\n")
     print()
 
 

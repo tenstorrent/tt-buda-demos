@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # MobileNetV3 Demo Script - Basic (large)
 
 import os
@@ -10,7 +13,7 @@ from pybuda._C.backend_api import BackendDevice
 from transformers import AutoImageProcessor
 
 
-def run_mobilenetv3_large_basic():
+def run_mobilenetv3_large_basic(batch_size=1):
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()  # load global compiler config object
@@ -30,13 +33,24 @@ def run_mobilenetv3_large_basic():
     image = Image.open(requests.get(url, stream=True).raw)
     # TODO : Choose image preprocessor from torchvision, to make a compatible postprocessing of the predicted class
     preprocessor = AutoImageProcessor.from_pretrained("google/mobilenet_v2_1.0_224")
-    img_tensor = preprocessor(images=image, return_tensors="pt").pixel_values
+    n_sample_images = [image] * batch_size
+
+    img_tensor = preprocessor(images=n_sample_images, return_tensors="pt").pixel_values
+
+    # Run inference on Tenstorrent device
     output_q = pybuda.run_inference(tt_model, inputs=([img_tensor]))
     output = output_q.get(timeout=0.5)
 
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
     # Data postprocessing
-    predicted_class_idx = output[0].value().detach().float().numpy().argmax(-1).item()
-    print("Predicted class:", predicted_class_idx)
+    predicted_class_idx = output[0].value().detach().float().numpy().argmax(-1)
+    for sample in range(batch_size):
+        print(f" Sampled ID: {sample} | Predicted class: ", predicted_class_idx[sample])
 
 
 if __name__ == "__main__":

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 import os
 
 import pybuda
@@ -9,7 +12,7 @@ from cv_demos.yolo_v3.holli_src.yolo_layer import *
 from cv_demos.yolo_v3.holli_src.yolov3_tiny import *
 
 
-def run_yolov3_tiny_holli_pytorch():
+def run_yolov3_tiny_holli_pytorch(batch_size=1):
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -40,12 +43,21 @@ def run_yolov3_tiny_holli_pytorch():
     image_url = "https://raw.githubusercontent.com/pytorch/hub/master/images/dog.jpg"
     img_org = Image.open(requests.get(image_url, stream=True).raw).convert("RGB")
     img_resized = img_org.resize((sz, sz))
-    img_tensor = utils.image2torch(img_resized)
+    img_tensor = [utils.image2torch(img_resized)] * batch_size
+    batch_tensor = torch.cat(img_tensor, dim=0)
 
     # Run inference on Tenstorrent device
-    output_q = pybuda.run_inference(tt_model, inputs=([img_tensor]))
+    output_q = pybuda.run_inference(tt_model, inputs=([batch_tensor]))
     output = output_q.get()
-    print(output)
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
+    for sample in range(batch_size):
+        print("Sample ID: ", sample, "| Result: ", output[0].value()[sample], "\n")
 
     # Remove weight file
     os.remove(load_path)

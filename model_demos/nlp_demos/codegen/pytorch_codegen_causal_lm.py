@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # CodeGen Demo - CasualLM
 # Support for Wormhole only
 
@@ -9,7 +12,7 @@ from pybuda.transformers.pipeline import pipeline as pybuda_pipeline
 from transformers import AutoTokenizer, CodeGenForCausalLM
 
 
-def run_codegen_causal_lm(variant="Salesforce/codegen-350M-mono"):
+def run_codegen_causal_lm(variant="Salesforce/codegen-350M-mono", batch_size=1):
 
     # Configurations
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -38,14 +41,10 @@ def run_codegen_causal_lm(variant="Salesforce/codegen-350M-mono"):
     tokenizer.add_special_tokens({"pad_token": "[PAD]"})
 
     # Set prompt
-    prompt = "def hello_world():"
+    prompt = ["def hello_world():"] * batch_size
 
     # Run inference on Tenstorrent device
-    text_generator = pybuda_pipeline(
-        "text-generation",
-        model=model,
-        tokenizer=tokenizer,
-    )
+    text_generator = pybuda_pipeline("text-generation", model=model, tokenizer=tokenizer, batch_size=batch_size)
     answer = text_generator(
         prompt,
         max_length=20,
@@ -56,10 +55,10 @@ def run_codegen_causal_lm(variant="Salesforce/codegen-350M-mono"):
     )
 
     # Report output
-    print(f"Prompt: {prompt}")
-    print("Generated text:")
-    for sequence in answer:
-        print(sequence.values())
+    for sample_id in range(batch_size):
+        print(f"Sample ID: {sample_id}")
+        print(f"Prefix text: {prompt[sample_id]}")
+        print(f"Generated text: {answer[sample_id]}")
 
 
 if __name__ == "__main__":

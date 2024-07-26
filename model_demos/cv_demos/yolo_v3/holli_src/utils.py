@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2018 Olli Huotari
+# SPDX-License-Identifier: MIT
+
 import math
 
 import numpy as np
@@ -114,6 +117,7 @@ def multi_bbox_ious(boxes1, boxes2, x1y1x2y2=True):
 
 
 # Plotting helpers
+
 
 # e.g. plot_multi_detections(img_tensor, model.predict_img(img_tensor))
 def plot_multi_detections(imgs, results, figsize=None, **kwargs):

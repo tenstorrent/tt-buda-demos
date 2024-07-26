@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # U-Net Segmentation Models Pytorch Demo
 
 import os
@@ -52,7 +55,7 @@ def download_model(download_func, *args, num_retries=3, timeout=120, **kwargs):
             assert False, "Failed to download the model after multiple retries."
 
 
-def run_unet_qubvel_pytorch():
+def run_unet_qubvel_pytorch(batch_size=1):
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -81,11 +84,19 @@ def run_unet_qubvel_pytorch():
     # Preprocessing
     image = get_imagenet_sample()
     img_tensor = torch.tensor(image)
-    img_tensor = (img_tensor - mean) / std
+    img_tensor = [(img_tensor - mean) / std] * batch_size
+    batch_input = torch.cat(img_tensor, dim=0)
 
     # Run inference on Tenstorrent device
-    output_q = pybuda.run_inference(tt_model, inputs=([img_tensor]), _verify_cfg=pybuda.VerifyConfig())
+    output_q = pybuda.run_inference(tt_model, inputs=([batch_input]), _verify_cfg=pybuda.VerifyConfig())
     output = output_q.get()
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
     pr_mask = output[0].value()
 
     # Pass the raw output through sigmoid to get the probabilities
@@ -94,7 +105,8 @@ def run_unet_qubvel_pytorch():
     pr_mask = pr_mask.detach().numpy()
 
     # Visualize output
-    visualize(pr_mask)
+    for sample in range(batch_size):
+        visualize(pr_mask[sample])
 
 
 if __name__ == "__main__":

@@ -1,10 +1,16 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # BERT Demo Script - Masked LM
 
+import os
+
 import pybuda
+import torch
 from transformers import BertForMaskedLM, BertTokenizer
 
 
-def run_bert_masked_lm_pytorch():
+def run_bert_masked_lm_pytorch(batch_size=1):
 
     # Load Bert tokenizer and model from HuggingFace
     model_ckpt = "bert-base-uncased"
@@ -15,7 +21,7 @@ def run_bert_masked_lm_pytorch():
     compiler_cfg.default_df_override = pybuda._C.DataFormat.Float16_b
 
     # Load data sample
-    sample_text = "The capital of France is [MASK]."
+    sample_text = ["The capital of France is [MASK]."] * batch_size
 
     # Data preprocessing
     input_tokens = tokenizer(
@@ -33,14 +39,22 @@ def run_bert_masked_lm_pytorch():
     )
     output = output_q.get()
 
-    # Data postprocessing
-    mask_token_index = (input_tokens["input_ids"] == tokenizer.mask_token_id)[0].nonzero(as_tuple=True)[0]
-    predicted_token_id = output[0].value()[0, mask_token_index].argmax(axis=-1)
-    answer = tokenizer.decode(predicted_token_id)
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
 
-    # Answer - "paris"
-    print(f"Context: {sample_text}")
-    print(f"Answer: {answer}")
+    for sample_id in range(batch_size):
+        # Data postprocessing
+        mask_token_index = (input_tokens["input_ids"] == tokenizer.mask_token_id)[sample_id].nonzero(as_tuple=True)[0]
+        predicted_token_id = output[0].value()[sample_id, mask_token_index].argmax(axis=-1)
+        answer = tokenizer.decode(predicted_token_id)
+
+        # Answer - "paris"
+        print(f"Sample ID: {sample_id}")
+        print(f"Context: {sample_text[sample_id]}")
+        print(f"Answer: {answer}")
 
 
 if __name__ == "__main__":

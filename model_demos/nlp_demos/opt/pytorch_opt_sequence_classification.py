@@ -1,12 +1,16 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # OPT Demo Script - Sequence Classification
 
 import os
 
 import pybuda
+import torch
 from transformers import AutoTokenizer, OPTForSequenceClassification
 
 
-def run_opt_sequence_classification(variant="facebook/opt-350m"):
+def run_opt_sequence_classification(variant="facebook/opt-350m", batch_size=1):
 
     # Set PyBUDA configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -27,7 +31,7 @@ def run_opt_sequence_classification(variant="facebook/opt-350m"):
             os.environ["PYBUDA_FORCE_SEQUENTIAL"] = "1"
 
     # Load data sample
-    review = "the movie was great!"
+    review = ["the movie was great!"] * batch_size
 
     # Data preprocessing
     input_tokens = tokenizer(
@@ -45,11 +49,20 @@ def run_opt_sequence_classification(variant="facebook/opt-350m"):
     )
     output = output_q.get()
 
-    # Data postprocessing
-    predicted_value = output[0].value().argmax(-1).item()
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
 
-    # Answer - "positive"
-    print(f"Review: {review} | Predicted Sentiment: {model.config.id2label[predicted_value]}")
+    # Data postprocessing
+    for sample_id in range(batch_size):
+        predicted_value = output[0].value()[sample_id].argmax(-1).item()
+
+        # Answer - "positive"
+        print(
+            f"Sample ID: {sample_id} | Review: {review[sample_id]} | Predicted Sentiment: {model.config.id2label[predicted_value]}"
+        )
 
 
 if __name__ == "__main__":

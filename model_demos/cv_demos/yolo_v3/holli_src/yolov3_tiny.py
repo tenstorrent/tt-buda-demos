@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2018 Olli Huotari
+# SPDX-License-Identifier: MIT
+
 import torch
 import torch.nn as nn
 

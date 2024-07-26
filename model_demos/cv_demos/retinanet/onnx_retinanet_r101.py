@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # import PyBuda library
 
 import os
@@ -32,9 +35,16 @@ def img_preprocess(scal_val=1):
     return img
 
 
-def run_retinanet_r101_640x480_onnx():
+def run_retinanet_r101_640x480_onnx(batch_size=1):
 
     # Set PyBuda configuration parameters
+    compiler_cfg = pybuda.config._get_global_compiler_config()
+    compiler_cfg.balancer_policy = "Ribbon"
+    compiler_cfg.graph_solver_self_cut_type = "ConsumerOperandDataEdgesFirst"
+    compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
+    compiler_cfg.enable_auto_fusing = False
+    compiler_cfg.conv_multi_op_fracture_factor_override["conv2d_356"] = 3
+
     os.environ["PYBUDA_DECOMPOSE_SIGMOID"] = "1"
     os.environ["PYBUDA_DISABLE_CONV_MULTI_OP_FRACTURE"] = "1"
     os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = f"{75*1024}"
@@ -43,13 +53,8 @@ def run_retinanet_r101_640x480_onnx():
         if available_devices[0] == pybuda.BackendDevice.Grayskull:
             os.environ["PYBUDA_RIBBON2"] = "1"
             os.environ["PYBUDA_FORCE_EMULATE_HARVESTED"] = "1"
-
-    compiler_cfg = pybuda.config._get_global_compiler_config()
-    compiler_cfg.balancer_policy = "Ribbon"
-    compiler_cfg.graph_solver_self_cut_type = "ConsumerOperandDataEdgesFirst"
-    compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
-    compiler_cfg.enable_auto_fusing = False
-    compiler_cfg.conv_multi_op_fracture_factor_override["conv2d_356"] = 3
+        elif available_devices[0] == pybuda.BackendDevice.Wormhole_B0:
+            compiler_cfg.place_on_new_epoch("conv2d_1557.dc.matmul.11")
 
     # Download model weights
     url = "https://github.com/onnx/models/raw/main/validated/vision/object_detection_segmentation/retinanet/model/retinanet-9.onnx?download="
@@ -63,14 +68,22 @@ def run_retinanet_r101_640x480_onnx():
     tt_model = pybuda.OnnxModule("onnx_retinanet", model, load_path)
 
     # Image preprocessing
-    img_tensor = img_preprocess()
+    img_tensor = [img_preprocess()] * batch_size
+    batch_input = torch.cat(img_tensor, dim=0)
 
     # Run inference on Tenstorrent device
-    output_q = pybuda.run_inference(tt_model, inputs=([img_tensor]))
+    output_q = pybuda.run_inference(tt_model, inputs=([batch_input]))
     output = output_q.get()
 
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
     # Print outputs
-    print(output)
+    for sample in range(batch_size):
+        print("Sample ID: ", sample, "| Result: ", output[sample], "\n")
 
     # Remove weight file
     os.remove(load_path)

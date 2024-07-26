@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # Wideresnet Demo Script
 
 import os
@@ -10,7 +13,7 @@ from PIL import Image
 from torchvision import transforms
 
 
-def run_wideresnet_torchhub_pytorch(variant="wide_resnet50_2"):
+def run_wideresnet_torchhub_pytorch(variant="wide_resnet50_2", batch_size=1):
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()  # load global compiler config object
     compiler_cfg.balancer_policy = "Ribbon"
@@ -37,26 +40,32 @@ def run_wideresnet_torchhub_pytorch(variant="wide_resnet50_2"):
         ]
     )
     input_tensor = preprocess(input_image)
-    input_batch = input_tensor.unsqueeze(0)  # create a mini-batch as expected by the model
+    input_batch = [input_tensor.unsqueeze(0)] * batch_size  # create a mini-batch as expected by the model
+    batch_input = torch.cat(input_batch, dim=0)
 
     # Run inference on Tenstorrent device
-    output_q = pybuda.run_inference(tt_model, inputs=([input_batch]))
-    output = output_q.get()[0].value()
+    output_q = pybuda.run_inference(tt_model, inputs=([batch_input]))
+    output = output_q.get()
 
-    # Data postprocessing
-    probabilities = torch.nn.functional.softmax(output[0], dim=0)
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
 
     # Get imagenet class mappings
     url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
     image_classes = urllib.request.urlopen(url)
     categories = [s.decode("utf-8").strip() for s in image_classes.readlines()]
-
-    # Print top categories per image
+    # Postprocessing
+    probabilities = torch.nn.functional.softmax(output[0].value(), dim=1)
+    # Show top categories per image
     top5_prob, top5_catid = torch.topk(probabilities, 5)
-    result = {}
-    for i in range(top5_prob.size(0)):
-        result[categories[top5_catid[i]]] = top5_prob[i].item()
-    print(result)
+    for sample in range(batch_size):
+        result = {}  # reset at the start of each new sample
+        for i in range(top5_prob.size(1)):
+            result[categories[top5_catid[sample][i]]] = top5_prob[sample][i].item()
+        print("Sample ID: ", sample, "| Result: ", result)
 
 
 if __name__ == "__main__":

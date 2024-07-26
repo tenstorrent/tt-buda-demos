@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # U-Net TorchHub Demo
 
 import os
@@ -11,7 +14,7 @@ from pybuda._C.backend_api import BackendDevice
 from torchvision import transforms
 
 
-def run_unet_torchhub_pytorch():
+def run_unet_torchhub_pytorch(batch_size=1):
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -51,14 +54,22 @@ def run_unet_torchhub_pytorch():
         ]
     )
     input_tensor = preprocess(input_image)
-    img_batch = input_tensor.unsqueeze(0)
+    img_batch = [input_tensor.unsqueeze(0)] * batch_size
+    batch_input = torch.cat(img_batch, dim=0)
 
     # Run inference on Tenstorrent device
-    output_q = pybuda.run_inference(tt_model, inputs=([img_batch]))
+    output_q = pybuda.run_inference(tt_model, inputs=([batch_input]))
     output = output_q.get()
 
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
     # Print output
-    print(output)
+    for sample in range(batch_size):
+        print("Sample ID: ", sample, "| Result: ", output[0].value()[sample], "\n")
 
 
 if __name__ == "__main__":

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 """
 Model class for Falcon LLM.
 """
@@ -8,7 +11,6 @@ import pybuda
 import torch
 from torch.nn import functional as F
 from transformers import AutoTokenizer
-from transformers.generation.utils import top_k_top_p_filtering
 
 from nlp_demos.falcon.utils.configuration_RW import RWConfig
 from nlp_demos.falcon.utils.pybudify import PyBudify
@@ -148,8 +150,6 @@ class Falcon:
         prompt_token_counts = [sum(mask) for mask in tokenized.attention_mask]
 
         # initial attention mask, rows will be overwritten for prefill users
-        # attention_mask = torch.ones((args.batch_size, args.user_rows, args.seqlen), dtype=torch.long, device=tokenized_attention_mask.device)
-        # initial attention mask, rows will be overwritten for prefill users
         attention_mask = torch.zeros((self.batch_size, self.user_rows, self.max_length), dtype=torch.long)
         input_ids = tokenized_input_ids[:, :, 0].clone()
 
@@ -182,12 +182,6 @@ class Falcon:
 
         end_token_pos = [None for _ in range(self.user_rows)]
 
-        # Prepare attention_mask and position_ids for decode mode. We will override these for users still in prefill mode.
-        # in decode phase we pay attention to all new tokens so concat 1 to attention_mask for the latest token
-        # and shift out oldest tokens attention mask FIFO style similar to odkv cache logic
-        # attention_mask = torch.cat((attention_mask, torch.ones((1, args.user_rows, 1))), dim=2)
-        # attention_mask = attention_mask[:, :, 1:]
-
         while True:
             if self.num_tokens and num_tokens >= self.num_tokens:
                 break
@@ -198,13 +192,8 @@ class Falcon:
                 if num_tokens < prompt_token_counts[i]:
                     # at the very least we have 1 prefill token so seqlen - 1 are the unused tokens. and then subtract num_tokens as we prefill them
                     # mask out tokens which haven't been prefilled
-                    # attention_mask[:, i, :args.seqlen - num_tokens - 1] = 0
 
                     attention_mask[:, i, num_tokens] = tokenized_attention_mask[:, i, num_tokens]
-
-                    # we get and set the prefill tokens attention mask according to the tokeniser which will mask out padded tokens for us
-                    # attention_mask[:, i, args.seqlen - num_tokens - 1:] = tokenized_attention_mask[:, i, :num_tokens + 1]
-                    # attention_mask[:, i, :num_tokens+1] = tokenized_attention_mask[:, i, :num_tokens+1]
 
                     # prefill mode picks input_ids from the prompt tokens
                     input_ids[:, i] = tokenized_input_ids[:, i, num_tokens]
@@ -263,6 +252,47 @@ class Falcon:
             num_tokens += 1
 
         return all_output
+
+
+def top_k_top_p_filtering(
+    logits: torch.Tensor,
+    top_k: int = 0,
+    top_p: float = 1.0,
+    filter_value: float = -float("Inf"),
+    min_tokens_to_keep: int = 1,
+) -> torch.Tensor:
+    """Filter a distribution of logits using top-k and/or nucleus (top-p) filtering
+    Args:
+        logits: logits distribution shape (batch size, vocabulary size)
+        if top_k > 0: keep only top k tokens with highest probability (top-k filtering).
+        if top_p < 1.0: keep the top tokens with cumulative probability >= top_p (nucleus filtering).
+            Nucleus filtering is described in Holtzman et al. (http://arxiv.org/abs/1904.09751)
+        Make sure we keep at least min_tokens_to_keep per batch example in the output
+    From: https://gist.github.com/thomwolf/1a5a29f6962089e871b94cbd09daf317
+    """
+    if top_k > 0:
+        top_k = min(max(top_k, min_tokens_to_keep), logits.size(-1))  # Safety check
+        # Remove all tokens with a probability less than the last token of the top-k
+        indices_to_remove = logits < torch.topk(logits, top_k)[0][..., -1, None]
+        logits[indices_to_remove] = filter_value
+
+    if top_p < 1.0:
+        sorted_logits, sorted_indices = torch.sort(logits, descending=True)
+        cumulative_probs = torch.cumsum(F.softmax(sorted_logits, dim=-1), dim=-1)
+
+        # Remove tokens with cumulative probability above the threshold (token with 0 are kept)
+        sorted_indices_to_remove = cumulative_probs > top_p
+        if min_tokens_to_keep > 1:
+            # Keep at least min_tokens_to_keep (set to min_tokens_to_keep-1 because we add the first one below)
+            sorted_indices_to_remove[..., :min_tokens_to_keep] = 0
+        # Shift the indices to the right to keep also the first token above the threshold
+        sorted_indices_to_remove[..., 1:] = sorted_indices_to_remove[..., :-1].clone()
+        sorted_indices_to_remove[..., 0] = 0
+
+        # scatter sorted tensors to original indexing
+        indices_to_remove = sorted_indices_to_remove.scatter(1, sorted_indices, sorted_indices_to_remove)
+        logits[indices_to_remove] = filter_value
+    return logits
 
 
 def sample_kp_logits(logits, k, p):
