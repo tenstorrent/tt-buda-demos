@@ -7,9 +7,6 @@ from pybuda.transformers.pipeline import pipeline as pybuda_pipeline
 model_name = "Qwen/Qwen1.5-0.5B"
 
 def run_qwen_causal_lm(max_length=1024, top_p=0.9, top_k=50, temperature=0.7):
-    # Set environment variables
-    os.environ['TT_BACKEND_TIMEOUT'] = '0'
-
     # Set PyBuda configurations
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
