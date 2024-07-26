@@ -1,13 +1,17 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # GPT Neo Demo Script - Sequence Classification
 
 import os
 
 import pybuda
+import torch
 from pybuda._C.backend_api import BackendDevice
 from transformers import AutoTokenizer, GPTNeoForSequenceClassification
 
 
-def run_gptneo_sequence_classification(variant="EleutherAI/gpt-neo-125M"):
+def run_gptneo_sequence_classification(variant="EleutherAI/gpt-neo-125M", batch_size=1):
 
     # Load tokenizer and model from HuggingFace
     # Variants: # EleutherAI/gpt-neo-125M, EleutherAI/gpt-neo-1.3B, EleutherAI/gpt-neo-2.7B
@@ -32,7 +36,7 @@ def run_gptneo_sequence_classification(variant="EleutherAI/gpt-neo-125M"):
     model = GPTNeoForSequenceClassification.from_pretrained(model_ckpt, torchscript=True)
 
     # Load data sample
-    review = "the movie was great!"
+    review = ["the movie was great!"] * batch_size
 
     # Data preprocessing
     input_tokens = tokenizer(
@@ -50,11 +54,20 @@ def run_gptneo_sequence_classification(variant="EleutherAI/gpt-neo-125M"):
     )
     output = output_q.get()
 
-    # Data postprocessing
-    predicted_value = output[0].value().argmax(-1).item()
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
 
-    # Answer - "positive"
-    print(f"Review: {review} | Predicted Sentiment: {model.config.id2label[predicted_value]}")
+    # Data postprocessing
+    for sample_id in range(batch_size):
+        predicted_value = output[0].value()[sample_id].argmax(-1).item()
+
+        # Answer - "positive"
+        print(
+            f"Sample ID: {sample_id} | Review: {review[sample_id]} | Predicted Sentiment: {model.config.id2label[predicted_value]}"
+        )
 
 
 if __name__ == "__main__":

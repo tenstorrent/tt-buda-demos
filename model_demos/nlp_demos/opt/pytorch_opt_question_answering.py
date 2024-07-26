@@ -1,12 +1,16 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # OPT Demo Script - Question Answering
 
 import os
 
 import pybuda
+import torch
 from transformers import AutoTokenizer, OPTForQuestionAnswering
 
 
-def run_opt_question_answering(variant="facebook/opt-350m"):
+def run_opt_question_answering(variant="facebook/opt-350m", batch_size=1):
 
     # set PyBuda configurations
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -26,7 +30,8 @@ def run_opt_question_answering(variant="facebook/opt-350m"):
     model = OPTForQuestionAnswering.from_pretrained(model_ckpt, torchscript=True)
 
     # Load data sample
-    question, context = "Who was Jim Henson?", "Jim Henson was a nice puppet"
+    question = ["Who was Jim Henson?"] * batch_size
+    context = ["Jim Henson was a nice puppet"] * batch_size
 
     # Data preprocessing
     input_tokens = tokenizer(
@@ -45,15 +50,25 @@ def run_opt_question_answering(variant="facebook/opt-350m"):
     )
     output = output_q.get()
 
-    # Data postprocessing
-    answer_start = output[0].value().argmax().item()
-    answer_end = output[1].value().argmax().item()
-    answer = tokenizer.decode(input_tokens["input_ids"][0, answer_start : answer_end + 1])
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_answer_start = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        concat_answer_end = torch.cat((output[2].to_pytorch(), output[3].to_pytorch()), dim=0)
+        buda_answer_start = pybuda.Tensor.create_from_torch(concat_answer_start)
+        buda_answer_end = pybuda.Tensor.create_from_torch(concat_answer_end)
+        output = [buda_answer_start, buda_answer_end]
 
-    # Answer - "nice puppet"
-    print(f"Context: {context}")
-    print(f"Question: {question}")
-    print(f"Answer: {answer}")
+    # Data postprocessing
+    for sample_id in range(batch_size):
+        answer_start = output[0].value()[sample_id].argmax(-1).item()
+        answer_end = output[1].value()[sample_id].argmax(-1).item()
+        answer = tokenizer.decode(input_tokens["input_ids"][sample_id, answer_start : answer_end + 1])
+
+        # Answer - "Denver Broncos"
+        print(f"Sample ID: {sample_id}")
+        print(f"Context: {context[sample_id]}")
+        print(f"Question: {question[sample_id]}")
+        print(f"Answer: {answer}")
 
 
 if __name__ == "__main__":

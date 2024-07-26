@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 
 from cv_demos.resnet.pytorch_resnet import run_resnet_pytorch
@@ -15,10 +18,10 @@ variants = [
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.resnet
-def test_resnet_pytorch(clear_pybuda, variant):
-    run_resnet_pytorch(variant)
+def test_resnet_pytorch(clear_pybuda, test_device, variant, batch_size):
+    run_resnet_pytorch(variant, batch_size=batch_size)
 
 
 @pytest.mark.resnet
-def test_resnet_timm(clear_pybuda):
-    run_resnet_timm()
+def test_resnet_timm(clear_pybuda, test_device, batch_size):
+    run_resnet_timm(batch_size=batch_size)

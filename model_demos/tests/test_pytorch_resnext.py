@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 
 from cv_demos.resnext.pytorch_resnext import run_resnext_pytorch
@@ -15,5 +18,5 @@ variants = [
 
 @pytest.mark.parametrize("variant", variants)
 @pytest.mark.resnext
-def test_resnext_pytorch(clear_pybuda, variant):
-    run_resnext_pytorch(variant)
+def test_resnext_pytorch(clear_pybuda, test_device, variant, batch_size):
+    run_resnext_pytorch(variant, batch_size=batch_size)

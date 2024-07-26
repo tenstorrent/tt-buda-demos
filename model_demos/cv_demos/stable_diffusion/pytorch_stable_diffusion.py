@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # Stable Diffusion Demo Script
 
 import os
@@ -113,10 +116,11 @@ def initialize_compiler_overrides():
     os.environ["PYBUDA_FORCE_CONV_MULTI_OP_FRACTURE"] = "1"
     os.environ["PYBUDA_RIBBON2"] = "1"
     os.environ["PYBUDA_DECOMPOSE_SIGMOID"] = "1"
+    os.environ["PYBUDA_DRAM_PICK_CAPACITY"] = "1"
+    os.environ["PYBUDA_DRAM_FLIP_FLOP"] = "1"
 
     compiler_cfg = pybuda.config._get_global_compiler_config()
     compiler_cfg.enable_tvm_constant_prop = True
-    compiler_cfg.enable_enumerate_u_kt = False
     compiler_cfg.graph_solver_self_cut_type = "FastCut"
     compiler_cfg.retain_tvm_python_files = True
     compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
@@ -161,7 +165,13 @@ def denoising_loop(
                 ]
             )
             output_q = pybuda.run_inference(_sequential=True)
-            noise_pred_0 = output_q.get()[0].value().detach()
+            noise_pred_0 = output_q.get()
+
+            # Combine outputs for data parallel runs
+            if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+                concat_tensor = torch.cat((noise_pred_0[0].to_pytorch(), noise_pred_0[1].to_pytorch()), dim=0)
+                buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+                noise_pred_0 = [buda_tensor]
 
             ttdevice.push_to_inputs(
                 *[
@@ -171,9 +181,15 @@ def denoising_loop(
                 ]
             )
             output_q = pybuda.run_inference(_sequential=True)
-            noise_pred_1 = output_q.get()[0].value().detach()
+            noise_pred_1 = output_q.get()
 
-            noise_pred = torch.cat([noise_pred_0, noise_pred_1], dim=0)
+            # Combine outputs for data parallel runs
+            if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+                concat_tensor = torch.cat((noise_pred_1[0].to_pytorch(), noise_pred_1[1].to_pytorch()), dim=0)
+                buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+                noise_pred_1 = [buda_tensor]
+
+            noise_pred = torch.cat([noise_pred_0[0].value().detach(), noise_pred_1[0].value().detach()], dim=0)
 
             # perform guidance
             if do_classifier_free_guidance:
@@ -229,7 +245,7 @@ def stable_diffusion_postprocessing(
     return StableDiffusionPipelineOutput(images=image, nsfw_content_detected=has_nsfw_concept)
 
 
-def run_stable_diffusion_pytorch(variant="CompVis/stable-diffusion-v1-4"):
+def run_stable_diffusion_pytorch(variant="CompVis/stable-diffusion-v1-4", batch_size=1):
 
     available_devices = pybuda.detect_available_devices()
     if available_devices:
@@ -255,9 +271,15 @@ def run_stable_diffusion_pytorch(variant="CompVis/stable-diffusion-v1-4"):
     print("Generating image for prompt: ", prompt)
 
     # Data preprocessing
-    (latents, timesteps, extra_step_kwargs, prompt_embeds, extra_step_kwargs,) = stable_diffusion_preprocessing(
+    (
+        latents,
+        timesteps,
+        extra_step_kwargs,
+        prompt_embeds,
+        extra_step_kwargs,
+    ) = stable_diffusion_preprocessing(
         pipe,
-        prompt,
+        [prompt] * batch_size,
         num_inference_steps=num_inference_steps,
     )
 

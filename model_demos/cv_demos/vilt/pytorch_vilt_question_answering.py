@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 import os
 
 import pybuda
@@ -6,10 +9,10 @@ import torch
 from PIL import Image
 from transformers import ViltConfig, ViltForQuestionAnswering, ViltProcessor
 
-from .vilt_model import ViLtEmbeddingWrapper, ViltModelWrapper
+from cv_demos.vilt.vilt_model import ViLtEmbeddingWrapper, ViltModelWrapper
 
 
-def run_vilt_for_question_answering_pytorch(variant="dandelin/vilt-b32-finetuned-vqa"):
+def run_vilt_for_question_answering_pytorch(variant="dandelin/vilt-b32-finetuned-vqa", batch_size=1):
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -22,9 +25,10 @@ def run_vilt_for_question_answering_pytorch(variant="dandelin/vilt-b32-finetuned
     # Sample Image
     url = "http://images.cocodataset.org/val2017/000000039769.jpg"
     sample_image = Image.open(requests.get(url, stream=True).raw)
+    batch_image = [sample_image] * batch_size
 
     # Sample text
-    sample_text = "How many cats are there?"
+    batch_text = ["How many cats are there?"] * batch_size
 
     model_ckpt = variant
 
@@ -40,7 +44,7 @@ def run_vilt_for_question_answering_pytorch(variant="dandelin/vilt-b32-finetuned
     model.eval()
 
     # Sample inputs
-    encoding = processor(sample_image, sample_text, return_tensors="pt")
+    encoding = processor(batch_image, batch_text, return_tensors="pt")
 
     # Wrapper
     text_vision_embedding_model = ViLtEmbeddingWrapper(model)
@@ -56,9 +60,20 @@ def run_vilt_for_question_answering_pytorch(variant="dandelin/vilt-b32-finetuned
     output_q = pybuda.run_inference(_sequential=True)
 
     # Model output (i.e Predicted answer: 2)
-    output = output_q.get()[0].value().detach().float()
-    idx = output.argmax(-1).item()
-    print("Predicted answer: ", model.config.id2label[idx])
+    output = output_q.get()
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
+    # Data postprocessing
+    for sample_id in range(batch_size):
+        predicted_value = output[0].value()[sample_id].argmax(-1).item()
+        print(
+            f"Sample ID: {sample_id} | Question: {batch_text[sample_id]} | Predicted Sentiment: {model.config.id2label[predicted_value]}"
+        )
 
 
 if __name__ == "__main__":

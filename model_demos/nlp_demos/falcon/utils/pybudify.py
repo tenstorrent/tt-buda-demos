@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 import os
 import sys
 
@@ -53,22 +56,11 @@ class PyBudify(torch.nn.Module):
 
             # pybuda workarounds
             os.environ["GOLDEN_WORMHOLE_B0"] = "1"  # golden should always simulate a B0 as that's all we use now
-            os.environ[
-                "PYBUDA_ENABLE_STABLE_SOFTMAX"
-            ] = "1"  # improved accuracy - pybuda team surprised we need it though
+            os.environ["PYBUDA_ENABLE_STABLE_SOFTMAX"] = (
+                "1"  # improved accuracy - pybuda team surprised we need it though
+            )
             os.environ["PYBUDA_CONVERT_PARAMS_TO_TVM"] = "0"  # faster compile times... why would this ever be 1?
             os.environ["TT_BACKEND_TIMEOUT"] = "0"  # default is too aggressive for large models?
-
-            # os.environ["PYBUDA_ENABLE_BROADCAST_SPLITTING"] = "1"
-            # os.environ["PYBUDA_DISABLE_FORK_JOIN_BUF"] = "1"
-            # os.environ["PYBUDA_DRAM_PICK_CAPACITY"] = "1"
-            # os.environ["WHA0_DISABLE_RELAY_BUFS"] = "1"
-            # os.environ["PYBUDA_FUSE_STOP_ON_RECIPROCAL"] = "1"
-            # os.environ["PYBUDA_PLACER_SNAKE"] = "1" Not what we want for dual chip placement
-            # os.environ["PYBUDA_DISABLE_INTERACTIVE_PLACER"] = "1" # Until interactive placer supports multi-chip placement overrides
-            # os.environ["PYBUDA_PLACER_SNAKE"] = "1"
-            # os.environ["PYBUDA_ETH_LINKS_NEBULA"] = "1"
-            # os.environ["PYBUDA_DISABLE_DYNAMIC_DRAM"] = "1"
 
             if self.odkv or self.masked_odkv:
                 os.environ["PYBUDA_DISABLE_DYNAMIC_DRAM"] = "1"  # much better performance, not sure why?
@@ -119,12 +111,6 @@ class PyBudify(torch.nn.Module):
                         2: [pybuda.DataFormat.Float16_b, True],
                     },
                 )
-
-            # pybuda.config.configure_mixed_precision(
-            #     name_regex="matmul_.*",
-            #     input_df={1: [pybuda.DataFormat.Bfp8_b, True]})
-
-            # pybuda.override_op_size('matmul_61', (1,2))
 
             if lora:
                 os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "147456"
@@ -216,57 +202,39 @@ class PyBudify(torch.nn.Module):
                         # Since we move around the users dimension, full attn fracturing won't be possible in a single group
                         pybuda.config.insert_fracture_group(
                             [
-                                # Q
-                                # (f"matmul_{26+layer_num*q_offset}", -2, attn_factor),
-                                # K
-                                # (f"matmul_{39+layer_num*q_offset}", -2, attn_factor),
-                                # V
-                                # (f"matmul_{64+layer_num*q_offset}", -2, attn_factor),
-                                # QK
-                                # (f"matmul_{52+layer_num*q_offset}", -3, attn_factor),
                                 (
                                     f"matmul_{51+layer_num*q_offset}",
                                     -3,
                                     attn_factor,
                                 ),
                                 # QK.V
-                                # (f"matmul_{70+layer_num*q_offset}", -3, attn_factor),
                                 (
                                     f"matmul_{65+layer_num*q_offset}",
                                     -3,
                                     attn_factor,
                                 ),
                                 # K cache
-                                # (f"past_key", -3, attn_factor),
                                 (
                                     f"concatenate_{48+layer_num*q_offset}",
                                     -3,
                                     attn_factor,
                                 ),
                                 # V cache
-                                # (f"past_value", -3, attn_factor),
                                 (
                                     f"concatenate_{61+layer_num*q_offset}",
                                     -3,
                                     attn_factor,
                                 ),
-                                #
-                                # fracturing this matmul leads to unspported fracture reshape_66 op
-                                # (f"matmul_{68+layer_num*q_offset}", -2, attn_factor),
                             ]
                         )
                         entries = [f"multiply_{15 + layer_num*q_offset}"]
-                        # ops = [[f'concatenate_{48 + layer_num*q_offset}',
                         ops = [
                             [
                                 f"matmul_{51 + layer_num*q_offset}",
-                                # f'concatenate_{61 + layer_num*q_offset}',
                                 f"matmul_{65 + layer_num*q_offset}",
-                                # f'matmul_{68 + layer_num*q_offset}',
                             ]
                         ]
                         exits = [f"matmul_{68 + layer_num*q_offset}"]
-                        # exits = [f'add_{70 + layer_num*q_offset}']
                         attn_constr = self.add_sched(
                             pybuda,
                             entries,
@@ -298,9 +266,7 @@ class PyBudify(torch.nn.Module):
                         pybuda.config.insert_fracture_group(
                             [
                                 # Can't do fracturing of weights due to transpose
-                                # mlp.dense_h_to_4h
                                 (f"matmul_{18+mlp_offset}", -1, mlp_factor),
-                                # mlp.dense_4h_to_h
                                 (
                                     f"matmul_{23+mlp_offset}",
                                     pybuda.k_dim,
@@ -339,54 +305,22 @@ class PyBudify(torch.nn.Module):
             compiler_cfg.input_queues_on_host = host_queues
 
             if self.masked_odkv:
-                # print('masked_odkv')
-
-                # compiler_cfg.manual_t_streaming = True
-
-                # pybuda.config.override_t_stream_dir(f"concatenate_50.dc.sparse_matmul.4.lc2", "c")
-                # pybuda.config.override_t_stream_dir(f"concatenate_67.dc.sparse_matmul.4.lc2", "c")
-
-                # import pdb; pdb.set_trace()
-
-                # pybuda.config.set_epoch_break("transpose_58.dc.sparse_matmul.4.lc2")
-
-                # pybuda.config.set_epoch_break("matmul_64")
-
-                # pybuda.config.add_schedule_constraint(['transpose_58.dc.sparse_matmul.4.lc2', 'add_59'])
 
                 if num_layers == 1:
                     names = "input__56, input__57"
                 elif num_layers == 32:
                     names = "input__1420, input__1421, input__1422, input__1423, input__1424, input__1425, input__1426, input__1427, input__1428, input__1429, input__1430, input__1431, input__1432, input__1433, input__1434, input__1435, input__1436, input__1437, input__1438, input__1439, input__1440, input__1441, input__1442, input__1443, input__1444, input__1445, input__1446, input__1447, input__1448, input__1449, input__1450, input__1451, input__1452, input__1453, input__1454, input__1455, input__1456, input__1457, input__1458, input__1459, input__1460, input__1461, input__1462, input__1463, input__1464, input__1465, input__1466, input__1467, input__1468, input__1469, input__1470, input__1471, input__1472, input__1473, input__1474, input__1475, input__1476, input__1477, input__1478, input__1479, input__1480, input__1481, input__1482, input__1483"
-                    # names = 'input__1418, input__1419, input__1420, input__1421, input__1422, input__1423, input__1424, input__1425, input__1426, input__1427, input__1428, input__1429, input__1430, input__1431, input__1432, input__1433, input__1434, input__1435, input__1436, input__1437, input__1438, input__1439, input__1440, input__1441, input__1442, input__1443, input__1444, input__1445, input__1446, input__1447, input__1448, input__1449, input__1450, input__1451, input__1452, input__1453, input__1454, input__1455, input__1456, input__1457, input__1458, input__1459, input__1460, input__1461, input__1462, input__1463, input__1464, input__1465, input__1466, input__1467, input__1468, input__1469, input__1470, input__1471, input__1472, input__1473, input__1474, input__1475, input__1476, input__1477, input__1478, input__1479, input__1480, input__1481'
                 else:
                     raise Exception("Unsupported num_layers. Please use either 1 or 32.")
                 names = names.split(", ")
-                # names = names[:2*num_layers]
                 print(f'names" {names}')
                 names_dict = {name: (i + 1) for i, name in enumerate(names)}
 
                 compiler_cfg = pybuda.config._get_global_compiler_config()
 
-                # pybuda.config.insert_fracture_group([(f"concatenate_50", 2, 2)])
-                # pybuda.config.insert_fracture_group([(f"concatenate_67", 2, 2)])
-
-                # pybuda.config.configure_mixed_precision(
-                #     name_regex="concatenate_50.dc.sparse_matmul.4.lc2",
-                #     input_df={0: [pybuda.DataFormat.Bfp8_b, True], 1: [pybuda.DataFormat.Bfp8_b, True], 2: [pybuda.DataFormat.Bfp8_b, True]})
-
-                # pybuda.config.configure_mixed_precision(
-                #     name_regex="concatenate_50.dc.sparse_matmul.4.lc2",
-                #     input_df={0: [pybuda.DataFormat.Bfp8_b, True], 1: [pybuda.DataFormat.Bfp8_b, True], 2: [pybuda.DataFormat.Bfp8_b, True]})
-
                 compiler_cfg.loopback_outputs = names_dict
 
             elif self.odkv:
-
-                # compiler_cfg.manual_t_streaming = True
-
-                # pybuda.config.override_t_stream_dir(f"concatenate_50.dc.sparse_matmul.4.lc2", "c")
-                # pybuda.config.override_t_stream_dir(f"concatenate_67.dc.sparse_matmul.4.lc2", "c")
 
                 if num_layers == 1:
                     names = "input__54, input__55"
@@ -395,28 +329,15 @@ class PyBudify(torch.nn.Module):
                 else:
                     raise Exception("Unsupported num_layers. Please use either 1 or 32.")
                 names = names.split(", ")
-                # names = names[:2*num_layers]
                 print(f'names" {names}')
                 names_dict = {name: (i + 1) for i, name in enumerate(names)}
 
                 compiler_cfg = pybuda.config._get_global_compiler_config()
 
-                # pybuda.config.insert_fracture_group([(f"concatenate_50", 2, 2)])
-                # pybuda.config.insert_fracture_group([(f"concatenate_67", 2, 2)])
-
-                # pybuda.config.configure_mixed_precision(
-                #     name_regex="concatenate_50.dc.sparse_matmul.4.lc2",
-                #     input_df={0: [pybuda.DataFormat.Bfp8_b, True], 1: [pybuda.DataFormat.Bfp8_b, True], 2: [pybuda.DataFormat.Bfp8_b, True]})
-
-                # pybuda.config.configure_mixed_precision(
-                #     name_regex="concatenate_50.dc.sparse_matmul.4.lc2",
-                #     input_df={0: [pybuda.DataFormat.Bfp8_b, True], 1: [pybuda.DataFormat.Bfp8_b, True], 2: [pybuda.DataFormat.Bfp8_b, True]})
-
                 compiler_cfg.loopback_outputs = names_dict
 
             pybuda_arch = {
                 "grayskull": pybuda.BackendDevice.Grayskull,
-                "wormhole": pybuda.BackendDevice.Wormhole,
                 "wormhole_b0": pybuda.BackendDevice.Wormhole_B0,
             }[arch]
 
@@ -454,11 +375,10 @@ class PyBudify(torch.nn.Module):
         assert self.device != "pytorch", "run_async() is only supported for pybuda devices"
         if self.odkv or self.masked_odkv:
             self.ensure_initialized(*args)
-            # print(f'pybuda pushing data')
             self.pybuda.sync()
             in_args = list(args[0]) + list(args[1]) + list(args[2]) + list(args[3])
             self.tt0.push_to_inputs(in_args)  # don't pass in kv over and over again
-            self.pybuda.run_generate(input_count=1, write_index=0)  # , _sequential=True)
+            self.pybuda.run_generate(input_count=1, write_index=0)
         else:
             self.ensure_initialized(*args)
             self.tt0.push_to_inputs(*args)
@@ -486,7 +406,6 @@ class PyBudify(torch.nn.Module):
         self.initialized = True
 
     def __call__(self, *args, **kwargs):
-        # import pdb; pdb.set_trace()
         if self.concurrent:
             self.run_async(*args)
             return self.output_q
@@ -497,7 +416,6 @@ class PyBudify(torch.nn.Module):
             self.ensure_initialized(*args)
 
             if self.masked_odkv:
-                # print('run_generate1')
                 self.pybuda.sync()
                 in_args = list(args[0]) + list(args[1]) + list(args[2]) + list(args[3]) + list(args[4]) + list(args[5])
                 self.tt0.push_to_inputs(in_args)  # don't pass in kv over and over again
@@ -540,8 +458,5 @@ class PyBudify(torch.nn.Module):
                             print(f"[add_sched]: Override op spatial epoch: {fop}, chip {f}")
                             pybuda.config.override_op_placement(fop, chip_id=f, spatial_epoch_break=True)
                     constr.append(fop)
-        # for elem in exits:
-        # constr.append(elem)
-        # pybuda.config.override_op_placement(exits[0], temporal_epoch_break=True)
         print(f"[add_sched] sched: {constr}")
         return constr

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # Pose Landmark Lite 1x1 demo
 
 import os
@@ -9,7 +12,7 @@ from pybuda import TFLiteModule
 from pybuda._C.backend_api import BackendDevice
 
 
-def run_pose_landmark_lite_1x1():
+def run_pose_landmark_lite_1x1(batch_size=1):
 
     # Device specific configurations
     available_devices = pybuda.detect_available_devices()
@@ -44,9 +47,18 @@ def run_pose_landmark_lite_1x1():
     # STEP 3: Run inference on Tenstorrent device
     input_shape = (1, 256, 256, 3)
     input_tensor = torch.rand(input_shape)
-    output_q = pybuda.run_inference(tt_model, inputs=([input_tensor]))
+    batch_tensor = torch.cat([input_tensor] * batch_size, dim=0)
+    output_q = pybuda.run_inference(tt_model, inputs=([batch_tensor]))
     output = output_q.get()
-    print(output)
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
+    for sample in range(batch_size):
+        print("Sample ID: ", sample, "| Result: ", output, "\n")
 
     # Remove weight file
     os.remove(tflite_path)

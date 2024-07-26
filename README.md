@@ -3,10 +3,10 @@
 ## Table of Contents
 
 - [Introduction](#introduction)
-- [First 5 Things To-Do](#first-5-things-to-do)
-- [Model Demos](#model-demos)
-- [Documentation](#documentation)
-- [FAQ & Troubleshooting](#faq--troubleshooting)
+- [First 5 Things To-Do](first_5_steps/)
+- [Model Demos](model_demos/)
+- [Documentation](https://docs.tenstorrent.com/tenstorrent/)
+- [FAQ & Troubleshooting](FAQ.md)
 - [Communication](#communication)
 - [Contributing](#contributing)
 

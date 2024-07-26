@@ -1,16 +1,20 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # MobileNet SSD 1x1 Demo Script
 
 import os
 
 import pybuda
 import requests
+import torch
 from PIL import Image
 from pybuda import TFLiteModule
 from pybuda._C.backend_api import BackendDevice
 from torchvision import transforms
 
 
-def run_mobilenetv2_ssd_1x1_tflite():
+def run_mobilenetv2_ssd_1x1_tflite(batch_size=1):
 
     # Set PyBUDA configuration parameters
     available_devices = pybuda.detect_available_devices()
@@ -44,12 +48,21 @@ def run_mobilenetv2_ssd_1x1_tflite():
     url = "http://images.cocodataset.org/val2017/000000039769.jpg"
     image = Image.open(requests.get(url, stream=True).raw)
     transform = transforms.Compose([transforms.Resize((256, 256)), transforms.ToTensor()])
-    img_tensor = transform(image).permute((1, 2, 0)).unsqueeze(0)
+    img_tensor = [transform(image).permute((1, 2, 0)).unsqueeze(0)] * batch_size
+    batch_tensor = torch.cat(img_tensor, dim=0)
 
     # Run inference on Tenstorrent device
-    output_q = pybuda.run_inference(tt_model, inputs=([img_tensor]))
+    output_q = pybuda.run_inference(tt_model, inputs=([batch_tensor]))
     output = output_q.get()
-    print(output)
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
+    for sample in range(batch_size):
+        print(f"Sampled ID: {sample} | Output: {output[0].value()[sample]}")
 
     # Remove weight file
     os.remove(tflite_path)

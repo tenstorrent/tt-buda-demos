@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # DenseNet Demo Script
 
 import os
@@ -13,7 +16,7 @@ from torchvision.transforms import CenterCrop, Compose, ConvertImageDtype, Norma
 torch.multiprocessing.set_sharing_strategy("file_system")
 
 
-def get_input_img():
+def get_input_img(batch_size):
 
     # Get image
     url = "https://raw.githubusercontent.com/pytorch/hub/master/images/dog.jpg"
@@ -30,12 +33,12 @@ def get_input_img():
     )
 
     # Preprocessing
-    img_tensor = transform(img).unsqueeze(0)
-    print(img_tensor.shape)
-    return img_tensor
+    img_tensor = [transform(img).unsqueeze(0)] * batch_size
+    batch_tensor = torch.cat(img_tensor, dim=0)
+    return batch_tensor
 
 
-def run_densenet_pytorch(variant="densenet121"):
+def run_densenet_pytorch(variant="densenet121", batch_size=1):
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()  # load global compiler config object
@@ -51,19 +54,9 @@ def run_densenet_pytorch(variant="densenet121"):
                 compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
 
     elif variant == "densenet161":
-        compiler_cfg.balancer_policy = "CNN"
-        compiler_cfg.place_on_new_epoch("concatenate_131.dc.sparse_matmul.7.lc2")
-        os.environ["PYBUDA_DISABLE_CONSTANT_FOLDING"] = "1"
-        os.environ["PYBUDA_LEGACY_UBLOCK_SHAPE"] = "1"
-        os.environ["PYBUDA_GRAPHSOLVER_SELF_CUT_TYPE"] = "ConsumerOperandDataEdgesFirst"
-        # Device specific configurations
-        available_devices = pybuda.detect_available_devices()
-        if available_devices:
-            if available_devices[0] == BackendDevice.Wormhole_B0:
-                # compiler_cfg.default_dram_parameters = True
-                compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
-            elif available_devices[0] == BackendDevice.Grayskull:
-                os.environ["PYBUDA_FORCE_EMULATE_HARVESTED"] = "1"
+        os.environ["PYBUDA_RIBBON2"] = "1"
+        compiler_cfg.balancer_policy = "Ribbon"
+        compiler_cfg.default_df_override = pybuda._C.DataFormat.Float16_b
 
     elif variant == "densenet169":
         compiler_cfg.balancer_policy = "CNN"
@@ -73,7 +66,6 @@ def run_densenet_pytorch(variant="densenet121"):
         available_devices = pybuda.detect_available_devices()
         if available_devices:
             if available_devices[0] == BackendDevice.Wormhole_B0:
-                # compiler_cfg.default_dram_parameters = False
                 compiler_cfg.default_df_override = pybuda.DataFormat.Float16_b
             else:
                 os.environ["PYBUDA_PAD_SPARSE_MM"] = "{11:12}"
@@ -97,23 +89,33 @@ def run_densenet_pytorch(variant="densenet121"):
     tt_model = pybuda.PyTorchModule("densnet121_pt", model)
 
     # Run inference on Tenstorrent device
-    img_tensor = get_input_img()
+    img_tensor = get_input_img(batch_size=batch_size)
     output_q = pybuda.run_inference(tt_model, inputs=([img_tensor]))
-    output = output_q.get()[0].value()
+    output = output_q.get()
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
 
     # Data postprocessing
-    probabilities = torch.nn.functional.softmax(output[0])
-    print("PROB:", probabilities.shape)
+    probabilities = torch.nn.functional.softmax(output[0].value(), dim=1)
 
     # Get ImageNet class mappings
     url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
     image_classes = urllib.request.urlopen(url)
     categories = [s.decode("utf-8").strip() for s in image_classes.readlines()]
 
-    # Print top categories per image
-    top5_prob, top5_catid = torch.topk(probabilities, 5)
-    for i in range(top5_prob.size(0)):
-        print(categories[top5_catid[i]], top5_prob[i].item())
+    # Get top-k prediction
+    top1_prob, top1_catid = torch.topk(probabilities, 1)
+    predicted_label = [categories[cat_id] for cat_id in top1_catid]
+
+    # Results
+    for sample in range(batch_size):
+        print(
+            f"Sample ID: {sample} | Predicted Label: {predicted_label[sample]} | Predicted Probability: {top1_prob[sample].item():.2f}"
+        )
 
 
 if __name__ == "__main__":

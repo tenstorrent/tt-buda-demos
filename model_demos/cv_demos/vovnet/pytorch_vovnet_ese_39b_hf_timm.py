@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # VoVNet Model V2
 
 import os
@@ -30,10 +33,12 @@ def preprocess_timm_model(model_name):
     return model, img_tensor
 
 
-def run_vovnet_ese_39b_timm_pytorch():
+def run_vovnet_ese_39b_timm_pytorch(batch_size=1):
 
     model_name = "ese_vovnet39b"
     model, img_tensor = preprocess_timm_model(model_name)
+    input_batch = [img_tensor] * batch_size  # create a mini-batch as expected by the model
+    batch_input = torch.cat(input_batch, dim=0)
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -46,20 +51,30 @@ def run_vovnet_ese_39b_timm_pytorch():
     tt_model = pybuda.PyTorchModule(model_name + "_pt", model)
 
     # Run inference on Tenstorrent device
-    output_q = pybuda.run_inference(tt_model, inputs=([img_tensor]))
-    output = output_q.get()[0].value()
+    output_q = pybuda.run_inference(tt_model, inputs=([batch_input]))
+    output = output_q.get()
 
-    probabilities = torch.nn.functional.softmax(output[0], dim=0)
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
+    # The output has unnormalized scores. To get probabilities, you can run a softmax on it.
+    probabilities = torch.nn.functional.softmax(output[0].value(), dim=1)
 
     # Get ImageNet class mappings
     url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
     image_classes = urllib.request.urlopen(url)
     categories = [s.decode("utf-8").strip() for s in image_classes.readlines()]
 
-    # Print top categories per image
+    # Show top categories per image
     top5_prob, top5_catid = torch.topk(probabilities, 5)
-    for i in range(top5_prob.size(0)):
-        print(categories[top5_catid[i]], top5_prob[i].item())
+    for sample in range(batch_size):
+        result = {}  # reset at the start of each new sample
+        for i in range(top5_prob.size(1)):
+            result[categories[top5_catid[sample][i]]] = top5_prob[sample][i].item()
+        print("Sample ID: ", sample, "| Result: ", result)
 
 
 if __name__ == "__main__":

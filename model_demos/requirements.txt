@@ -7,6 +7,7 @@ torchxrayvision==0.0.39  # For DenseNet
 yolov5==7.0.9  # For YOLOv5
 soundfile==0.12.1  # For Whisper
 librosa==0.10.0  # For Whisper
-numba==0.53.1  # For Whisper
 segmentation-models-pytorch==0.3.3  # For U-Net
-diffusers==0.14.0  # For Stable Diffusion
+diffusers==0.27.2  # For Stable Diffusion
+yolov6detect==0.4.1 # For YOLOv6
+datasets==2.16.1

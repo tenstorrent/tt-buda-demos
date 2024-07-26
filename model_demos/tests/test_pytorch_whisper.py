@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 
 from audio_demos.whisper.pytorch_whisper_generation import run_whisper_generation
@@ -13,5 +16,5 @@ variants = [
 
 @pytest.mark.parametrize("variant", variants, ids=variants)
 @pytest.mark.whisper
-def test_whisper_generation_pytorch(clear_pybuda, variant):
-    run_whisper_generation(variant)
+def test_whisper_generation_pytorch(clear_pybuda, test_device, variant, batch_size):
+    run_whisper_generation(variant, batch_size=batch_size)

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 
 from cv_demos.hrnet.pytorch_hrnet_osmr import run_hrnet_osmr_pytorch
@@ -30,11 +33,11 @@ variants_timm = [
 
 @pytest.mark.parametrize("variant", variants_osmr, ids=variants_osmr)
 @pytest.mark.hrnet
-def test_hrnet_osmr_pytorch(clear_pybuda, variant):
-    run_hrnet_osmr_pytorch(variant)
+def test_hrnet_osmr_pytorch(clear_pybuda, test_device, variant, batch_size):
+    run_hrnet_osmr_pytorch(variant, batch_size=batch_size)
 
 
 @pytest.mark.parametrize("variant", variants_timm, ids=variants_timm)
 @pytest.mark.hrnet
-def test_hrnet_timm_pytorch(clear_pybuda, variant):
-    run_hrnet_timm_pytorch(variant)
+def test_hrnet_timm_pytorch(clear_pybuda, test_device, variant, batch_size):
+    run_hrnet_timm_pytorch(variant, batch_size=batch_size)

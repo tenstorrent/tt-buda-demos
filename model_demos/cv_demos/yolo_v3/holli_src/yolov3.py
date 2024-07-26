@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2018 Olli Huotari
+# SPDX-License-Identifier: MIT
+
 import torch
 import torch.nn as nn
 
@@ -74,7 +77,6 @@ class Darknet(nn.Module):
         self.base = ConvBN(3, nf, kernel_size=3, stride=1)  # , padding=1)
         self.layers = []
         for i, nb in enumerate(num_blocks):
-            # dn_layer = make_group_layer(nf, nb, stride=(1 if i==-1 else 2))
             dn_layer = self.make_group_layer(nf, nb, stride=2)
             self.add_module(f"darknet_{i}", dn_layer)
             self.layers.append(dn_layer)

@@ -1,13 +1,17 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # ALBERT demo script - Masked Language Modeling
 
 import os
 
 import pybuda
+import torch
 from pybuda._C.backend_api import BackendDevice
 from transformers import AlbertForMaskedLM, AlbertTokenizer
 
 
-def run_albert_masked_lm_pytorch(size="base", variant="v2"):
+def run_albert_masked_lm_pytorch(size="base", variant="v2", batch_size=1):
     available_devices = pybuda.detect_available_devices()
 
     # Set PyBUDA configuration parameters
@@ -59,7 +63,7 @@ def run_albert_masked_lm_pytorch(size="base", variant="v2"):
     model = AlbertForMaskedLM.from_pretrained(model_ckpt)
 
     # Load data sample
-    sample_text = "The capital of [MASK] is Paris."
+    sample_text = ["The capital of [MASK] is Paris."] * batch_size
 
     # Data preprocessing
     input_tokens = tokenizer(
@@ -77,20 +81,28 @@ def run_albert_masked_lm_pytorch(size="base", variant="v2"):
     )
     output = output_q.get()
 
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
+
     # Output processing
     output_pb = output[0].value()
     scores = output_pb.softmax(dim=-1)
-    mask_token_index = (input_tokens["input_ids"] == tokenizer.mask_token_id)[0].nonzero(as_tuple=True)[0]
-    predicted_token_rankings = output_pb[0, mask_token_index].argsort(axis=-1, descending=True)[0]
+    for idx, score in enumerate(scores):
+        mask_token_index = (input_tokens["input_ids"] == tokenizer.mask_token_id)[idx].nonzero(as_tuple=True)[0]
+        predicted_token_rankings = output_pb[idx, mask_token_index].argsort(axis=-1, descending=True)[0]
 
-    # Report output
-    top_k = 5
-    print(f"Masked text: {sample_text}")
-    print(f"Top {top_k} predictions:")
-    for i in range(top_k):
-        prediction = tokenizer.decode(predicted_token_rankings[i])
-        score = scores[0, mask_token_index, predicted_token_rankings[i]]
-        print(f"{i+1}: {prediction} (score = {round(float(score), 3)})")
+        # Report output
+        top_k = 5
+        print(f"Sample ID: {idx}")
+        print(f"Masked text: {sample_text[idx]}")
+        print(f"Top {top_k} predictions:")
+        for i in range(top_k):
+            prediction = tokenizer.decode(predicted_token_rankings[i])
+            pred_score = score[mask_token_index, predicted_token_rankings[i]]
+            print(f"{i+1}: {prediction} (score = {round(float(pred_score), 3)})")
 
 
 if __name__ == "__main__":

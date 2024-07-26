@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 
 from nlp_demos.squeezebert.pytorch_squeezebert_sequence_classification import (
@@ -6,5 +9,5 @@ from nlp_demos.squeezebert.pytorch_squeezebert_sequence_classification import (
 
 
 @pytest.mark.squeezebert
-def test_squeezebert_sequence_classification_pytorch(clear_pybuda):
-    run_squeezebert_sequence_classification_pytorch()
+def test_squeezebert_sequence_classification_pytorch(clear_pybuda, test_device, batch_size):
+    run_squeezebert_sequence_classification_pytorch(batch_size=batch_size)
