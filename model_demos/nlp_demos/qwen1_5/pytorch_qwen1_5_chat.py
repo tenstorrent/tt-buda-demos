@@ -15,7 +15,7 @@ def parse_chat_completion(text: str):
     
     return messages
 
-def run_qwen_chat():
+def run_qwen1_5_chat():
     os.environ["TT_BACKEND_TIMEOUT"] = '0'
 
     # Set PyBuda configurations
@@ -86,4 +86,4 @@ def run_qwen_chat():
         print()
 
 if __name__ == "__main__":
-    run_qwen_chat()
+    run_qwen1_5_chat()
