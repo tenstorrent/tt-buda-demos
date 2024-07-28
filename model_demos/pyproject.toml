@@ -89,5 +89,5 @@ markers = [
     "monodle: tests that involve Monodle",
     "phi2: tests that involve Phi2",
     "yolox: tests that involve YOLOX",
-    "qwen1_5: tests that involve Qwen1_5",
+    "qwen1_5: tests that involve Qwen1.5",
 ]
