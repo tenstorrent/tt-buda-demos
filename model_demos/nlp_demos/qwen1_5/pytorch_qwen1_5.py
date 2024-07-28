@@ -4,7 +4,7 @@ import pybuda
 from transformers import Qwen2ForCausalLM, Qwen2Tokenizer, Qwen2Config
 from pybuda.transformers.pipeline import pipeline as pybuda_pipeline
 
-def run_qwen_causal_lm(batch_size=1):
+def run_qwen1_5_causal_lm(batch_size=1):
     os.environ["TT_BACKEND_TIMEOUT"] = '0'
 
     # Set PyBuda configurations
@@ -56,4 +56,4 @@ def run_qwen_causal_lm(batch_size=1):
 
 
 if __name__ == "__main__":
-    run_qwen_causal_lm()
+    run_qwen1_5_causal_lm()
