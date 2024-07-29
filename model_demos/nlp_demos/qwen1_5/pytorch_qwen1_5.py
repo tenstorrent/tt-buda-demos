@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
+# Qwen1.5-0.5B-Chat Demo - Text Generation
+
 import os
 import pybuda
 
