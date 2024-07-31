@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
+# Qwen1.5-0.5B-Chat Demo - Chat
+
 import os
 import pybuda
 import re
@@ -26,13 +31,17 @@ def run_qwen1_5_chat():
 
     # Setup model configuration
     config = Qwen2Config.from_pretrained("Qwen/Qwen1.5-0.5B-Chat")
-    config.use_cache = True
-    config.return_dict = True
+    config.use_cache = False
+    config.return_dict = False
 
     # Load model and tokenizer with config
     model = Qwen2ForCausalLM.from_pretrained("Qwen/Qwen1.5-0.5B-Chat", config=config)
     tokenizer = Qwen2Tokenizer.from_pretrained("Qwen/Qwen1.5-0.5B-Chat")
     tokenizer.pad_token, tokenizer.pad_token_id = (tokenizer.eos_token, tokenizer.eos_token_id)
+
+    # Disable DynamicCache
+    # See: https://github.com/tenstorrent/tt-buda/issues/42
+    model._supports_cache_class = False
 
     # Sample chat messages
     batch_messages = [
