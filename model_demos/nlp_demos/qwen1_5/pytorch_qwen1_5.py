@@ -23,7 +23,7 @@ def run_qwen1_5_causal_lm(batch_size=1):
     config.use_cache = False
     config.return_dict = False
 
-    # Load moadl and tokenizer with config
+    # Load model and tokenizer with config
     model = Qwen2ForCausalLM.from_pretrained("Qwen/Qwen1.5-0.5B", config=config)
     tokenizer = Qwen2Tokenizer.from_pretrained("Qwen/Qwen1.5-0.5B")
     tokenizer.pad_token, tokenizer.pad_token_id = (tokenizer.eos_token, tokenizer.eos_token_id)
