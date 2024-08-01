@@ -50,6 +50,15 @@ def run_segformer_semseg_pytorch(variant="nvidia/segformer-b0-finetuned-ade-512-
             ]:
                 compiler_cfg.amp_level = 1
 
+            if variant == "nvidia/segformer-b2-finetuned-ade-512-512":
+                compiler_cfg.place_on_new_epoch("concatenate_1098.dc.concatenate.0")
+
+            elif variant == "nvidia/segformer-b3-finetuned-ade-512-512":
+                compiler_cfg.place_on_new_epoch("concatenate_1890.dc.concatenate.0")
+
+            elif variant == "nvidia/segformer-b4-finetuned-ade-512-512":
+                compiler_cfg.place_on_new_epoch("concatenate_2748.dc.concatenate.0")
+
     # Load the model from HuggingFace
     model = SegformerForSemanticSegmentation.from_pretrained(variant)
     model.eval()
