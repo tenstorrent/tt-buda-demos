@@ -88,4 +88,5 @@ markers = [
     "segformer: tests that involve SegFormer",
     "monodle: tests that involve Monodle",
     "phi2: tests that involve Phi2",
+    "yolox: tests that involve YOLOX",
 ]

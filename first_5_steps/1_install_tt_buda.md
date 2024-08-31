@@ -44,29 +44,11 @@ If you would like to run PyBuda in a Python virtualenv, then follow the instruct
 
 ### Setup HugePages
 
-1. Download latest [setup_hugepages.py](https://github.com/tenstorrent/tt-metal/blob/main/infra/machine_setup/scripts/setup_hugepages.py) script.
-
-    ```sh
-    wget https://raw.githubusercontent.com/tenstorrent/tt-metal/main/infra/machine_setup/scripts/setup_hugepages.py
-    ```
-
-2. Run first setup script.
-
-    ```sh
-    sudo -E python3 setup_hugepages.py first_pass
-    ```
-
-3. Reboot
-
-    ```sh
-    sudo reboot now
-    ```
-
-4. Run second setup script & check setup.
-
-    ```sh
-    sudo -E python3 setup_hugepages.py enable && sudo -E python3 setup_hugepages.py check
-    ```
+```bash
+git clone https://github.com/tenstorrent/tt-system-tools.git
+cd tt-system-tools
+sudo ./hugepages-setup.sh
+```
 
 ### PCI Driver Installation
 
