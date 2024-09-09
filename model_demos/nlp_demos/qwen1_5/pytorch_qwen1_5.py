@@ -4,13 +4,14 @@
 # Qwen1.5-0.5B Demo - Text Generation
 
 import os
-import pybuda
 
-from transformers import Qwen2ForCausalLM, Qwen2Tokenizer, Qwen2Config
+import pybuda
 from pybuda.transformers.pipeline import pipeline as pybuda_pipeline
+from transformers import Qwen2Config, Qwen2ForCausalLM, Qwen2Tokenizer
+
 
 def run_qwen1_5_causal_lm(batch_size=1):
-    os.environ["TT_BACKEND_TIMEOUT"] = '0'
+    os.environ["TT_BACKEND_TIMEOUT"] = "0"
 
     # Set PyBuda configurations
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -36,11 +37,7 @@ def run_qwen1_5_causal_lm(batch_size=1):
     prompt = ["My name is Jim Keller and"] * batch_size
 
     # Initialize pipeline
-    text_generator = pybuda_pipeline(
-        "text-generation",
-        model=model,
-        tokenizer=tokenizer
-    )
+    text_generator = pybuda_pipeline("text-generation", model=model, tokenizer=tokenizer)
 
     # Inference on TT device
     response = text_generator(
@@ -54,7 +51,7 @@ def run_qwen1_5_causal_lm(batch_size=1):
         no_repeat_ngram_size=5,
         pad_token_id=tokenizer.pad_token_id,
         eos_token_id=tokenizer.eos_token_id,
-        early_stopping=True
+        early_stopping=True,
     )
 
     # Display Responses
