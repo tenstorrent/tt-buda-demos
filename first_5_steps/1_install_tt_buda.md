@@ -169,7 +169,7 @@ For example, to run on an Ubuntu version 20.04 on a Grayskull device, use this c
 sudo docker pull ghcr.io/tenstorrent/tt-buda/ubuntu-20-04-amd64/gs:<TAG>
 ```
 
-where `<TAG>` is the version number i.e. `v0.12.3`.
+where `<TAG>` is the release version number from: <https://github.com/tenstorrent/tt-buda/tags>
 
 #### Step 2. Run the container
 
