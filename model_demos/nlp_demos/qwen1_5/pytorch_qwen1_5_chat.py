@@ -4,24 +4,26 @@
 # Qwen1.5-0.5B-Chat Demo - Chat
 
 import os
-import pybuda
 import re
 
-from transformers import Qwen2ForCausalLM, Qwen2Tokenizer, Qwen2Config
+import pybuda
 from pybuda.transformers.pipeline import pipeline as pybuda_pipeline
+from transformers import Qwen2Config, Qwen2ForCausalLM, Qwen2Tokenizer
+
 
 def parse_chat_completion(text: str):
-    pattern = r'<\|im_start\|>\s*(\w+)\s*([\s\S]*?)\s*(?:<\|im_end\|>|$)'
+    pattern = r"<\|im_start\|>\s*(\w+)\s*([\s\S]*?)\s*(?:<\|im_end\|>|$)"
     matches = re.findall(pattern, text, re.DOTALL)
-    
+
     messages = []
     for role, content in matches:
         messages.append({"role": role, "content": content.strip()})
-    
+
     return messages
 
+
 def run_qwen1_5_chat():
-    os.environ["TT_BACKEND_TIMEOUT"] = '0'
+    os.environ["TT_BACKEND_TIMEOUT"] = "0"
 
     # Set PyBuda configurations
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -47,27 +49,19 @@ def run_qwen1_5_chat():
     batch_messages = [
         [
             {"role": "system", "content": "You are Jim Keller, the CEO of Tenstorrent"},
-            {"role": "user", "content": "Introduce yourself please!"}
+            {"role": "user", "content": "Introduce yourself please!"},
         ]
     ]
     batch_size = len(batch_messages)
 
     # Apply chat template to each batch
     chat_texts = [
-        tokenizer.apply_chat_template(
-            messages,
-            tokenize=False,
-            add_generation_prompt=True
-        )
+        tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         for messages in batch_messages[:batch_size]
     ]
 
     # Initialize pipeline
-    text_generator = pybuda_pipeline(
-        "text-generation",
-        model=model,
-        tokenizer=tokenizer
-    )
+    text_generator = pybuda_pipeline("text-generation", model=model, tokenizer=tokenizer)
 
     # Inference on TT device
     responses = text_generator(
@@ -81,18 +75,19 @@ def run_qwen1_5_chat():
         no_repeat_ngram_size=5,
         pad_token_id=tokenizer.pad_token_id,
         eos_token_id=tokenizer.eos_token_id,
-        early_stopping=True
+        early_stopping=True,
     )
 
     # Display Responses
     for batch_id in range(batch_size):
         print(f"Batch: {batch_id}")
-        raw_text = responses[batch_id][0]['generated_text']
+        raw_text = responses[batch_id][0]["generated_text"]
         parsed_messages = parse_chat_completion(raw_text)
 
         for message in parsed_messages:
             print(f"{message['role'].capitalize()}: {message['content']}")
         print()
+
 
 if __name__ == "__main__":
     run_qwen1_5_chat()

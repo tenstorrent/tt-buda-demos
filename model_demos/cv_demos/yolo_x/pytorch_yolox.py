@@ -2,21 +2,24 @@
 
 import subprocess
 
-subprocess.run(["pip", "install", "yolox==0.3.0", "--no-deps"])  # Install yolox==0.3.0 without installing its dependencies
+subprocess.run(
+    ["pip", "install", "yolox==0.3.0", "--no-deps"]
+)  # Install yolox==0.3.0 without installing its dependencies
 
-import pybuda
-import torch
+import os
+
 import cv2
 import numpy as np
+import pybuda
 import requests
-import os
+import torch
 from pybuda._C.backend_api import BackendDevice
 
 torch.multiprocessing.set_sharing_strategy("file_system")
-from yolox.exp import get_exp
 from yolox.data.data_augment import preproc as preprocess
 from yolox.data.datasets import COCO_CLASSES
-from yolox.utils import multiclass_nms, demo_postprocess
+from yolox.exp import get_exp
+from yolox.utils import demo_postprocess, multiclass_nms
 
 
 def run_yolox_pytorch(variant):
@@ -37,33 +40,61 @@ def run_yolox_pytorch(variant):
                 os.environ["PYBUDA_FORK_JOIN_SKIP_EXPANDING_BUFFERS"] = "1"
 
             if variant in ["yolox_nano", "yolox_tiny"]:
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.4.lc2", "t_stream_shape", (1, 2))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.4.lc2", "t_stream_shape", (1, 2))
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.4.lc2", "t_stream_shape", (1, 2)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.4.lc2", "t_stream_shape", (1, 2)
+                )
                 os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "81920"
                 if variant == "yolox_nano":
-                    compiler_cfg.balancer_op_override("max_pool2d_630.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (1, 1))
+                    compiler_cfg.balancer_op_override(
+                        "max_pool2d_630.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (1, 1)
+                    )
                 elif variant == "yolox_tiny":
-                    compiler_cfg.balancer_op_override("max_pool2d_454.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (1, 1))
+                    compiler_cfg.balancer_op_override(
+                        "max_pool2d_454.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (1, 1)
+                    )
 
             elif variant == "yolox_s":
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.5.dc.reshape.0.dc.sparse_matmul.4.lc2", "t_stream_shape", (1, 4))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.4.lc2", "t_stream_shape", (1, 4))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.10.lc2", "t_stream_shape", (1, 4))
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.5.dc.reshape.0.dc.sparse_matmul.4.lc2", "t_stream_shape", (1, 4)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.4.lc2", "t_stream_shape", (1, 4)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.10.lc2", "t_stream_shape", (1, 4)
+                )
                 compiler_cfg.balancer_op_override("conv2d_33.dc.matmul.8", "t_stream_shape", (1, 1))
                 os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "4096"
                 compiler_cfg.place_on_new_epoch("concatenate_1163.dc.sparse_matmul.11.lc2")
-                compiler_cfg.balancer_op_override("max_pool2d_454.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "grid_shape", (1, 2))
+                compiler_cfg.balancer_op_override(
+                    "max_pool2d_454.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "grid_shape", (1, 2)
+                )
 
             elif variant == "yolox_m":
                 compiler_cfg.place_on_new_epoch("conv2d_811.dc.matmul.8")
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.4.lc2", "t_stream_shape", (1, 4))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.4.lc2", "t_stream_shape", (1, 6))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.5.dc.sparse_matmul.9.dc.sparse_matmul.1.lc2", "t_stream_shape", (5, 1))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.5.dc.reshape.0.dc.sparse_matmul.10.lc2", "t_stream_shape", (1, 4))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.10.lc2", "t_stream_shape", (1, 4))
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.4.lc2", "t_stream_shape", (1, 4)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.4.lc2", "t_stream_shape", (1, 6)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.5.dc.sparse_matmul.9.dc.sparse_matmul.1.lc2", "t_stream_shape", (5, 1)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.5.dc.reshape.0.dc.sparse_matmul.10.lc2", "t_stream_shape", (1, 4)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.10.lc2", "t_stream_shape", (1, 4)
+                )
                 compiler_cfg.place_on_new_epoch("concatenate_1530.dc.sparse_matmul.11.lc2")
                 os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "4096"
-                compiler_cfg.balancer_op_override("max_pool2d_671.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (169, 1))
+                compiler_cfg.balancer_op_override(
+                    "max_pool2d_671.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (169, 1)
+                )
 
             elif variant == "yolox_l":
                 os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "245760"
@@ -75,48 +106,98 @@ def run_yolox_pytorch(variant):
                 compiler_cfg.place_on_new_epoch("conv2d_1147.dc.matmul.11")
 
             elif variant == "yolox_x":
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.5.dc.reshape.0.dc.sparse_matmul.4.lc2", "t_stream_shape", (1, 4))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.10.lc2", "t_stream_shape", (1, 4))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.3.dc.sparse_matmul.9.dc.sparse_matmul.1.lc2", "t_stream_shape", (5, 1))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.10.lc2", "t_stream_shape", (1, 4))
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.5.dc.reshape.0.dc.sparse_matmul.4.lc2", "t_stream_shape", (1, 4)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.10.lc2", "t_stream_shape", (1, 4)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.3.dc.sparse_matmul.9.dc.sparse_matmul.1.lc2", "t_stream_shape", (5, 1)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.10.lc2", "t_stream_shape", (1, 4)
+                )
                 compiler_cfg.place_on_new_epoch("concatenate_2264.dc.sparse_matmul.11.lc2")
-                compiler_cfg.balancer_op_override("max_pool2d_1104.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (13, 1))
+                compiler_cfg.balancer_op_override(
+                    "max_pool2d_1104.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (13, 1)
+                )
 
         elif available_devices[0] == BackendDevice.Grayskull:
 
             if variant == "yolox_nano":
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.5.dc.reshape.0.dc.sparse_matmul.4.lc2", "grid_shape", (4, 1))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.4.lc2", "grid_shape", (4, 1))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.4.lc2", "grid_shape", (4, 1))
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.5.dc.reshape.0.dc.sparse_matmul.4.lc2", "grid_shape", (4, 1)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.4.lc2", "grid_shape", (4, 1)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.4.lc2", "grid_shape", (4, 1)
+                )
                 os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "81920"
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.14.lc2", "t_stream_shape", (1, 13))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.14.lc2", "t_stream_shape", (1, 13))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.5.dc.reshape.0.dc.sparse_matmul.14.lc2", "t_stream_shape", (1, 13))
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.14.lc2", "t_stream_shape", (1, 13)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.14.lc2", "t_stream_shape", (1, 13)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.5.dc.reshape.0.dc.sparse_matmul.14.lc2", "t_stream_shape", (1, 13)
+                )
 
             elif variant == "yolox_tiny":
                 os.environ["TT_BACKEND_OVERLAY_MAX_EXTRA_BLOB_SIZE"] = "81920"
-                compiler_cfg.balancer_op_override("max_pool2d_454.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (13, 1))
+                compiler_cfg.balancer_op_override(
+                    "max_pool2d_454.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (13, 1)
+                )
                 compiler_cfg.balancer_op_override("_fused_op_34", "t_stream_shape", (1, 1))
 
             elif variant == "yolox_s":
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.5.dc.sparse_matmul.9.dc.sparse_matmul.1.lc2", "t_stream_shape", (10, 1))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.5.dc.reshape.0.dc.sparse_matmul.10.lc2", "t_stream_shape", (1, 5))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.10.lc2", "t_stream_shape", (1, 5))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.10.lc2", "t_stream_shape", (1, 5))
-                compiler_cfg.balancer_op_override("max_pool2d_454.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (169, 1))
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.5.dc.sparse_matmul.9.dc.sparse_matmul.1.lc2", "t_stream_shape", (10, 1)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.5.dc.reshape.0.dc.sparse_matmul.10.lc2", "t_stream_shape", (1, 5)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.10.lc2", "t_stream_shape", (1, 5)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.10.lc2", "t_stream_shape", (1, 5)
+                )
+                compiler_cfg.balancer_op_override(
+                    "max_pool2d_454.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2", "t_stream_shape", (169, 1)
+                )
 
             elif variant == "yolox_m":
                 os.environ["PYBUDA_FORK_JOIN_BUF_QUEUES"] = "1"
                 os.environ["PYBUDA_FORK_JOIN_EXPAND_OUTPUT_BUFFERS"] = "1"
                 os.environ["PYBUDA_FORK_JOIN_SKIP_EXPANDING_BUFFERS"] = "1"
-                compiler_cfg.balancer_op_override("concatenate_1530.dc.concatenate.7_to_concatenate_1530.dc.sparse_matmul.11.lc2_1_serialized_dram_queue.before_padded_node.nop_0", "grid_shape", (1, 1))
+                compiler_cfg.balancer_op_override(
+                    "concatenate_1530.dc.concatenate.7_to_concatenate_1530.dc.sparse_matmul.11.lc2_1_serialized_dram_queue.before_padded_node.nop_0",
+                    "grid_shape",
+                    (1, 1),
+                )
                 compiler_cfg.place_on_new_epoch("concatenate_1530.dc.sparse_matmul.11.lc2")
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.5.dc.reshape.0.dc.sparse_matmul.4.lc2", "grid_shape", (4, 2))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.4.lc2", "grid_shape", (4, 2))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.4.lc2", "grid_shape", (4, 2))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.5.dc.reshape.0.dc.sparse_matmul.10.lc2", "grid_shape", (1, 5))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.10.lc2", "grid_shape", (1, 5))
-                compiler_cfg.balancer_op_override("conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.10.lc2", "grid_shape", (1, 5))
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.5.dc.reshape.0.dc.sparse_matmul.4.lc2", "grid_shape", (4, 2)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.4.lc2", "grid_shape", (4, 2)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.4.lc2", "grid_shape", (4, 2)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.5.dc.reshape.0.dc.sparse_matmul.10.lc2", "grid_shape", (1, 5)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.3.dc.reshape.0.dc.sparse_matmul.10.lc2", "grid_shape", (1, 5)
+                )
+                compiler_cfg.balancer_op_override(
+                    "conv2d_7.dc.conv2d.1.dc.reshape.0.dc.sparse_matmul.10.lc2", "grid_shape", (1, 5)
+                )
                 compiler_cfg.place_on_new_epoch("max_pool2d_671.dc.sparse_matmul.5.dc.sparse_matmul.1.lc2")
 
     # prepare model
