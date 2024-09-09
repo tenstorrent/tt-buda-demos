@@ -14,7 +14,7 @@ from pybuda import TFLiteModule
 from pybuda._C.backend_api import BackendDevice
 
 
-def run_efficientnet_lite4_1x1():
+def run_efficientnet_lite4_1x1(batch_size=1):
 
     # Device specific configurations
     available_devices = pybuda.detect_available_devices()
@@ -50,7 +50,7 @@ def run_efficientnet_lite4_1x1():
     tt_model = TFLiteModule("tflite_efficientnet_lite4", tflite_path)
 
     # STEP 3: Run inference on Tenstorrent device
-    input_shape = (1, 320, 320, 3)
+    input_shape = (batch_size, 320, 320, 3)
     input_tensor = torch.rand(input_shape)
 
     output_q = pybuda.run_inference(tt_model, inputs=([input_tensor]))
