@@ -45,10 +45,9 @@ def run_pose_landmark_lite_1x1(batch_size=1):
     tt_model = TFLiteModule("tflite_pose_landmark_light", tflite_path)
 
     # STEP 3: Run inference on Tenstorrent device
-    input_shape = (1, 256, 256, 3)
+    input_shape = (batch_size, 256, 256, 3)
     input_tensor = torch.rand(input_shape)
-    batch_tensor = torch.cat([input_tensor] * batch_size, dim=0)
-    output_q = pybuda.run_inference(tt_model, inputs=([batch_tensor]))
+    output_q = pybuda.run_inference(tt_model, inputs=([input_tensor]))
     output = output_q.get()
 
     # Combine outputs for data parallel runs
