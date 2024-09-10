@@ -28,6 +28,7 @@ Once you have identified the release version you would like to install, you can 
    3. [Device Firmware Update](#device-firmware-update)
    4. [Backend Compiler Dependencies](#backend-compiler-dependencies)
    5. [TT-SMI](#tt-smi)
+   6. [Topology (TT-LoudBox/TT-QuietBox Only)](#tt-topology-tt-loudboxtt-quietbox-systems-only)
 2. [PyBuda Installation](#pybuda-installation)
    1. [Python Environment Installation](#python-environment-installation)
    2. [Docker Container Installation](#docker-container-installation)
@@ -92,6 +93,10 @@ rm libyaml-cpp-dev_0.6.2-4ubuntu1_amd64.deb libyaml-cpp0.6_0.6.2-4ubuntu1_amd64.
 ### TT-SMI
 
 Please navigate to [tt-smi](https://github.com/tenstorrent/tt-smi) homepage and follow instructions within the README.
+
+### TT-Topology (TT-LoudBox/TT-QuietBox Systems Only)
+
+If you are running on a TT-LoudBox or TT-QuietBox system, please navigate to [tt-topology](https://github.com/tenstorrent/tt-topology) homepage and follow instructions within the README.
 
 ## PyBuda Installation
 
