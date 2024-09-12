@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+# SPDX-License-Identifier: Apache-2.0
+
 # yolox demo script
 
 import subprocess
@@ -22,7 +25,7 @@ from yolox.exp import get_exp
 from yolox.utils import demo_postprocess, multiclass_nms
 
 
-def run_yolox_pytorch(variant):
+def run_yolox_pytorch(variant, batch_size=1):
 
     # Set PyBuda configuration parameters
     compiler_cfg = pybuda.config._get_global_compiler_config()
@@ -234,10 +237,17 @@ def run_yolox_pytorch(variant):
     img, ratio = preprocess(img, input_shape)
     img_tensor = torch.from_numpy(img)
     img_tensor = img_tensor.unsqueeze(0)
+    batch_input = torch.cat([img_tensor] * batch_size, dim=0)
 
     # Run inference on Tenstorrent device
-    output_q = pybuda.run_inference(tt_model, inputs=[(img_tensor)])
+    output_q = pybuda.run_inference(tt_model, inputs=[(batch_input)])
     output = output_q.get()
+
+    # Combine outputs for data parallel runs
+    if os.environ.get("PYBUDA_N300_DATA_PARALLEL", "0") == "1":
+        concat_tensor = torch.cat((output[0].to_pytorch(), output[1].to_pytorch()), dim=0)
+        buda_tensor = pybuda.Tensor.create_from_torch(concat_tensor)
+        output = [buda_tensor]
 
     # Post-processing
     for i in range(len(output)):
