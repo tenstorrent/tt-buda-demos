@@ -22,7 +22,7 @@ def parse_chat_completion(text: str):
     return messages
 
 
-def run_qwen1_5_chat():
+def run_qwen1_5_chat(batch_size=1):
     os.environ["TT_BACKEND_TIMEOUT"] = "0"
 
     # Set PyBuda configurations
@@ -51,8 +51,8 @@ def run_qwen1_5_chat():
             {"role": "system", "content": "You are Jim Keller, the CEO of Tenstorrent"},
             {"role": "user", "content": "Introduce yourself please!"},
         ]
+        * batch_size
     ]
-    batch_size = len(batch_messages)
 
     # Apply chat template to each batch
     chat_texts = [
