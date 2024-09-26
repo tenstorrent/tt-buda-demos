@@ -46,9 +46,22 @@ If you would like to run PyBuda in a Python virtualenv, then follow the instruct
 ### Setup HugePages
 
 ```bash
+# Clone System Tools Repo
 git clone https://github.com/tenstorrent/tt-system-tools.git
 cd tt-system-tools
+chmod +x hugepages-setup.sh
 sudo ./hugepages-setup.sh
+
+# Install `.deb`
+wget https://github.com/tenstorrent/tt-system-tools/releases/download/upstream%2F1.1/tenstorrent-tools_1.1-5_all.deb
+sudo dpkg -i tenstorrent-tools_1.1-5_all.deb
+
+# Start Services
+sudo systemctl enable --now tenstorrent-hugepages.service
+sudo systemctl enable --now 'dev-hugepages\x2d1G.mount'
+
+# System Reboot
+sudo reboot
 ```
 
 ### PCI Driver Installation
