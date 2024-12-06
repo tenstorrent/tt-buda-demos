@@ -142,7 +142,7 @@ source env/bin/activate
 
 ```bash
 pip install --upgrade pip==24.0
-pip install pybuda-<version>.whl tvm-<version>.whl torchvision-<version>.whl
+pip install torchvision-<version>.whl pybuda-<version>.whl tvm-<version>.whl 
 ```
 
 The `pybuda-<version>.whl` file contains the PyBuda library, the `tvm-<version>.whl` file contains the latest TVM downloaded release, and the `torchvision-<version>.whl` file bundles the torchvision library.
