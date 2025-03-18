@@ -5,7 +5,7 @@
 - [Introduction](#introduction)
 - [First 5 Things To-Do](first_5_steps/)
 - [Model Demos](model_demos/)
-- [Documentation](https://docs.tenstorrent.com/tenstorrent/)
+- [Documentation](https://docs.tenstorrent.com/)
 - [FAQ & Troubleshooting](FAQ.md)
 - [Communication](#communication)
 - [Contributing](#contributing)
@@ -36,7 +36,7 @@ For additional example code for running some popular AI/ML models, please visit 
 
 ## Documentation
 
-Please refer to the [official documentation website](https://docs.tenstorrent.com/tenstorrent/).
+Please refer to the [official documentation website](https://docs.tenstorrent.com/).
 
 ## FAQ & Troubleshooting
 
