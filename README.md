@@ -1,5 +1,7 @@
 # TT-Buda Demos
 
+> **IMPORTANT:** TT-Buda is no longer being actively developed. Please refer to our [MLIR Compiler Forge demos](https://github.com/tenstorrent/tt-forge/tree/main/demos) instead.
+
 ## Table of Contents
 
 - [Introduction](#introduction)
